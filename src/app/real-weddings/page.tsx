@@ -1,22 +1,25 @@
 import React from "react";
-import { Container } from "@/components/ui/Container";
-import { Section } from "@/components/ui/Section";
-import { Heading } from "@/components/ui/Heading";
+import type { Metadata } from "next";
+import {
+  RealWeddingsHero,
+  RealWeddingsIntro,
+  RealWeddingsDirectory,
+  RealWeddingsCTA,
+} from "@/components/sections/real-weddings";
+
+export const metadata: Metadata = {
+  title: "Real Weddings — Wedora | Luxury Wedding Stories Archive",
+  description:
+    "Explore Wedora's editorial archive of luxury real weddings — intimate heritage, coastal modern, and traditional celebrations documented across breathtaking destinations.",
+};
 
 export default function RealWeddingsPage() {
   return (
-    <Section padding="xl">
-      <Container size="lg">
-        <div className="py-20 text-center space-y-4">
-          <span className="caption text-[var(--accent-gold)]">Route Placeholder</span>
-          <Heading as="h1" size="display-lg">
-            Real Weddings
-          </Heading>
-          <p className="body-md max-w-md mx-auto">
-            Cinematic celebrations documented across breathtaking global destinations.
-          </p>
-        </div>
-      </Container>
-    </Section>
+    <article className="min-h-screen bg-[#FAF8F5]">
+      <RealWeddingsHero />
+      <RealWeddingsIntro />
+      <RealWeddingsDirectory />
+      <RealWeddingsCTA />
+    </article>
   );
 }

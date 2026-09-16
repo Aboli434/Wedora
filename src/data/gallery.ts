@@ -1,60 +1,86 @@
-export interface GalleryItem {
+export type GalleryCategory = "CELEBRATIONS" | "DETAILS" | "PEOPLE" | "PLACES";
+
+export interface GalleryImage {
   id: string;
   src: string;
   alt: string;
-  category: string;
+  category: GalleryCategory;
+  title: string;
+  caption: string;
   location?: string;
-  aspectRatio?: string;
+  aspect?: "portrait" | "landscape" | "square";
   spanClass?: string;
 }
 
-export const GALLERY_DATA: GalleryItem[] = [
+export type GalleryItem = GalleryImage;
+
+export const GALLERY_CATEGORIES = [
+  "ALL",
+  "CELEBRATIONS",
+  "DETAILS",
+  "PEOPLE",
+  "PLACES",
+] as const;
+
+export const GALLERY_DATA: GalleryImage[] = [
   {
     id: "gallery-01",
     src: "/images/wedding/wedora-gallery-01.jpg",
-    alt: "Indian bride and groom sharing a candid wedding moment",
-    category: "MOMENTS",
-    location: "Udaipur, Rajasthan",
-    spanClass: "lg:col-span-7 lg:row-span-2 aspect-[4/3] sm:aspect-[16/10] lg:aspect-[16/11]",
+    alt: "Detailed Indian bridal adornments, jewelry, and heirloom embroidery",
+    category: "DETAILS",
+    title: "Bridal Adornments",
+    caption: "Intimate jewelry and heirloom details before the ceremony.",
+    aspect: "portrait",
+    spanClass: "lg:col-span-4 lg:row-span-2 aspect-[3/4]",
   },
   {
     id: "gallery-02",
     src: "/images/wedding/wedora-gallery-02.jpg",
-    alt: "Elegant Indian wedding ceremony beneath a floral mandap",
-    category: "CEREMONY",
-    location: "Jaipur, Rajasthan",
-    spanClass: "lg:col-span-5 aspect-[4/3]",
+    alt: "Golden hour light across heritage palatial courtyards in Rajasthan",
+    category: "PLACES",
+    title: "Courtyard Architecture",
+    caption: "Golden hour across heritage palatial courtyards.",
+    aspect: "landscape",
+    spanClass: "lg:col-span-8 aspect-[16/10]",
   },
   {
     id: "gallery-03",
     src: "/images/wedding/wedora-gallery-03.jpg",
-    alt: "Detailed bridal jewellery and embroidered wedding attire",
-    category: "COUTURE",
-    location: "Delhi, India",
-    spanClass: "lg:col-span-5 lg:row-span-2 aspect-[3/4]",
+    alt: "Handwoven marigold garlands and mandap floral design",
+    category: "DETAILS",
+    title: "Artisan Florals",
+    caption: "Handwoven marigolds and bespoke mandap installations.",
+    aspect: "landscape",
+    spanClass: "lg:col-span-8 aspect-[16/9]",
   },
   {
     id: "gallery-04",
     src: "/images/wedding/wedora-gallery-04.jpg",
-    alt: "Luxury Indian wedding tablescape with candlelight and flowers",
-    category: "DETAILS",
-    location: "Goa, India",
-    spanClass: "lg:col-span-7 aspect-[16/9]",
+    alt: "Candid glances and unscripted emotional moments between family",
+    category: "PEOPLE",
+    title: "Unscripted Emotion",
+    caption: "Quiet glances and candid joy shared between family.",
+    aspect: "portrait",
+    spanClass: "lg:col-span-4 aspect-[3/4]",
   },
   {
     id: "gallery-05",
     src: "/images/wedding/wedora-gallery-05.jpg",
-    alt: "Guests celebrating at a warm evening wedding reception",
-    category: "CELEBRATION",
-    location: "Pune, Maharashtra",
-    spanClass: "lg:col-span-6 aspect-[4/3]",
+    alt: "Sunset Pheras ceremony surrounding the sacred fire in Udaipur",
+    category: "CELEBRATIONS",
+    title: "Pheras Ceremony",
+    caption: "Sunset vows surrounding the sacred fire in Udaipur.",
+    aspect: "landscape",
+    spanClass: "lg:col-span-6 aspect-[16/10]",
   },
   {
     id: "gallery-06",
     src: "/images/wedding/wedora-gallery-06.jpg",
-    alt: "Heritage Indian palace courtyard prepared for a wedding celebration",
-    category: "ARCHITECTURE",
-    location: "Udaipur, Rajasthan",
-    spanClass: "lg:col-span-6 aspect-[4/3]",
+    alt: "Evening illuminations and sitar melodies under open midnight skies",
+    category: "CELEBRATIONS",
+    title: "Evening Illuminations",
+    caption: "Lanterns and sitar melodies under open midnight skies.",
+    aspect: "landscape",
+    spanClass: "lg:col-span-6 aspect-[16/10]",
   },
 ];
