@@ -1,22 +1,23 @@
 import React from "react";
-import { Container } from "@/components/ui/Container";
-import { Section } from "@/components/ui/Section";
-import { Heading } from "@/components/ui/Heading";
+import type { Metadata } from "next";
+import {
+  VendorsHero,
+  VendorDirectory,
+  VendorCTA,
+} from "@/components/sections/vendors";
+
+export const metadata: Metadata = {
+  title: "Vendors — Wedora | Luxury Wedding & Vendor Directory",
+  description:
+    "Explore Wedora's curated directory of premier Indian wedding artisans, photographers, planners, venues, caterers, and couturiers.",
+};
 
 export default function VendorsPage() {
   return (
-    <Section padding="xl">
-      <Container size="lg">
-        <div className="py-20 text-center space-y-4">
-          <span className="caption text-[var(--accent-gold)]">Route Placeholder</span>
-          <Heading as="h1" size="display-lg">
-            Vendors
-          </Heading>
-          <p className="body-md max-w-md mx-auto">
-            Curated network of world-class wedding artisans, photographers, and venues.
-          </p>
-        </div>
-      </Container>
-    </Section>
+    <article className="min-h-screen bg-[#FAF8F5]">
+      <VendorsHero />
+      <VendorDirectory />
+      <VendorCTA />
+    </article>
   );
 }
