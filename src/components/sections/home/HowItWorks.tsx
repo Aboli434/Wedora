@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from "next/image";
 import { motion, Variants } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
@@ -86,6 +87,27 @@ export function HowItWorks() {
               ))}
             </div>
           </div>
+
+          {/* Editorial Process Banner Visual */}
+          <motion.div
+            variants={headerVariants}
+            className="relative w-full aspect-[16/9] sm:aspect-[21/9] lg:aspect-[3/1] overflow-hidden bg-[#161514] border border-[var(--border-subtle)] shadow-xs"
+          >
+            <Image
+              src="/images/wedding/wedora-process-celebration.jpg"
+              alt="Wedora Intimate Indian Wedding Celebration Journey"
+              fill
+              unoptimized
+              sizes="100vw"
+              className="object-cover object-center filter brightness-[0.92] transition-transform duration-1000 hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute bottom-3 left-4 sm:bottom-5 sm:left-6 z-10">
+              <span className="caption text-[10px] tracking-[0.3em] text-[var(--accent-gold)] bg-black/60 backdrop-blur-xs px-3 py-1 border border-[var(--accent-gold)]/30">
+                The Wedora Celebration Journey
+              </span>
+            </div>
+          </motion.div>
 
           {/* Subtle Supporting Editorial Phrase */}
           <motion.div

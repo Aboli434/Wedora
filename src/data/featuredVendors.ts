@@ -18,6 +18,7 @@ export const FEATURED_VENDORS_DATA: FeaturedVendor[] = [
     location: "Mumbai, Maharashtra",
     description: "Documentary wedding photography with a quiet, cinematic eye.",
     href: "/vendors",
+    imageSrc: "/images/wedding/wedora-vendor-frame-house.jpg",
   },
   {
     id: "mitti-marigold",
@@ -27,6 +28,7 @@ export const FEATURED_VENDORS_DATA: FeaturedVendor[] = [
     location: "Jaipur, Rajasthan",
     description: "Thoughtful floral and spatial design rooted in Indian craft.",
     href: "/vendors",
+    imageSrc: "/images/wedding/wedora-vendor-mitti-marigold.jpg",
   },
   {
     id: "house-of-vows",
@@ -36,6 +38,7 @@ export const FEATURED_VENDORS_DATA: FeaturedVendor[] = [
     location: "Pune, Maharashtra",
     description: "Full-service wedding planning shaped around your story and pace.",
     href: "/vendors",
+    imageSrc: "/images/wedding/wedora-vendor-house-of-vows.jpg",
   },
   {
     id: "the-courtyard-estate",
@@ -46,6 +49,7 @@ export const FEATURED_VENDORS_DATA: FeaturedVendor[] = [
     description:
       "A heritage setting for intimate celebrations and unforgettable evenings.",
     href: "/vendors",
+    imageSrc: "/images/wedding/wedora-vendor-courtyard-estate.jpg",
   },
   {
     id: "saffron-table",
@@ -56,6 +60,7 @@ export const FEATURED_VENDORS_DATA: FeaturedVendor[] = [
     description:
       "Seasonal menus and thoughtful hospitality for celebrations of every scale.",
     href: "/vendors",
+    imageSrc: "/images/wedding/wedora-vendor-saffron-table.jpg",
   },
   {
     id: "atelier-noor",
@@ -66,5 +71,6 @@ export const FEATURED_VENDORS_DATA: FeaturedVendor[] = [
     description:
       "Contemporary bridalwear balancing tradition, texture, and individuality.",
     href: "/vendors",
+    imageSrc: "/images/wedding/wedora-vendor-atelier-noor.jpg",
   },
 ];

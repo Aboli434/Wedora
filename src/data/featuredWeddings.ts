@@ -18,6 +18,7 @@ export const FEATURED_WEDDINGS_DATA: FeaturedWedding[] = [
     description:
       "An intimate celebration shaped by old-world architecture, warm evenings, and thoughtful details.",
     href: "/real-weddings",
+    imageSrc: "/images/wedding/wedora-wedding-aditi-arjun.jpg",
     isFeatured: true,
   },
   {
@@ -28,6 +29,7 @@ export const FEATURED_WEDDINGS_DATA: FeaturedWedding[] = [
     description:
       "A relaxed coastal celebration where contemporary design meets the rhythm of the sea.",
     href: "/real-weddings",
+    imageSrc: "/images/wedding/wedora-wedding-meera-rohan.jpg",
     isFeatured: false,
   },
   {
@@ -38,6 +40,7 @@ export const FEATURED_WEDDINGS_DATA: FeaturedWedding[] = [
     description:
       "A vibrant celebration balancing timeless traditions with a distinctly modern visual language.",
     href: "/real-weddings",
+    imageSrc: "/images/wedding/wedora-wedding-isha-kunal.jpg",
     isFeatured: false,
   },
 ];
