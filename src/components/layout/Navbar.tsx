@@ -118,7 +118,7 @@ export function Navbar() {
           "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-out",
           isScrolled
             ? "h-16 bg-[var(--bg-primary)]/95 backdrop-blur-md border-b border-[var(--border-subtle)] shadow-xs text-[var(--text-primary)]"
-            : "h-24 bg-gradient-to-b from-black/70 via-black/30 to-transparent border-b border-transparent text-[var(--text-light)]"
+            : "h-24 bg-gradient-to-b from-black/80 to-transparent text-[var(--text-light)]"
         )}
       >
         <Container size="lg" className="h-full">
@@ -217,15 +217,7 @@ export function Navbar() {
                 </Button>
               </Link>
               <Link href="/register">
-                <Button
-                  variant="primary"
-                  size="sm"
-                  className={cn(
-                    isScrolled
-                      ? "bg-[var(--text-primary)] text-[var(--bg-primary)] hover:bg-[var(--accent-gold)] hover:text-white"
-                      : "bg-[var(--accent-gold)] !text-black border-transparent hover:bg-white hover:!text-black shadow-md"
-                  )}
-                >
+                <Button variant="primary" size="sm">
                   Plan Your Wedding
                 </Button>
               </Link>
@@ -308,7 +300,7 @@ export function Navbar() {
                 className="pt-8 flex flex-col space-y-4 max-w-xs mx-auto w-full"
               >
                 <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="primary" size="lg" className="w-full bg-[var(--accent-gold)] !text-black hover:bg-white hover:!text-black">
+                  <Button variant="primary" size="lg" className="w-full">
                     Plan Your Wedding
                   </Button>
                 </Link>

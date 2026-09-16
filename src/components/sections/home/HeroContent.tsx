@@ -83,11 +83,7 @@ export function HeroContent() {
         className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center gap-4"
       >
         <Link href="/register">
-          <Button
-            variant="primary"
-            size="lg"
-            className="bg-[var(--accent-gold)] !text-black hover:bg-white hover:!text-black border-transparent shadow-md"
-          >
+          <Button variant="primary" size="lg">
             Plan Your Wedding
           </Button>
         </Link>
@@ -96,7 +92,7 @@ export function HeroContent() {
           <Button
             variant="outline"
             size="lg"
-            className="text-[var(--text-light)] border-[var(--text-light)]/40 hover:border-white hover:bg-white hover:text-black"
+            className="text-white border-white/50 hover:border-white hover:bg-white hover:text-[#161514]"
           >
             Explore Weddings
           </Button>
