@@ -14,3 +14,4 @@ export * from "./VendorCard";
 export * from "./BudgetCTA";
 export * from "./BudgetVisual";
 export * from "./Gallery";
+export * from "./Testimonials";

@@ -8,6 +8,7 @@ import {
   FeaturedVendors,
   Gallery,
   BudgetCTA,
+  Testimonials,
 } from "@/components/sections/home";
 
 export default function Home() {
@@ -21,6 +22,7 @@ export default function Home() {
       <FeaturedVendors />
       <Gallery />
       <BudgetCTA />
+      <Testimonials />
     </div>
   );
 }

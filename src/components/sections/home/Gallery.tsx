@@ -107,13 +107,13 @@ export function Gallery() {
                     className="object-cover object-center transition-transform duration-1000 ease-[0.25,1,0.5,1] group-hover:scale-[1.04]"
                   />
 
-                  {/* Subtle Dark Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500 pointer-events-none" />
+                  {/* Solid Editorial Overlay */}
+                  <div className="absolute inset-0 bg-[#161514]/30 group-hover:bg-[#161514]/50 transition-colors duration-500 pointer-events-none" />
 
                   {/* Category & Location Badges Overlay */}
                   <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 flex flex-col justify-end text-white transition-all duration-300 group-hover:translate-y-0">
                     <div className="flex items-center justify-between text-xs font-sans tracking-[0.2em] uppercase">
-                      <span className="caption text-[10px] tracking-[0.25em] text-[var(--accent-gold)] bg-black/50 px-2.5 py-1 border border-[var(--accent-gold)]/30">
+                      <span className="caption text-[10px] tracking-[0.25em] text-[var(--accent-gold)] bg-[#161514] px-3 py-1 border border-[var(--accent-gold)]/40 shadow-xs">
                         {item.category}
                       </span>
                       {item.location && (
