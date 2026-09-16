@@ -65,17 +65,17 @@ export function Footer() {
             <span className="caption text-[var(--accent-gold)]">Planning</span>
             <ul className="space-y-3 body-sm">
               <li>
-                <Link href="#" className="hover:text-[var(--accent-gold)] transition-colors">
+                <Link href="/register" className="hover:text-[var(--accent-gold)] transition-colors">
                   Plan Your Wedding
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-[var(--accent-gold)] transition-colors">
+                <Link href="/budget-calculator" className="hover:text-[var(--accent-gold)] transition-colors">
                   Budget Calculator
                 </Link>
               </li>
               <li>
-                <Link href="#" className="hover:text-[var(--accent-gold)] transition-colors">
+                <Link href="/contact" className="hover:text-[var(--accent-gold)] transition-colors">
                   Concierge &amp; Contact
                 </Link>
               </li>

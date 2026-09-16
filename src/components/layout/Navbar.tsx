@@ -202,7 +202,7 @@ export function Navbar() {
               variants={navItemVariants}
               className="hidden lg:flex items-center space-x-4"
             >
-              <Link href="/register">
+              <Link href="/login">
                 <Button
                   variant="ghost"
                   size="sm"
@@ -304,7 +304,7 @@ export function Navbar() {
                     Plan Your Wedding
                   </Button>
                 </Link>
-                <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
                   <Button variant="outline" size="md" className="w-full">
                     Login
                   </Button>
