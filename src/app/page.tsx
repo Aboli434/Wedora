@@ -6,6 +6,7 @@ import {
   FeaturedWeddings,
   HowItWorks,
   FeaturedVendors,
+  Gallery,
   BudgetCTA,
 } from "@/components/sections/home";
 
@@ -18,6 +19,7 @@ export default function Home() {
       <FeaturedWeddings />
       <HowItWorks />
       <FeaturedVendors />
+      <Gallery />
       <BudgetCTA />
     </div>
   );
