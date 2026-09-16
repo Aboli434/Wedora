@@ -93,8 +93,6 @@ img, video {
 /* Button & Link Reset Defaults */
 button {
   cursor: pointer;
-  background: none;
-  border: none;
   font-family: inherit;
 }
 
