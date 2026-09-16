@@ -28,6 +28,11 @@ export function Footer() {
             <span className="caption text-[var(--accent-gold)]">Navigation</span>
             <ul className="space-y-3 body-sm">
               <li>
+                <Link href="/about" className="hover:text-[var(--accent-gold)] transition-colors">
+                  About
+                </Link>
+              </li>
+              <li>
                 <Link href="/services" className="hover:text-[var(--accent-gold)] transition-colors">
                   Services
                 </Link>

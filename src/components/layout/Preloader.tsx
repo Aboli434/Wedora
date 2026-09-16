@@ -4,13 +4,15 @@ import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 export function Preloader() {
-  const [isLoading, setIsLoading] = useState<boolean>(() => {
-    if (typeof window !== "undefined") {
-      return !sessionStorage.getItem("wedora_preloaded");
-    }
-    return false;
-  });
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && !sessionStorage.getItem("wedora_preloaded")) {
+      const timer = setTimeout(() => setIsLoading(true), 0);
+      return () => clearTimeout(timer);
+    }
+  }, []);
 
   useEffect(() => {
     if (!isLoading) return;

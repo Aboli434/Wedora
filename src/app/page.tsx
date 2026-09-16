@@ -6,7 +6,6 @@ import {
   FeaturedWeddings,
   HowItWorks,
   FeaturedVendors,
-  Gallery,
   BudgetCTA,
   Testimonials,
   FinalCTA,
@@ -21,7 +20,6 @@ export default function Home() {
       <FeaturedWeddings />
       <HowItWorks />
       <FeaturedVendors />
-      <Gallery />
       <BudgetCTA />
       <Testimonials />
       <FinalCTA />
