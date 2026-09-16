@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import Link from "next/link";
-import { motion, Variants } from "framer-motion";
+import Image from "next/image";
+import { motion, Variants, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { Heading } from "@/components/ui/Heading";
@@ -10,6 +11,20 @@ import { Button } from "@/components/ui/Button";
 import { BudgetVisual } from "./BudgetVisual";
 
 export function BudgetCTA() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const shouldReduceMotion = useReducedMotion();
+
+  // Subtle Parallax Scroll Effect for Image
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const imageParallaxY = useTransform(
+    scrollYProgress,
+    [0, 1],
+    [20, shouldReduceMotion ? 0 : -20]
+  );
+
   const containerVariants: Variants = {
     hidden: { opacity: 0 },
     show: {
@@ -30,10 +45,20 @@ export function BudgetCTA() {
     },
   };
 
+  const imageVariants: Variants = {
+    hidden: { opacity: 0, scale: 1.06 },
+    show: {
+      opacity: 1,
+      scale: 1,
+      transition: { duration: 1.1, ease: [0.25, 1, 0.5, 1] as const },
+    },
+  };
+
   return (
     <Section
+      ref={sectionRef}
       padding="xl"
-      className="bg-[var(--bg-dark)] text-[var(--text-light)] min-h-[80svh] flex items-center relative overflow-hidden"
+      className="bg-[var(--bg-dark)] text-[var(--text-light)] min-h-[90svh] flex items-center relative overflow-hidden"
     >
       <Container size="lg">
         <motion.div
@@ -44,7 +69,7 @@ export function BudgetCTA() {
           className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center"
         >
           {/* Left Column: Text & Action */}
-          <div className="lg:col-span-6 space-y-6 lg:space-y-8">
+          <div className="lg:col-span-5 space-y-6 lg:space-y-8">
             <motion.div variants={itemVariants} className="inline-block">
               <span className="caption tracking-[0.25em] text-[var(--accent-gold)]">
                 Plan With Clarity
@@ -71,11 +96,7 @@ export function BudgetCTA() {
             <motion.div variants={itemVariants} className="pt-2 space-y-3">
               <div>
                 <Link href="/budget-calculator">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="bg-[var(--accent-gold)] text-black hover:bg-white hover:text-black border-transparent shadow-md"
-                  >
+                  <Button variant="primary" size="lg">
                     Explore the Budget Calculator
                   </Button>
                 </Link>
@@ -87,9 +108,31 @@ export function BudgetCTA() {
             </motion.div>
           </div>
 
-          {/* Right Column: Illustrative Budget Visual Panel */}
-          <div className="lg:col-span-6 w-full flex justify-center lg:justify-end">
-            <BudgetVisual />
+          {/* Right Column: Editorial Wedding Photography + Overlaid Budget Panel */}
+          <div className="lg:col-span-7 w-full">
+            <div className="relative w-full">
+              {/* Main Premium AI Wedding Photography Frame */}
+              <motion.div
+                style={{ y: imageParallaxY }}
+                variants={imageVariants}
+                className="relative w-full aspect-[4/3] sm:aspect-[16/10] overflow-hidden bg-[#161514] border border-[var(--border-dark)] shadow-2xl group"
+              >
+                <Image
+                  src="/images/wedding/wedora-budget-celebration.jpg"
+                  alt="Elegant Indian wedding reception table with warm candlelight and floral details"
+                  fill
+                  unoptimized
+                  sizes="(max-width: 1024px) 100vw, 60vw"
+                  className="object-cover object-center transition-transform duration-1000 ease-[0.25,1,0.5,1] group-hover:scale-[1.03] filter brightness-[0.95]"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#141312] via-transparent to-transparent opacity-70 pointer-events-none" />
+              </motion.div>
+
+              {/* Overlaid Secondary Budget Allocation Card Panel */}
+              <div className="mt-6 lg:mt-0 lg:absolute lg:-bottom-8 lg:-left-10 lg:w-[88%] z-10">
+                <BudgetVisual />
+              </div>
+            </div>
           </div>
         </motion.div>
       </Container>

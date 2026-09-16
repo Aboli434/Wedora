@@ -18,11 +18,11 @@ export interface BudgetVisualProps {
 
 export function BudgetVisual({ className }: BudgetVisualProps) {
   const panelVariants: Variants = {
-    hidden: { opacity: 0, scale: 0.96 },
+    hidden: { opacity: 0, y: 20 },
     show: {
       opacity: 1,
-      scale: 1,
-      transition: { duration: 0.9, ease: [0.25, 1, 0.5, 1] as const },
+      y: 0,
+      transition: { duration: 0.8, delay: 0.3, ease: [0.25, 1, 0.5, 1] as const },
     },
   };
 
@@ -30,12 +30,12 @@ export function BudgetVisual({ className }: BudgetVisualProps) {
     <motion.div
       variants={panelVariants}
       className={cn(
-        "w-full max-w-lg mx-auto bg-[#1A1817] border border-[var(--border-dark)] p-6 sm:p-8 space-y-6 shadow-xl select-none",
+        "w-full bg-[#161514] border border-[var(--border-dark)] p-5 sm:p-6 space-y-5 shadow-xl select-none",
         className
       )}
     >
       {/* Panel Header */}
-      <div className="flex items-center justify-between border-b border-[var(--border-dark)] pb-4">
+      <div className="flex items-center justify-between border-b border-[var(--border-dark)] pb-3">
         <span className="caption text-[9px] tracking-[0.25em] text-[var(--accent-gold)]">
           Illustrative Estimate
         </span>
@@ -45,38 +45,38 @@ export function BudgetVisual({ className }: BudgetVisualProps) {
       </div>
 
       {/* Primary Figure */}
-      <div className="space-y-1">
-        <span className="caption text-[10px] tracking-[0.2em] text-[var(--text-muted)] block">
+      <div className="space-y-0.5">
+        <span className="caption text-[9px] tracking-[0.2em] text-[var(--text-muted)] block">
           Estimated Starting Point
         </span>
-        <div className="font-serif text-4xl sm:text-5xl tracking-tight text-[var(--text-light)] font-light">
+        <div className="font-serif text-3xl sm:text-4xl tracking-tight text-[var(--text-light)] font-light">
           ₹ 18,50,000
         </div>
       </div>
 
       {/* Allocation Progress Bars */}
-      <div className="space-y-4 pt-2">
+      <div className="space-y-3 pt-1">
         <span className="caption text-[9px] tracking-[0.2em] text-[var(--accent-gold)] block">
           Category Allocation Breakdown
         </span>
 
-        <div className="space-y-3">
+        <div className="space-y-2.5">
           {ALLOCATION_ITEMS.map((item) => (
-            <div key={item.label} className="space-y-1.5">
-              <div className="flex justify-between text-xs font-sans tracking-wider text-[var(--text-light)]/90">
+            <div key={item.label} className="space-y-1">
+              <div className="flex justify-between text-[11px] font-sans tracking-wider text-[var(--text-light)]/90">
                 <span>{item.label}</span>
                 <span className="text-[var(--accent-gold)] font-medium">
                   {item.percentage}%
                 </span>
               </div>
-              <div className="w-full h-1.5 bg-[#2A2825] rounded-none overflow-hidden">
+              <div className="w-full h-1 bg-[#282624] rounded-none overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   whileInView={{ width: `${item.percentage}%` }}
                   viewport={{ once: true }}
                   transition={{
                     duration: 1,
-                    delay: 0.2,
+                    delay: 0.3,
                     ease: [0.25, 1, 0.5, 1] as const,
                   }}
                   className={cn("h-full", item.color)}
@@ -88,7 +88,7 @@ export function BudgetVisual({ className }: BudgetVisualProps) {
       </div>
 
       {/* Footer Disclaimer */}
-      <div className="pt-4 border-t border-[var(--border-dark)] flex items-center justify-between text-[9px] font-sans tracking-[0.2em] text-[var(--text-muted)] uppercase">
+      <div className="pt-3 border-t border-[var(--border-dark)] flex items-center justify-between text-[8px] font-sans tracking-[0.2em] text-[var(--text-muted)] uppercase">
         <span>Example Allocation</span>
         <span>For Planning Clarity</span>
       </div>
