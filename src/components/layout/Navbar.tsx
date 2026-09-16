@@ -57,6 +57,10 @@ export function Navbar() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isMobileMenuOpen]);
 
+  if (pathname?.startsWith("/dashboard")) {
+    return null;
+  }
+
   const navContainerVariants: Variants = {
     hidden: { opacity: 0, y: -15 },
     visible: {

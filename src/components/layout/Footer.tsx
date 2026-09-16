@@ -1,9 +1,17 @@
+"use client";
+
 import React from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { Divider } from "@/components/ui/Divider";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/dashboard")) {
+    return null;
+  }
   return (
     <footer className="w-full bg-[var(--bg-dark)] text-[var(--text-light)] pt-24 pb-12">
       <Container size="lg">
