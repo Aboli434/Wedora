@@ -117,8 +117,8 @@ export function Navbar() {
         className={cn(
           "fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-out",
           isScrolled
-            ? "h-16 bg-[var(--bg-primary)]/95 backdrop-blur-md border-b border-[var(--border-subtle)] shadow-xs text-[var(--text-primary)]"
-            : "h-24 bg-gradient-to-b from-black/80 to-transparent text-[var(--text-light)]"
+            ? "h-16 bg-[var(--bg-primary)] border-b border-[var(--border-subtle)] shadow-xs text-[var(--text-primary)]"
+            : "h-24 bg-[#141312]/70 text-[var(--text-light)]"
         )}
       >
         <Container size="lg" className="h-full">

@@ -44,7 +44,7 @@ export function HeroContent() {
     >
       {/* Eyebrow */}
       <motion.div variants={itemVariants} className="inline-block">
-        <span className="caption tracking-[0.3em] text-[var(--accent-gold)] bg-[var(--bg-dark)]/40 px-3 py-1.5 border border-[var(--accent-gold)]/20 backdrop-blur-xs">
+        <span className="caption tracking-[0.3em] text-[var(--accent-gold)] bg-[#161514] px-3.5 py-1.5 border border-[var(--accent-gold)]/30 shadow-xs">
           Wedding Planning, Reimagined
         </span>
       </motion.div>

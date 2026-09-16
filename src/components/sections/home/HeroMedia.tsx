@@ -103,9 +103,8 @@ export function HeroMedia({
         )}
       </motion.div>
 
-      {/* Editorial Sophisticated Gradient Overlay for Visual Balance & Readability */}
-      <div className="absolute inset-0 bg-gradient-to-t from-[#141312] via-[#141312]/50 to-[#141312]/25 pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#141312]/75 via-[#141312]/40 to-transparent pointer-events-none" />
+      {/* Editorial Dark Solid Overlay for Visual Balance & Readability */}
+      <div className="absolute inset-0 bg-[#141312]/60 pointer-events-none" />
     </div>
   );
 }
