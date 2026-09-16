@@ -9,6 +9,7 @@ import {
   Gallery,
   BudgetCTA,
   Testimonials,
+  FinalCTA,
 } from "@/components/sections/home";
 
 export default function Home() {
@@ -23,6 +24,7 @@ export default function Home() {
       <Gallery />
       <BudgetCTA />
       <Testimonials />
+      <FinalCTA />
     </div>
   );
 }
