@@ -25,6 +25,7 @@ import {
   ClientDetail,
   ClientEditor,
   RecordContactModal,
+  ClientsEmptyState,
   ClientsPageCTA,
 } from "@/components/vendor-dashboard/clients";
 
@@ -310,35 +311,41 @@ export default function VendorClientsPage() {
           onFilterActive={() => handleStatusFilterSelect("ACTIVE")}
         />
 
-        {/* Overview Editorial Metrics */}
-        <ClientsOverview
-          summary={summary}
-          activeFilterStatus={filters.relationshipStatus}
-          onSelectStatusFilter={handleStatusFilterSelect}
-        />
+        {clients.length === 0 ? (
+          <ClientsEmptyState />
+        ) : (
+          <>
+            {/* Overview Editorial Metrics */}
+            <ClientsOverview
+              summary={summary}
+              activeFilterStatus={filters.relationshipStatus}
+              onSelectStatusFilter={handleStatusFilterSelect}
+            />
 
-        {/* Needs Attention Follow-up Section */}
-        <ClientsNeedsAttention
-          clientsNeedingAttention={needsAttentionList}
-          onSelectClient={(client) => setSelectedClientId(client.id)}
-        />
+            {/* Needs Attention Follow-up Section */}
+            <ClientsNeedsAttention
+              clientsNeedingAttention={needsAttentionList}
+              onSelectClient={(client) => setSelectedClientId(client.id)}
+            />
 
-        {/* Filters & Directory */}
-        <div className="space-y-6">
-          <ClientFilters
-            filters={filters}
-            onFilterChange={handleFilterChange}
-            onResetFilters={handleResetFilters}
-            totalFilteredCount={filteredClients.length}
-          />
+            {/* Filters & Directory */}
+            <div className="space-y-6">
+              <ClientFilters
+                filters={filters}
+                onFilterChange={handleFilterChange}
+                onResetFilters={handleResetFilters}
+                totalFilteredCount={filteredClients.length}
+              />
 
-          <ClientList
-            clients={filteredClients}
-            selectedClientId={selectedClientId || undefined}
-            onSelectClient={(client) => setSelectedClientId(client.id)}
-            onResetFilters={handleResetFilters}
-          />
-        </div>
+              <ClientList
+                clients={filteredClients}
+                selectedClientId={selectedClientId || undefined}
+                onSelectClient={(client) => setSelectedClientId(client.id)}
+                onResetFilters={handleResetFilters}
+              />
+            </div>
+          </>
+        )}
 
         {/* Closing CTA */}
         <ClientsPageCTA />

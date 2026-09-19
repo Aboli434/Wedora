@@ -82,17 +82,33 @@ export function BusinessCompletion({ profile, completionScore }: BusinessComplet
   };
 
   return (
-    <section className="bg-[#FAF8F5] border border-[#E8E2D9] rounded-xl p-6 md:p-8 space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#E8E2D9] pb-4">
-        <div>
-          <h2 className="font-serif text-2xl text-[#2C2A29]">Profile completion checklist</h2>
-          <p className="text-xs text-[#6E6B65] mt-0.5">
-            Key sections required for maximum couple discovery on Wedora.
-          </p>
-        </div>
-        <span className="text-xs font-mono font-medium text-[#2C2A29] bg-[#F2ECE4] border border-[#E5DEC9] px-3 py-1 rounded-full self-start sm:self-auto">
-          {completionScore}% Complete
+    <section className="bg-[#FAF8F5] border border-[#161514]/15 p-6 md:p-8 space-y-6">
+      <div className="space-y-4 border-b border-[#161514]/15 pb-6">
+        <span className="text-[10px] font-sans tracking-[0.25em] uppercase text-[#C5A880] font-semibold block">
+          BUSINESS PROFILE
         </span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h2 className="font-serif text-2xl md:text-3xl text-[#161514] font-light">
+              Complete your studio profile.
+            </h2>
+            <p className="text-xs font-sans text-[#5A5650] max-w-lg leading-relaxed">
+              Give couples the context they need to understand your work, approach, and services.
+            </p>
+          </div>
+          <div className="flex items-center gap-3 shrink-0">
+            <span className="text-xs font-mono font-medium text-[#161514] bg-[#FAF8F5] border border-[#161514]/20 px-3 py-1.5">
+              {completionScore}% Complete
+            </span>
+            <button
+              type="button"
+              onClick={() => handleScrollToSection("#identity")}
+              className="px-5 py-2.5 min-h-[44px] bg-[#161514] text-[#FAF8F5] text-xs font-semibold uppercase tracking-[0.15em] hover:bg-[#C5A880] hover:text-[#161514] transition-colors focus:outline-none focus:ring-1 focus:ring-[#C5A880]"
+            >
+              Complete profile
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

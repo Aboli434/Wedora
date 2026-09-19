@@ -12,10 +12,18 @@ import {
 
 interface AddExpenseFormProps {
   onAddExpense: (expense: BudgetExpense) => void;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function AddExpenseForm({ onAddExpense }: AddExpenseFormProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function AddExpenseForm({ onAddExpense, isOpen: controlledIsOpen, onOpenChange }: AddExpenseFormProps) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isFormOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+
+  const setIsOpen = (open: boolean) => {
+    setInternalIsOpen(open);
+    if (onOpenChange) onOpenChange(open);
+  };
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState("venue");
   const [vendorName, setVendorName] = useState("");
@@ -79,7 +87,7 @@ export function AddExpenseForm({ onAddExpense }: AddExpenseFormProps) {
 
       {/* Lightweight Modal Dialog */}
       <AnimatePresence>
-        {isOpen && (
+        {isFormOpen && (
           <div
             role="dialog"
             aria-modal="true"

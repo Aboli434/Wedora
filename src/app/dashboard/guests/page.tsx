@@ -136,8 +136,10 @@ export default function GuestsPage() {
 
           <GuestList
             guests={filteredGuests}
+            totalGuests={guests.length}
             onSelectGuest={setSelectedGuest}
             onClearFilters={handleResetFilters}
+            onAddGuest={() => setIsAddModalOpen(true)}
           />
         </div>
 

@@ -145,8 +145,10 @@ export default function VendorsDashboardPage() {
 
           <VendorList
             vendors={filteredVendors}
+            totalVendors={vendors.length}
             onSelectVendor={setSelectedVendor}
             onClearFilters={handleResetFilters}
+            onAddVendor={() => setIsAddModalOpen(true)}
           />
         </div>
 

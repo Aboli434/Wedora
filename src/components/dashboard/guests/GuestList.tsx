@@ -7,17 +7,27 @@ import { GuestEmptyState } from "./GuestEmptyState";
 
 interface GuestListProps {
   guests: Guest[];
+  totalGuests?: number;
   onSelectGuest: (guest: Guest) => void;
   onClearFilters: () => void;
+  onAddGuest?: () => void;
 }
 
 export function GuestList({
   guests,
+  totalGuests = 0,
   onSelectGuest,
   onClearFilters,
+  onAddGuest,
 }: GuestListProps) {
   if (guests.length === 0) {
-    return <GuestEmptyState onClearFilters={onClearFilters} />;
+    return (
+      <GuestEmptyState
+        isFiltered={totalGuests > 0}
+        onAddGuest={onAddGuest}
+        onClearFilters={onClearFilters}
+      />
+    );
   }
 
   return (

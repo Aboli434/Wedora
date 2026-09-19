@@ -7,10 +7,18 @@ import { CHECKLIST_CATEGORIES, ChecklistPriority, ChecklistTask } from "@/data/c
 
 interface AddTaskFormProps {
   onAddTask: (task: ChecklistTask) => void;
+  isOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
-export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
-  const [isOpen, setIsOpen] = useState(false);
+export function AddTaskForm({ onAddTask, isOpen: controlledIsOpen, onOpenChange }: AddTaskFormProps) {
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
+  const isFormOpen = controlledIsOpen !== undefined ? controlledIsOpen : internalIsOpen;
+
+  const setIsOpen = (open: boolean) => {
+    setInternalIsOpen(open);
+    if (onOpenChange) onOpenChange(open);
+  };
   const [title, setTitle] = useState("");
   const [categoryId, setCategoryId] = useState("venue");
   const [priority, setPriority] = useState<ChecklistPriority>("MEDIUM");
@@ -63,7 +71,7 @@ export function AddTaskForm({ onAddTask }: AddTaskFormProps) {
 
       {/* Lightweight Modal Dialog */}
       <AnimatePresence>
-        {isOpen && (
+        {isFormOpen && (
           <div
             role="dialog"
             aria-modal="true"

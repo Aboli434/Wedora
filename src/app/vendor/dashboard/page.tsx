@@ -3,61 +3,48 @@
 import React from "react";
 import { VendorDashboardShell } from "@/components/vendor-dashboard/layout";
 import { MOCK_VENDOR_DASHBOARD_DATA } from "@/data/vendorDashboard";
+import { VendorDashboardCommandCenter } from "@/components/vendor-dashboard/VendorDashboardCommandCenter";
+import { VendorDashboardReadiness } from "@/components/vendor-dashboard/VendorDashboardReadiness";
+import { VendorDashboardActionNeeded } from "@/components/vendor-dashboard/VendorDashboardActionNeeded";
+import { VendorDashboardUpcomingWork } from "@/components/vendor-dashboard/VendorDashboardUpcomingWork";
+import { VendorDashboardBusinessHealth } from "@/components/vendor-dashboard/VendorDashboardBusinessHealth";
+import { VendorDashboardPerformance } from "@/components/vendor-dashboard/VendorDashboardPerformance";
 import {
-  VendorProfileSnapshot,
-  VendorOverviewMetrics,
-  VendorNeedsAttention,
-  VendorEnquiriesSnapshot,
-  VendorBookingsSnapshot,
-  VendorPaymentSnapshot,
-  VendorPerformance,
   VendorRecentActivity,
   VendorQuickActions,
-  VendorDashboardCTA,
 } from "@/components/vendor-dashboard/overview";
 
 export default function VendorDashboardPage() {
-  const {
-    profile,
-    summary,
-    enquiries,
-    bookings,
-    actionItems,
-    recentActivities,
-  } = MOCK_VENDOR_DASHBOARD_DATA;
+  const data = MOCK_VENDOR_DASHBOARD_DATA;
 
   return (
     <VendorDashboardShell>
-      <div className="space-y-8">
-        {/* Profile Snapshot Banner */}
-        <VendorProfileSnapshot profile={profile} />
+      <div className="max-w-7xl mx-auto space-y-10 pb-12">
+        {/* LEVEL 1 — VENDOR COMMAND CENTER HERO & NEXT ACTION */}
+        <VendorDashboardCommandCenter data={data} />
 
-        {/* Primary Metrics Grid */}
-        <VendorOverviewMetrics summary={summary} />
+        {/* LEVEL 1 — STUDIO READINESS CHECKLIST */}
+        <VendorDashboardReadiness data={data} />
 
-        {/* Needs Attention / Action Items */}
-        <VendorNeedsAttention items={actionItems} />
+        {/* LEVEL 1 — ACTION NEEDED (Immediate Studio Priorities) */}
+        <VendorDashboardActionNeeded data={data} />
 
-        {/* Recent Enquiries & Bookings Snapshot */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <VendorEnquiriesSnapshot enquiries={enquiries} />
-          <VendorPaymentSnapshot summary={summary} />
+        {/* LEVEL 2 — UPCOMING WORK (Next Confirmed Shoot Dates) */}
+        <VendorDashboardUpcomingWork data={data} />
+
+        {/* LEVEL 2 — BUSINESS HEALTH SNAPSHOT */}
+        <VendorDashboardBusinessHealth data={data} />
+
+        {/* LEVEL 3 — PERFORMANCE, RECENT ACTIVITY & QUICK ACTION SHORTCUTS */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start pt-6 border-t border-[#161514]/10">
+          <div className="lg:col-span-7 space-y-8">
+            <VendorDashboardPerformance data={data} />
+            <VendorRecentActivity activities={data.recentActivities} />
+          </div>
+          <div className="lg:col-span-5">
+            <VendorQuickActions />
+          </div>
         </div>
-
-        {/* Upcoming Bookings */}
-        <VendorBookingsSnapshot bookings={bookings} />
-
-        {/* Performance & Recent Activity */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          <VendorPerformance summary={summary} />
-          <VendorRecentActivity activities={recentActivities} />
-        </div>
-
-        {/* Quick Studio Actions */}
-        <VendorQuickActions />
-
-        {/* Closing CTA */}
-        <VendorDashboardCTA />
       </div>
     </VendorDashboardShell>
   );

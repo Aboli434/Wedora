@@ -7,17 +7,27 @@ import { EventEmptyState } from "./EventEmptyState";
 
 interface EventListProps {
   events: WeddingEvent[];
+  totalEvents?: number;
   onSelectEvent: (event: WeddingEvent) => void;
   onClearFilters: () => void;
+  onAddEvent?: () => void;
 }
 
 export function EventList({
   events,
+  totalEvents = 0,
   onSelectEvent,
   onClearFilters,
+  onAddEvent,
 }: EventListProps) {
   if (events.length === 0) {
-    return <EventEmptyState onClearFilters={onClearFilters} />;
+    return (
+      <EventEmptyState
+        isFiltered={totalEvents > 0}
+        onAddEvent={onAddEvent}
+        onClearFilters={onClearFilters}
+      />
+    );
   }
 
   return (

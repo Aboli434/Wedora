@@ -31,6 +31,7 @@ export default function BudgetPage() {
   const [totalBudget] = useState<number>(INITIAL_TOTAL_BUDGET);
   const [categories] = useState(BUDGET_CATEGORIES);
   const [expenses, setExpenses] = useState<BudgetExpense[]>(MOCK_BUDGET_EXPENSES);
+  const [isAddExpenseOpen, setIsAddExpenseOpen] = useState(false);
 
   // Filters & Sort State
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -94,7 +95,11 @@ export default function BudgetPage() {
             </h3>
           </div>
 
-          <AddExpenseForm onAddExpense={handleAddExpense} />
+          <AddExpenseForm
+            onAddExpense={handleAddExpense}
+            isOpen={isAddExpenseOpen}
+            onOpenChange={setIsAddExpenseOpen}
+          />
         </div>
 
         <ExpenseFilters
@@ -112,7 +117,9 @@ export default function BudgetPage() {
 
         <ExpenseList
           expenses={filteredExpenses}
+          totalExpenses={expenses.length}
           onClearFilters={handleClearFilters}
+          onAddExpense={() => setIsAddExpenseOpen(true)}
         />
       </div>
 

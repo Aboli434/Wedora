@@ -2,12 +2,8 @@ import React from "react";
 import {
   Hero,
   Philosophy,
-  Services,
-  FeaturedWeddings,
   HowItWorks,
-  FeaturedVendors,
-  BudgetCTA,
-  Testimonials,
+  EditorialShowcase,
   FinalCTA,
 } from "@/components/sections/home";
 
@@ -16,12 +12,8 @@ export default function Home() {
     <div>
       <Hero />
       <Philosophy />
-      <Services />
-      <FeaturedWeddings />
       <HowItWorks />
-      <FeaturedVendors />
-      <BudgetCTA />
-      <Testimonials />
+      <EditorialShowcase />
       <FinalCTA />
     </div>
   );

@@ -27,6 +27,7 @@ export default function ChecklistPage() {
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("dueDate");
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Dynamic calculations via pure functions
   const stats = calculateChecklistProgress(tasks);
@@ -102,13 +103,19 @@ export default function ChecklistPage() {
       {/* 6. Filtered Task List & Items */}
       <ChecklistTaskList
         tasks={filteredTasks}
+        totalTasks={tasks.length}
         onToggleComplete={handleToggleComplete}
         onClearFilters={handleClearFilters}
+        onAddTask={() => setIsAddModalOpen(true)}
       />
 
       {/* 7. Add Custom Task Trigger */}
       <div className="flex justify-end pt-2">
-        <AddTaskForm onAddTask={handleAddTask} />
+        <AddTaskForm
+          onAddTask={handleAddTask}
+          isOpen={isAddModalOpen}
+          onOpenChange={setIsAddModalOpen}
+        />
       </div>
     </DashboardShell>
   );

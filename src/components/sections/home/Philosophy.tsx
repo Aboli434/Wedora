@@ -2,7 +2,9 @@
 
 import React, { useRef } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { motion, Variants, useScroll, useTransform, useReducedMotion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Section } from "@/components/ui/Section";
 import { Heading } from "@/components/ui/Heading";
@@ -102,6 +104,17 @@ export function Philosophy({
               details, and decisions behind your wedding into one beautifully
               considered experience.
             </motion.p>
+
+            {/* Subtle Editorial Link */}
+            <motion.div variants={itemVariants} className="pt-2">
+              <Link
+                href="/about"
+                className="group inline-flex items-center text-xs uppercase tracking-[0.2em] font-sans font-medium text-[var(--text-primary)] hover:text-[var(--accent-gold)] transition-colors"
+              >
+                <span>Discover the Wedora approach</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
+              </Link>
+            </motion.div>
 
             {/* Subtle Divider Line Accent */}
             <motion.div variants={itemVariants} className="pt-2">

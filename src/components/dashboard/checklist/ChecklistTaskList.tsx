@@ -7,17 +7,27 @@ import { ChecklistEmptyState } from "./ChecklistEmptyState";
 
 interface ChecklistTaskListProps {
   tasks: ChecklistTask[];
+  totalTasks?: number;
   onToggleComplete: (taskId: string) => void;
   onClearFilters: () => void;
+  onAddTask?: () => void;
 }
 
 export function ChecklistTaskList({
   tasks,
+  totalTasks = 0,
   onToggleComplete,
   onClearFilters,
+  onAddTask,
 }: ChecklistTaskListProps) {
   if (tasks.length === 0) {
-    return <ChecklistEmptyState onClearFilters={onClearFilters} />;
+    return (
+      <ChecklistEmptyState
+        isFiltered={totalTasks > 0}
+        onAddTask={onAddTask}
+        onClearFilters={onClearFilters}
+      />
+    );
   }
 
   return (

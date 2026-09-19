@@ -7,17 +7,27 @@ import { VendorEmptyState } from "./VendorEmptyState";
 
 interface VendorListProps {
   vendors: DashboardVendor[];
+  totalVendors?: number;
   onSelectVendor: (vendor: DashboardVendor) => void;
   onClearFilters: () => void;
+  onAddVendor?: () => void;
 }
 
 export function VendorList({
   vendors,
+  totalVendors = 0,
   onSelectVendor,
   onClearFilters,
+  onAddVendor,
 }: VendorListProps) {
   if (vendors.length === 0) {
-    return <VendorEmptyState onClearFilters={onClearFilters} />;
+    return (
+      <VendorEmptyState
+        isFiltered={totalVendors > 0}
+        onAddVendor={onAddVendor}
+        onClearFilters={onClearFilters}
+      />
+    );
   }
 
   return (

@@ -177,8 +177,13 @@ export default function EventsDashboardPage() {
 
           <EventList
             events={filteredEvents}
+            totalEvents={events.length}
             onSelectEvent={setSelectedEvent}
             onClearFilters={handleResetFilters}
+            onAddEvent={() => {
+              setEditingEvent(null);
+              setIsAddModalOpen(true);
+            }}
           />
         </div>
 

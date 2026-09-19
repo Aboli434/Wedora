@@ -116,22 +116,22 @@ export function FinalCTA() {
             beautifully considered place.
           </motion.p>
 
-          {/* Actions: Primary CTA & Secondary Link */}
+          {/* Actions: Primary CTA for Couples & Secondary Link for Vendor Studios */}
           <motion.div
             variants={itemVariants}
             className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-6"
           >
             <Link href="/register">
               <Button variant="primary" size="lg">
-                Plan Your Wedding
+                Begin Planning
               </Button>
             </Link>
 
             <Link
-              href="/about"
+              href="/register?role=vendor"
               className="group inline-flex items-center text-xs uppercase tracking-[0.2em] font-sans font-medium text-[var(--text-light)] hover:text-[var(--accent-gold)] transition-colors duration-300 py-2 border-b border-transparent hover:border-[var(--accent-gold)]"
             >
-              <span>Explore the Wedora Journey</span>
+              <span>Join as a Studio</span>
               <ArrowRight className="w-4 h-4 ml-2 transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </motion.div>

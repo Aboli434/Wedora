@@ -11,13 +11,25 @@ import { IconButton } from "@/components/ui/IconButton";
 import { cn } from "@/lib/utils";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
 
-const NAV_LINKS = [
-  { label: "Home", href: "/" },
-  { label: "Services", href: "/services" },
+const DESKTOP_NAV_LINKS = [
   { label: "Vendors", href: "/vendors" },
-  { label: "Weddings", href: "/real-weddings" },
+  { label: "Real Weddings", href: "/real-weddings" },
+  { label: "Services", href: "/services" },
+  { label: "About", href: "/about" },
+];
+
+const MOBILE_EXPLORE_LINKS = [
+  { label: "Vendors", href: "/vendors" },
+  { label: "Real Weddings", href: "/real-weddings" },
+  { label: "Services", href: "/services" },
+  { label: "About", href: "/about" },
+];
+
+const MOBILE_SECONDARY_LINKS = [
   { label: "Gallery", href: "/gallery" },
   { label: "Journal", href: "/blog" },
+  { label: "Budget Calculator", href: "/budget-calculator" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function Navbar() {
@@ -104,7 +116,7 @@ export function Navbar() {
   };
 
   const mobileItemVariants: Variants = {
-    closed: { opacity: 0, y: 20 },
+    closed: { opacity: 0, y: 15 },
     open: {
       opacity: 1,
       y: 0,
@@ -163,11 +175,13 @@ export function Navbar() {
               aria-label="Main Navigation"
               className="hidden lg:flex items-center space-x-8"
             >
-              {NAV_LINKS.map((link) => {
+              {DESKTOP_NAV_LINKS.map((link) => {
                 const isActive =
-                  link.href === "/"
-                    ? pathname === "/"
-                    : pathname.startsWith(link.href);
+                  link.href === "/vendors"
+                    ? pathname.startsWith("/vendors")
+                    : link.href === "/real-weddings"
+                    ? pathname.startsWith("/real-weddings")
+                    : pathname === link.href;
 
                 return (
                   <Link
@@ -222,7 +236,7 @@ export function Navbar() {
               </Link>
               <Link href="/register">
                 <Button variant="primary" size="sm">
-                  Plan Your Wedding
+                  Begin Planning
                 </Button>
               </Link>
             </motion.div>
@@ -269,54 +283,85 @@ export function Navbar() {
             animate="open"
             exit="closed"
             variants={mobileOverlayVariants}
-            className="fixed inset-0 z-40 bg-[var(--bg-primary)] flex flex-col justify-between pt-28 pb-12 px-8 lg:hidden overflow-y-auto"
+            className="fixed inset-0 z-40 bg-[var(--bg-primary)] flex flex-col justify-between pt-24 pb-10 px-8 lg:hidden overflow-y-auto"
           >
             <motion.nav
               variants={mobileListVariants}
-              className="flex flex-col space-y-6 my-auto text-center"
+              className="space-y-8 my-auto text-left max-w-sm mx-auto w-full"
             >
-              {NAV_LINKS.map((link) => {
-                const isActive =
-                  link.href === "/"
-                    ? pathname === "/"
-                    : pathname.startsWith(link.href);
+              {/* Group 1: EXPLORE */}
+              <motion.div variants={mobileItemVariants} className="space-y-3">
+                <span className="caption text-[10px] tracking-[0.25em] text-[var(--accent-gold)] uppercase font-semibold block">
+                  EXPLORE
+                </span>
+                <div className="space-y-2">
+                  {MOBILE_EXPLORE_LINKS.map((link) => {
+                    const isActive =
+                      link.href === "/vendors"
+                        ? pathname.startsWith("/vendors")
+                        : link.href === "/real-weddings"
+                        ? pathname.startsWith("/real-weddings")
+                        : pathname === link.href;
 
-                return (
-                  <motion.div key={link.href} variants={mobileItemVariants}>
+                    return (
+                      <Link
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className={cn(
+                          "font-serif text-2xl sm:text-3xl tracking-[0.1em] uppercase transition-colors duration-300 block py-0.5",
+                          isActive
+                            ? "text-[var(--accent-gold)] font-medium"
+                            : "text-[var(--text-primary)] hover:text-[var(--accent-gold)]"
+                        )}
+                      >
+                        {link.label}
+                      </Link>
+                    );
+                  })}
+                </div>
+              </motion.div>
+
+              {/* Group 2: ACCOUNT ACTIONS */}
+              <motion.div variants={mobileItemVariants} className="space-y-3 pt-2 border-t border-[var(--border-subtle)]">
+                <span className="caption text-[10px] tracking-[0.25em] text-[var(--accent-gold)] uppercase font-semibold block">
+                  ACCOUNT
+                </span>
+                <div className="flex flex-col space-y-3">
+                  <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="primary" size="lg" className="w-full">
+                      Begin Planning
+                    </Button>
+                  </Link>
+                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                    <Button variant="outline" size="md" className="w-full">
+                      Login
+                    </Button>
+                  </Link>
+                </div>
+              </motion.div>
+
+              {/* Group 3: MORE RESOURCES */}
+              <motion.div variants={mobileItemVariants} className="space-y-3 pt-2 border-t border-[var(--border-subtle)]">
+                <span className="caption text-[10px] tracking-[0.25em] text-[var(--text-muted)] uppercase font-semibold block">
+                  MORE
+                </span>
+                <div className="grid grid-cols-2 gap-2 text-xs font-sans uppercase tracking-widest text-[var(--text-secondary)]">
+                  {MOBILE_SECONDARY_LINKS.map((link) => (
                     <Link
+                      key={link.href}
                       href={link.href}
                       onClick={() => setIsMobileMenuOpen(false)}
-                      className={cn(
-                        "font-serif text-3xl sm:text-4xl tracking-[0.15em] uppercase transition-colors duration-300 block py-1",
-                        isActive
-                          ? "text-[var(--accent-gold)] font-medium"
-                          : "text-[var(--text-primary)] hover:text-[var(--accent-gold)]"
-                      )}
+                      className="hover:text-[var(--accent-gold)] transition-colors py-1"
                     >
                       {link.label}
                     </Link>
-                  </motion.div>
-                );
-              })}
-
-              <motion.div
-                variants={mobileItemVariants}
-                className="pt-8 flex flex-col space-y-4 max-w-xs mx-auto w-full"
-              >
-                <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="primary" size="lg" className="w-full">
-                    Plan Your Wedding
-                  </Button>
-                </Link>
-                <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                  <Button variant="outline" size="md" className="w-full">
-                    Login
-                  </Button>
-                </Link>
+                  ))}
+                </div>
               </motion.div>
             </motion.nav>
 
-            <div className="text-center pt-8 text-xs font-sans tracking-[0.2em] text-[var(--text-muted)] uppercase">
+            <div className="text-center pt-6 text-[10px] font-sans tracking-[0.2em] text-[var(--text-muted)] uppercase">
               Wedora • Luxury Wedding Planning
             </div>
           </motion.div>

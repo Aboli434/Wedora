@@ -7,15 +7,25 @@ import { BudgetEmptyState } from "./BudgetEmptyState";
 
 interface ExpenseListProps {
   expenses: BudgetExpense[];
+  totalExpenses?: number;
   onClearFilters: () => void;
+  onAddExpense?: () => void;
 }
 
 export function ExpenseList({
   expenses,
+  totalExpenses = 0,
   onClearFilters,
+  onAddExpense,
 }: ExpenseListProps) {
   if (expenses.length === 0) {
-    return <BudgetEmptyState onClearFilters={onClearFilters} />;
+    return (
+      <BudgetEmptyState
+        isFiltered={totalExpenses > 0}
+        onAddExpense={onAddExpense}
+        onClearFilters={onClearFilters}
+      />
+    );
   }
 
   return (

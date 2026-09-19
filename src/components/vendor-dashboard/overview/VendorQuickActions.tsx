@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Plus, Image as ImageIcon, MessageSquare, Calendar } from "lucide-react";
+import { Plus, Image as ImageIcon, CreditCard, Calendar } from "lucide-react";
 
 const ACTIONS = [
   {
@@ -12,22 +12,22 @@ const ACTIONS = [
     icon: Plus,
   },
   {
-    title: "Update Portfolio",
+    title: "Upload Portfolio",
     description: "Upload recent wedding photos",
     href: "/vendor/dashboard/portfolio",
     icon: ImageIcon,
   },
   {
-    title: "Review Enquiries",
-    description: "Respond to incoming couples",
-    href: "/vendor/dashboard/enquiries",
-    icon: MessageSquare,
-  },
-  {
-    title: "View Calendar",
-    description: "Manage blackout dates",
+    title: "Block Calendar Date",
+    description: "Manage studio blackout dates",
     href: "/vendor/dashboard/calendar",
     icon: Calendar,
+  },
+  {
+    title: "Record Payment",
+    description: "Log client retainer transactions",
+    href: "/vendor/dashboard/payments",
+    icon: CreditCard,
   },
 ];
 

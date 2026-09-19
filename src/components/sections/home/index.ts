@@ -15,3 +15,4 @@ export * from "./BudgetCTA";
 export * from "./BudgetVisual";
 export * from "./Testimonials";
 export * from "./FinalCTA";
+export * from "./EditorialShowcase";
