@@ -2,7 +2,8 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import { Edit2, X, Info } from "lucide-react";
+import Link from "next/link";
+import { Edit2, X, Info, ArrowRight } from "lucide-react";
 import { WeddingProfile } from "@/data/wedding";
 
 interface WeddingDetailsProps {
@@ -20,6 +21,14 @@ export function WeddingDetails({ profile }: WeddingDetailsProps) {
     { label: "GUEST TARGET", value: profile.guestTarget },
     { label: "NUMBER OF EVENTS", value: profile.eventCountText },
     { label: "PLANNING STATUS", value: profile.planningStatus },
+  ];
+
+  const planningModules = [
+    { label: "Events", href: "/dashboard/events" },
+    { label: "Budget", href: "/dashboard/budget" },
+    { label: "Checklist", href: "/dashboard/checklist" },
+    { label: "Vendors", href: "/dashboard/vendors" },
+    { label: "Guests", href: "/dashboard/guests" },
   ];
 
   return (
@@ -64,6 +73,25 @@ export function WeddingDetails({ profile }: WeddingDetailsProps) {
             </span>
           </div>
         ))}
+      </div>
+
+      {/* Connected Planning Workspace Navigation Bar */}
+      <div className="pt-4 border-t border-[#161514]/10">
+        <span className="text-[10px] font-semibold tracking-[0.2em] uppercase text-[#5A5650] block mb-2 font-sans">
+          CONNECTED PLANNING WORKSPACE
+        </span>
+        <div className="flex flex-wrap items-center gap-4 text-xs font-sans text-[#161514]">
+          {planningModules.map((mod) => (
+            <Link
+              key={mod.label}
+              href={mod.href}
+              className="inline-flex items-center gap-1 hover:text-[#C5A880] transition-colors font-medium py-1 min-h-[36px]"
+            >
+              <span>View {mod.label}</span>
+              <ArrowRight className="w-3 h-3 text-[#C5A880]" />
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Lightweight Demo Edit Modal */}

@@ -12,6 +12,7 @@ import {
 import { EventVendorList } from "./EventVendorList";
 import { EventTaskList } from "./EventTaskList";
 import { EventGuestSummary } from "./EventGuestSummary";
+import { ContextualLink } from "@/components/common/ContextualLink";
 import { X, Edit, MapPin, ExternalLink, Calendar } from "lucide-react";
 
 interface EventDetailProps {
@@ -135,6 +136,22 @@ export function EventDetail({
           tasks={event.tasks}
           onToggleTask={(taskId) => onToggleTask(event.id, taskId)}
         />
+
+        {/* Cross-Module Links */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <ContextualLink
+            label="Guest Roster"
+            value={`${event.confirmedGuests} Confirmed / ${event.expectedGuests} Expected`}
+            href="/dashboard/guests"
+            actionLabel="View guest roster"
+          />
+          <ContextualLink
+            label="Master Checklist"
+            value={`${event.tasks.filter((t) => t.status === "COMPLETED").length}/${event.tasks.length} Completed`}
+            href="/dashboard/checklist"
+            actionLabel="View master checklist"
+          />
+        </div>
 
         {/* Notes */}
         {event.notes && (

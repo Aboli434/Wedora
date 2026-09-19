@@ -72,7 +72,7 @@ export default function BudgetPage() {
   return (
     <DashboardShell>
       {/* 1. Header */}
-      <BudgetPageHeader />
+      <BudgetPageHeader onAddExpenseClick={() => setIsAddExpenseOpen(true)} />
 
       {/* 2. Main Budget Overview */}
       <BudgetOverview summary={summary} />

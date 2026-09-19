@@ -140,7 +140,7 @@ export function GuestCard({ guest, onSelect }: GuestListItemProps) {
           Attending {attendingEventsCount} of 4 events
         </span>
         <span className="inline-flex items-center gap-1 text-[#161514] font-medium uppercase tracking-wider text-[11px]">
-          Details
+          View guest profile
           <ChevronRight className="w-3.5 h-3.5 text-[#C5A880]" />
         </span>
       </div>

@@ -12,6 +12,7 @@ import {
   calculateEventDuration,
   formatCalendarPriority,
 } from "@/lib/vendorCalendar";
+import { ContextualLink } from "@/components/common/ContextualLink";
 import {
   X,
   Calendar,
@@ -20,7 +21,6 @@ import {
   Tag,
   Edit,
   CheckCircle,
-  ExternalLink,
   Trash2,
 } from "lucide-react";
 
@@ -198,22 +198,13 @@ export const CalendarEventDetail: React.FC<CalendarEventDetailProps> = ({
 
           {/* Booking Connection */}
           {event.bookingReference && (
-            <div className="p-4 bg-white border border-[#161514]/10 mb-6 text-xs flex items-center justify-between">
-              <div>
-                <span className="text-[10px] font-semibold uppercase tracking-wider text-[#5A5650] block mb-0.5">
-                  LINKED CONTRACT BOOKING
-                </span>
-                <span className="font-serif text-base font-medium text-[#161514]">
-                  Reference #{event.bookingReference}
-                </span>
-              </div>
-              <Link
+            <div className="mb-6">
+              <ContextualLink
+                label="Linked Contract Booking"
+                value={`Ref #${event.bookingReference}`}
                 href="/vendor/dashboard/bookings"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#161514] text-[#FAF8F5] text-xs uppercase tracking-wider font-medium hover:bg-[#161514]/90"
-              >
-                <span>View Booking</span>
-                <ExternalLink className="w-3.5 h-3.5 text-[#C5A880]" />
-              </Link>
+                actionLabel="View booking"
+              />
             </div>
           )}
 
@@ -277,7 +268,7 @@ export const CalendarEventDetail: React.FC<CalendarEventDetailProps> = ({
           </span>
           <button
             onClick={onClose}
-            className="px-5 py-2.5 bg-[#161514] text-[#FAF8F5] text-xs font-medium uppercase tracking-wider"
+            className="px-5 py-2 border border-[#161514]/20 text-[#161514] bg-white hover:bg-[#161514]/5 text-xs font-medium uppercase tracking-wider rounded-sm transition-colors"
           >
             Close Item
           </button>

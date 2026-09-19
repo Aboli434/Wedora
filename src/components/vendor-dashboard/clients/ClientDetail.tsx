@@ -16,6 +16,7 @@ import { ClientUpcomingEvents } from "./ClientUpcomingEvents";
 import { ClientServices } from "./ClientServices";
 import { ClientNotes } from "./ClientNotes";
 import { ClientActivity } from "./ClientActivity";
+import { ContextualLink } from "@/components/common/ContextualLink";
 import { X } from "lucide-react";
 
 interface ClientDetailProps {
@@ -117,6 +118,18 @@ export const ClientDetail: React.FC<ClientDetailProps> = ({
 
           {/* Associated Services */}
           <ClientServices services={client.services} />
+
+          {/* Connected Original Enquiry if available */}
+          {client.enquiryId && (
+            <div className="mb-8 p-4 bg-white border border-[#161514]/10 text-xs">
+              <ContextualLink
+                label="Enquiry"
+                value={`Original enquiry #${client.enquiryId}`}
+                href="/vendor/dashboard/enquiries"
+                linkText="View original enquiry →"
+              />
+            </div>
+          )}
 
           {/* Private Notes */}
           <ClientNotes

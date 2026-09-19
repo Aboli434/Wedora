@@ -8,12 +8,10 @@ import { ReviewStatusControl } from "./ReviewStatusControl";
 import { ReviewResponseComposer } from "./ReviewResponseComposer";
 import { ReviewActivity } from "./ReviewActivity";
 import { ReviewNotes } from "./ReviewNotes";
+import { ContextualLink } from "@/components/common/ContextualLink";
 import {
   X,
   Star,
-  User,
-  CalendarCheck,
-  ExternalLink,
   Clock,
 } from "lucide-react";
 
@@ -168,45 +166,18 @@ export const ReviewDetail: React.FC<ReviewDetailProps> = ({
 
             {/* Related Client & Booking Context Links */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 bg-white border border-[#161514]/10 rounded-sm space-y-2">
-                <div className="flex items-center gap-1.5 text-[#5A5650] text-[10px] font-semibold uppercase tracking-wider">
-                  <User className="w-3.5 h-3.5 text-[#C5A880]" />
-                  Client Dossier
-                </div>
-                <div className="font-serif text-base font-medium text-[#161514]">
-                  {review.coupleName}
-                </div>
-                <span className="font-mono text-xs text-[#5A5650] block">
-                  Ref #{review.clientReference}
-                </span>
-                <Link
-                  href="/vendor/dashboard/clients"
-                  className="text-xs text-[#C5A880] hover:text-[#161514] transition-colors underline inline-flex items-center gap-1 mt-1"
-                >
-                  View Client Workspace
-                  <ExternalLink className="w-3 h-3" />
-                </Link>
-              </div>
-
-              <div className="p-4 bg-white border border-[#161514]/10 rounded-sm space-y-2">
-                <div className="flex items-center gap-1.5 text-[#5A5650] text-[10px] font-semibold uppercase tracking-wider">
-                  <CalendarCheck className="w-3.5 h-3.5 text-[#C5A880]" />
-                  Booking Contract
-                </div>
-                <div className="font-mono text-sm font-medium text-[#161514]">
-                  #{review.bookingId}
-                </div>
-                <span className="text-xs text-[#5A5650] block">
-                  Wedding: {review.weddingDate}
-                </span>
-                <Link
-                  href="/vendor/dashboard/bookings"
-                  className="text-xs text-[#C5A880] hover:text-[#161514] transition-colors underline inline-flex items-center gap-1 mt-1"
-                >
-                  View Booking Contract
-                  <ExternalLink className="w-3 h-3" />
-                </Link>
-              </div>
+              <ContextualLink
+                label="Client Dossier"
+                value={review.coupleName}
+                href="/vendor/dashboard/clients"
+                actionLabel="View client profile"
+              />
+              <ContextualLink
+                label="Booking Contract"
+                value={`#${review.bookingId}`}
+                href="/vendor/dashboard/bookings"
+                actionLabel="View booking"
+              />
             </div>
 
             {/* Lifecycle Activity */}
@@ -231,7 +202,7 @@ export const ReviewDetail: React.FC<ReviewDetailProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="px-5 py-2 bg-[#161514] text-[#FAF8F5] text-xs font-medium uppercase tracking-wider rounded-sm hover:bg-[#2c2927]"
+            className="px-5 py-2 border border-[#161514]/20 text-[#161514] bg-white hover:bg-[#161514]/5 text-xs font-medium uppercase tracking-wider rounded-sm transition-colors"
           >
             Close Dossier
           </button>

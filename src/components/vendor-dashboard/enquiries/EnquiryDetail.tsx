@@ -24,6 +24,7 @@ import {
   Eye,
   EyeOff,
 } from "lucide-react";
+import { ContextualLink } from "@/components/common/ContextualLink";
 
 interface EnquiryDetailProps {
   enquiry: VendorEnquiry | null;
@@ -281,6 +282,29 @@ export const EnquiryDetail: React.FC<EnquiryDetailProps> = ({
             </div>
           </div>
 
+          {/* Related Workspace Records Contextual Links */}
+          <div className="mb-8 p-4 bg-white border border-[#161514]/10 text-xs">
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#5A5650] mb-3">
+              RELATED WORKSPACE RECORDS
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <ContextualLink
+                label="Client"
+                value={enquiry.coupleName}
+                href="/vendor/dashboard/clients"
+                linkText="View client profile →"
+              />
+              {(enquiry.status === "ACCEPTED" || (enquiry as { bookingId?: string }).bookingId) && (
+                <ContextualLink
+                  label="Booking"
+                  value={`Contract dossier for ${enquiry.coupleName}`}
+                  href="/vendor/dashboard/bookings"
+                  linkText="View booking →"
+                />
+              )}
+            </div>
+          </div>
+
           {/* Original Message */}
           <div className="mb-8">
             <h4 className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#5A5650] mb-2">
@@ -322,7 +346,7 @@ export const EnquiryDetail: React.FC<EnquiryDetailProps> = ({
           </span>
           <button
             onClick={onClose}
-            className="px-5 py-2.5 bg-[#161514] text-[#FAF8F5] text-xs font-medium uppercase tracking-wider"
+            className="px-5 py-2 border border-[#161514]/20 text-[#161514] bg-white hover:bg-[#161514]/5 text-xs font-medium uppercase tracking-wider rounded-sm transition-colors"
           >
             Close Workspace
           </button>

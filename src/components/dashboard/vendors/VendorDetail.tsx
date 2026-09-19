@@ -11,6 +11,7 @@ import {
   formatIndianCurrency,
   calculatePaymentProgress,
 } from "@/lib/vendorsDashboard";
+import { ContextualLink } from "@/components/common/ContextualLink";
 import { X, ExternalLink, Mail, Phone, MapPin, CreditCard, Clock } from "lucide-react";
 
 interface VendorDetailProps {
@@ -185,6 +186,15 @@ export function VendorDetail({ vendor, onClose }: VendorDetailProps) {
                       style={{ width: `${progress}%` }}
                     />
                   </div>
+                </div>
+
+                <div className="pt-2">
+                  <ContextualLink
+                    label="Budget Integration"
+                    value={formatIndianCurrency(amount)}
+                    href="/dashboard/budget"
+                    actionLabel="View in budget"
+                  />
                 </div>
               </div>
             ) : (

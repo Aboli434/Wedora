@@ -26,6 +26,7 @@ import {
   ExternalLink,
   Sparkles,
 } from "lucide-react";
+import { ContextualLink } from "@/components/common/ContextualLink";
 
 interface BookingDetailProps {
   booking: VendorBooking | null;
@@ -240,6 +241,49 @@ export const BookingDetail: React.FC<BookingDetailProps> = ({
             )}
           </div>
 
+          {/* Related Workspace Records Contextual Links */}
+          <div className="mb-8 p-4 bg-white border border-[#161514]/10 text-xs">
+            <h4 className="text-[11px] font-semibold uppercase tracking-[0.15em] text-[#5A5650] mb-3">
+              RELATED WORKSPACE RECORDS
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <ContextualLink
+                label="Client"
+                value={booking.coupleName}
+                href="/vendor/dashboard/clients"
+                linkText="View client profile →"
+              />
+              <ContextualLink
+                label="Calendar"
+                value={
+                  booking.weddingDate
+                    ? new Date(booking.weddingDate).toLocaleDateString("en-IN", {
+                        day: "numeric",
+                        month: "short",
+                        year: "numeric",
+                      })
+                    : "Scheduled"
+                }
+                href="/vendor/dashboard/calendar"
+                linkText="View in calendar →"
+              />
+              <ContextualLink
+                label="Payments"
+                value={`${formatIndianCurrency(booking.amountOutstanding)} due`}
+                href="/vendor/dashboard/payments"
+                linkText="View payment details →"
+              />
+              {(booking.enquiryReferenceId || (booking as { enquiryId?: string }).enquiryId) && (
+                <ContextualLink
+                  label="Enquiry"
+                  value={`Enquiry #${booking.enquiryReferenceId || (booking as { enquiryId?: string }).enquiryId}`}
+                  href="/vendor/dashboard/enquiries"
+                  linkText="View original enquiry →"
+                />
+              )}
+            </div>
+          </div>
+
           {/* Financial Snapshot */}
           <BookingPaymentSnapshot
             booking={booking}
@@ -275,7 +319,7 @@ export const BookingDetail: React.FC<BookingDetailProps> = ({
           </span>
           <button
             onClick={onClose}
-            className="px-5 py-2.5 bg-[#161514] text-[#FAF8F5] text-xs font-medium uppercase tracking-wider"
+            className="px-5 py-2 border border-[#161514]/20 text-[#161514] bg-white hover:bg-[#161514]/5 text-xs font-medium uppercase tracking-wider rounded-sm transition-colors"
           >
             Close Dossier
           </button>

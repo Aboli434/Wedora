@@ -70,6 +70,7 @@ export default function ChecklistPage() {
       <ChecklistPageHeader
         completedCount={stats.completedCount}
         totalCount={stats.totalCount}
+        onAddTaskClick={() => setIsAddModalOpen(true)}
       />
 
       {/* 2. Visual Progress Overview */}

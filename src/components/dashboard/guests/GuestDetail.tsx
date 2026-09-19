@@ -3,6 +3,7 @@
 import React, { useEffect } from "react";
 import { Guest } from "@/data/guests";
 import { formatGuestStatus, formatMealPreference } from "@/lib/guests";
+import { ContextualLink } from "@/components/common/ContextualLink";
 import { X, Mail, Phone, UserCheck, Utensils } from "lucide-react";
 
 interface GuestDetailProps {
@@ -160,6 +161,15 @@ export function GuestDetail({ guest, onClose }: GuestDetailProps) {
                     : "Pending"}
                 </span>
               </div>
+            </div>
+
+            <div className="pt-2">
+              <ContextualLink
+                label="Wedding Schedule"
+                value="4 Main Celebrations"
+                href="/dashboard/events"
+                actionLabel="View wedding events"
+              />
             </div>
           </div>
 

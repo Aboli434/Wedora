@@ -42,13 +42,9 @@ export function BusinessPageHeader({ isEditing, onToggleEdit }: BusinessPageHead
           <button
             type="button"
             onClick={onToggleEdit}
-            className={`inline-flex items-center gap-2 px-4 py-2 text-xs font-medium uppercase tracking-wider rounded-md transition-colors ${
-              isEditing
-                ? "bg-[#2C2A29] text-white hover:bg-[#1A1918]"
-                : "bg-white text-[#2C2A29] border border-[#2C2A29]/20 hover:bg-[#F2ECE4]"
-            }`}
+            className="inline-flex items-center gap-2 px-4 py-2 text-xs font-medium uppercase tracking-wider text-white bg-[#2C2A29] hover:bg-[#1A1918] transition-colors rounded-md shadow-xs"
           >
-            <Edit2 className="w-3.5 h-3.5" />
+            <Edit2 className="w-3.5 h-3.5 text-[#C5A880]" />
             <span>{isEditing ? "Done Editing" : "Edit Business"}</span>
           </button>
 
