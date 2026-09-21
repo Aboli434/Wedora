@@ -1,0 +1,696 @@
+// Wedora Canonical Database Schema
+// Phase 22.6 Final Schema Specification
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ==========================================
+// ENUMS
+// ==========================================
+
+enum UserRole {
+  CLIENT
+  VENDOR
+  ADMIN
+}
+
+enum AttendanceStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  MAYBE
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum CategoryType {
+  VENUE
+  PHOTOGRAPHY
+  VIDEOGRAPHY
+  CATERING
+  DECOR
+  MAKEUP
+  MEHNDI
+  DJ_SOUND
+  CHOREOGRAPHY
+  INVITATIONS
+  ATTIRE
+  PLANNERS
+  GIFTS
+  OTHER
+}
+
+enum ServicePricingType {
+  FIXED
+  PER_DAY
+  PER_EVENT
+  PER_PLATE
+  CUSTOM
+}
+
+enum PortfolioMediaType {
+  IMAGE
+  VIDEO
+}
+
+enum EnquiryStatus {
+  NEW
+  CONTACTED
+  QUOTED
+  ACCEPTED
+  DECLINED
+  CONVERTED
+  EXPIRED
+}
+
+enum BookingStatus {
+  DRAFT
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum PaymentStatus {
+  PENDING
+  PARTIAL
+  PAID
+  OVERDUE
+  REFUNDED
+}
+
+enum PaymentMethod {
+  UPI
+  CREDIT_CARD
+  DEBIT_CARD
+  NET_BANKING
+  BANK_TRANSFER
+  CASH
+  CHEQUE
+}
+
+enum TransactionType {
+  PAYMENT
+  REFUND
+  ADJUSTMENT
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum CalendarEventType {
+  WEDDING_EVENT
+  VENDOR_BOOKING
+  BLACKOUT_DATE
+  PERSONAL_REMINDER
+}
+
+enum CalendarEventStatus {
+  TENTATIVE
+  CONFIRMED
+  CANCELLED
+}
+
+enum ReviewStatus {
+  PENDING
+  PUBLISHED
+  FLAGGED
+  ARCHIVED
+}
+
+enum NotificationType {
+  ENQUIRY
+  BOOKING
+  PAYMENT
+  TASK
+  SYSTEM
+}
+
+enum LogSeverity {
+  INFO
+  WARNING
+  ERROR
+}
+
+// ==========================================
+// IDENTITY DOMAIN
+// ==========================================
+
+model User {
+  id                 String   @id @default(uuid()) @db.Uuid
+  supabaseAuthUserId String   @unique @db.Uuid
+  email              String   @unique
+  role               UserRole
+  fullName           String
+  phoneNumber        String?
+  avatarUrl          String?
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime @updatedAt @db.Timestamptz(6)
+
+  clientProfile   ClientProfile?
+  vendorProfile   VendorProfile?
+  enquiryMessages EnquiryMessage[]
+  reviewsAuthored Review[]
+  notifications   Notification[]
+  activityLogs    ActivityLog[]
+
+  @@map("users")
+}
+
+model ClientProfile {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String   @unique @db.Uuid
+  location    String?
+  phone       String?
+  budgetRange String?
+  notes       String?
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime @updatedAt @db.Timestamptz(6)
+
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  weddings Wedding[]
+
+  @@map("client_profiles")
+}
+
+model VendorProfile {
+  id              String       @id @default(uuid()) @db.Uuid
+  userId          String       @unique @db.Uuid
+  businessName    String
+  slug            String       @unique
+  category        CategoryType
+  rating          Float        @default(0)
+  reviewCount     Int          @default(0)
+  city            String
+  startingPrice   BigInt
+  coverImage      String?
+  description     String?
+  experienceYears Int?
+  teamSize        String?
+  verified        Boolean      @default(false)
+  featured        Boolean      @default(false)
+  createdAt       DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(6)
+
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  services       VendorService[]
+  mediaAssets    MediaAsset[]
+  portfolioItems VendorPortfolioItem[]
+  availability   VendorAvailability[]
+  weddingVendors WeddingVendor[]
+  enquiries      VendorEnquiry[]
+  bookings       Booking[]
+  reviews        Review[]
+  calendarEvents CalendarEvent[]
+
+  @@map("vendor_profiles")
+}
+
+// ==========================================
+// WEDDING DOMAIN
+// ==========================================
+
+model Wedding {
+  id           String   @id @default(uuid()) @db.Uuid
+  clientId     String   @db.Uuid
+  partner1Name String
+  partner2Name String
+  title        String
+  weddingDate  DateTime @db.Date
+  location     String
+  totalBudget  BigInt
+  totalSpent   BigInt   @default(0)
+  status       String   @default("PLANNING")
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(6)
+
+  client         ClientProfile   @relation(fields: [clientId], references: [id], onDelete: Restrict)
+  events         WeddingEvent[]
+  guests         Guest[]
+  tasks          ChecklistTask[]
+  budgets        Budget[]
+  expenses       Expense[]
+  vendors        WeddingVendor[]
+  enquiries      VendorEnquiry[]
+  bookings       Booking[]
+  calendarEvents CalendarEvent[]
+
+  @@map("weddings")
+}
+
+model WeddingEvent {
+  id        String    @id @default(uuid()) @db.Uuid
+  weddingId String    @db.Uuid
+  name      String
+  date      DateTime  @db.Date
+  startTime DateTime? @db.Time(6)
+  endTime   DateTime? @db.Time(6)
+  timezone  String    @default("Asia/Kolkata")
+  venue     String?
+  address   String?
+  notes     String?
+  createdAt DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(6)
+
+  wedding       Wedding                @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  attendances   GuestEventAttendance[]
+  bookingEvents BookingEvent[]
+
+  @@map("wedding_events")
+}
+
+model Guest {
+  id                  String           @id @default(uuid()) @db.Uuid
+  weddingId           String           @db.Uuid
+  name                String
+  email               String?
+  phone               String?
+  rsvpStatus          AttendanceStatus @default(PENDING)
+  plusOne             Boolean          @default(false)
+  plusOneName         String?
+  dietaryRestrictions String?
+  group               String?
+  tableNumber         String?
+  createdAt           DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime         @updatedAt @db.Timestamptz(6)
+
+  wedding          Wedding                @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  eventAttendances GuestEventAttendance[]
+
+  @@map("guests")
+}
+
+model GuestEventAttendance {
+  id        String           @id @default(uuid()) @db.Uuid
+  guestId   String           @db.Uuid
+  eventId   String           @db.Uuid
+  status    AttendanceStatus @default(PENDING)
+  createdAt DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime         @updatedAt @db.Timestamptz(6)
+
+  guest Guest        @relation(fields: [guestId], references: [id], onDelete: Cascade)
+  event WeddingEvent @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  @@unique([guestId, eventId])
+  @@map("guest_event_attendances")
+}
+
+model ChecklistTask {
+  id         String       @id @default(uuid()) @db.Uuid
+  weddingId  String       @db.Uuid
+  title      String
+  category   String
+  dueDate    DateTime?    @db.Date
+  priority   TaskPriority @default(MEDIUM)
+  status     TaskStatus   @default(PENDING)
+  assignedTo String?
+  notes      String?
+  createdAt  DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt  DateTime     @updatedAt @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+
+  @@map("checklist_tasks")
+}
+
+model Budget {
+  id              String       @id @default(uuid()) @db.Uuid
+  weddingId       String       @db.Uuid
+  category        CategoryType
+  allocatedAmount BigInt
+  spentAmount     BigInt       @default(0)
+  notes           String?
+  createdAt       DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime     @updatedAt @db.Timestamptz(6)
+
+  wedding  Wedding   @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  expenses Expense[]
+
+  @@map("budgets")
+}
+
+model Expense {
+  id             String        @id @default(uuid()) @db.Uuid
+  weddingId      String        @db.Uuid
+  budgetId       String?       @db.Uuid
+  vendorName     String
+  category       CategoryType
+  amount         BigInt
+  paidAmount     BigInt        @default(0)
+  paymentDueDate DateTime?     @db.Date
+  status         PaymentStatus @default(PENDING)
+  notes          String?
+  createdAt      DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @db.Timestamptz(6)
+
+  wedding Wedding @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  budget  Budget? @relation(fields: [budgetId], references: [id], onDelete: SetNull)
+
+  @@map("expenses")
+}
+
+// ==========================================
+// VENDOR DOMAIN
+// ==========================================
+
+model VendorService {
+  id             String             @id @default(uuid()) @db.Uuid
+  vendorId       String             @db.Uuid
+  name           String
+  description    String?
+  pricingType    ServicePricingType @default(FIXED)
+  price          BigInt
+  isCustomizable Boolean            @default(false)
+  features       Json?
+  createdAt      DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime           @updatedAt @db.Timestamptz(6)
+
+  vendor          VendorProfile    @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+  bookingServices BookingService[]
+
+  @@map("vendor_services")
+}
+
+model MediaAsset {
+  id        String             @id @default(uuid()) @db.Uuid
+  vendorId  String             @db.Uuid
+  url       String
+  type      PortfolioMediaType @default(IMAGE)
+  caption   String?
+  sortOrder Int                @default(0)
+  createdAt DateTime           @default(now()) @db.Timestamptz(6)
+
+  vendor VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("media_assets")
+}
+
+model VendorPortfolioItem {
+  id          String    @id @default(uuid()) @db.Uuid
+  vendorId    String    @db.Uuid
+  title       String
+  description String?
+  coverUrl    String
+  images      Json?
+  tags        Json?
+  eventDate   DateTime? @db.Date
+  createdAt   DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt   DateTime  @updatedAt @db.Timestamptz(6)
+
+  vendor VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@map("vendor_portfolio_items")
+}
+
+model VendorAvailability {
+  id          String   @id @default(uuid()) @db.Uuid
+  vendorId    String   @db.Uuid
+  date        DateTime @db.Date
+  isAvailable Boolean  @default(true)
+  notes       String?
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  vendor VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Cascade)
+
+  @@unique([vendorId, date])
+  @@map("vendor_availabilities")
+}
+
+// ==========================================
+// WORKFLOW DOMAIN
+// ==========================================
+
+model WeddingVendor {
+  id                String       @id @default(uuid()) @db.Uuid
+  weddingId         String       @db.Uuid
+  vendorId          String       @db.Uuid
+  category          CategoryType
+  status            String       @default("HIRED")
+  hiredAt           DateTime     @default(now()) @db.Timestamptz(6)
+  totalAgreedAmount BigInt
+  notes             String?
+  createdAt         DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt         DateTime     @updatedAt @db.Timestamptz(6)
+
+  wedding  Wedding       @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  vendor   VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  bookings Booking[]
+
+  @@unique([weddingId, vendorId])
+  @@map("wedding_vendors")
+}
+
+model VendorEnquiry {
+  id              String        @id @default(uuid()) @db.Uuid
+  referenceCode   String        @unique
+  weddingId       String        @db.Uuid
+  vendorId        String        @db.Uuid
+  eventDate       DateTime      @db.Date
+  guestCount      Int?
+  estimatedBudget BigInt?
+  status          EnquiryStatus @default(NEW)
+  message         String
+  createdAt       DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime      @updatedAt @db.Timestamptz(6)
+
+  wedding  Wedding          @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  vendor   VendorProfile    @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  messages EnquiryMessage[]
+  booking  Booking?
+
+  @@map("vendor_enquiries")
+}
+
+model EnquiryMessage {
+  id        String   @id @default(uuid()) @db.Uuid
+  enquiryId String   @db.Uuid
+  senderId  String   @db.Uuid
+  message   String
+  sentAt    DateTime @default(now()) @db.Timestamptz(6)
+
+  enquiry VendorEnquiry @relation(fields: [enquiryId], references: [id], onDelete: Cascade)
+  sender  User          @relation(fields: [senderId], references: [id], onDelete: Restrict)
+
+  @@map("enquiry_messages")
+}
+
+model Booking {
+  id              String        @id @default(uuid()) @db.Uuid
+  referenceCode   String        @unique
+  weddingId       String        @db.Uuid
+  vendorId        String        @db.Uuid
+  weddingVendorId String?       @db.Uuid
+  enquiryId       String?       @unique @db.Uuid
+  status          BookingStatus @default(DRAFT)
+  totalAmount     BigInt
+  advanceAmount   BigInt        @default(0)
+  paidAmount      BigInt        @default(0)
+  notes           String?
+  createdAt       DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime      @updatedAt @db.Timestamptz(6)
+
+  wedding       Wedding          @relation(fields: [weddingId], references: [id], onDelete: Restrict)
+  vendor        VendorProfile    @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  weddingVendor WeddingVendor?   @relation(fields: [weddingVendorId], references: [id], onDelete: SetNull)
+  enquiry       VendorEnquiry?   @relation(fields: [enquiryId], references: [id], onDelete: SetNull)
+  services      BookingService[]
+  events        BookingEvent[]
+  payments      Payment[]
+  invoices      Invoice[]
+  review        Review?
+
+  @@map("bookings")
+}
+
+model BookingService {
+  id              String   @id @default(uuid()) @db.Uuid
+  bookingId       String   @db.Uuid
+  vendorServiceId String?  @db.Uuid
+  serviceName     String
+  unitPrice       BigInt
+  quantity        Int      @default(1)
+  totalPrice      BigInt
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+
+  booking       Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  vendorService VendorService? @relation(fields: [vendorServiceId], references: [id], onDelete: SetNull)
+
+  @@map("booking_services")
+}
+
+model BookingEvent {
+  id             String    @id @default(uuid()) @db.Uuid
+  bookingId      String    @db.Uuid
+  weddingEventId String?   @db.Uuid
+  eventName      String
+  eventDate      DateTime  @db.Date
+  startTime      DateTime? @db.Time(6)
+  endTime        DateTime? @db.Time(6)
+  venue          String?
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+
+  booking      Booking       @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  weddingEvent WeddingEvent? @relation(fields: [weddingEventId], references: [id], onDelete: SetNull)
+
+  @@map("booking_events")
+}
+
+// ==========================================
+// FINANCIAL DOMAIN
+// ==========================================
+
+model Payment {
+  id             String        @id @default(uuid()) @db.Uuid
+  bookingId      String        @db.Uuid
+  invoiceId      String?       @db.Uuid
+  amount         BigInt
+  dueDate        DateTime      @db.Date
+  status         PaymentStatus @default(PENDING)
+  milestoneTitle String?
+  createdAt      DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime      @updatedAt @db.Timestamptz(6)
+
+  booking      Booking              @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  invoice      Invoice?             @relation(fields: [invoiceId], references: [id], onDelete: SetNull)
+  transactions PaymentTransaction[]
+
+  @@map("payments")
+}
+
+model PaymentTransaction {
+  id                   String          @id @default(uuid()) @db.Uuid
+  paymentId            String          @db.Uuid
+  transactionRef       String          @unique
+  amount               BigInt
+  paymentMethod        PaymentMethod
+  type                 TransactionType @default(PAYMENT)
+  gatewayProvider      String?
+  gatewayTransactionId String?
+  notes                String?
+  transactedAt         DateTime        @default(now()) @db.Timestamptz(6)
+
+  payment Payment @relation(fields: [paymentId], references: [id], onDelete: Restrict)
+
+  @@map("payment_transactions")
+}
+
+model Invoice {
+  id            String        @id @default(uuid()) @db.Uuid
+  invoiceNumber String        @unique
+  bookingId     String        @db.Uuid
+  totalAmount   BigInt
+  taxAmount     BigInt        @default(0)
+  netAmount     BigInt
+  issueDate     DateTime      @db.Date
+  dueDate       DateTime      @db.Date
+  status        InvoiceStatus @default(DRAFT)
+  notes         String?
+  createdAt     DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime      @updatedAt @db.Timestamptz(6)
+
+  booking  Booking   @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  payments Payment[]
+
+  @@map("invoices")
+}
+
+// ==========================================
+// CALENDAR & REPUTATION DOMAIN
+// ==========================================
+
+model CalendarEvent {
+  id              String              @id @default(uuid()) @db.Uuid
+  weddingId       String?             @db.Uuid
+  vendorProfileId String?             @db.Uuid
+  title           String
+  type            CalendarEventType
+  startDate       DateTime            @db.Timestamptz(6)
+  endDate         DateTime            @db.Timestamptz(6)
+  status          CalendarEventStatus @default(CONFIRMED)
+  notes           String?
+  createdAt       DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt       DateTime            @updatedAt @db.Timestamptz(6)
+
+  wedding       Wedding?       @relation(fields: [weddingId], references: [id], onDelete: Cascade)
+  vendorProfile VendorProfile? @relation(fields: [vendorProfileId], references: [id], onDelete: Cascade)
+
+  @@map("calendar_events")
+}
+
+model Review {
+  id        String       @id @default(uuid()) @db.Uuid
+  bookingId String       @unique @db.Uuid
+  vendorId  String       @db.Uuid
+  authorId  String       @db.Uuid
+  rating    Int
+  title     String?
+  comment   String
+  status    ReviewStatus @default(PUBLISHED)
+  createdAt DateTime     @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime     @updatedAt @db.Timestamptz(6)
+
+  booking Booking       @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+  vendor  VendorProfile @relation(fields: [vendorId], references: [id], onDelete: Restrict)
+  author  User          @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@map("reviews")
+}
+
+// ==========================================
+// PLATFORM INFRASTRUCTURE DOMAIN
+// ==========================================
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  userId    String           @db.Uuid
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  linkUrl   String?
+  createdAt DateTime         @default(now()) @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model ActivityLog {
+  id         String      @id @default(uuid()) @db.Uuid
+  userId     String?     @db.Uuid
+  action     String
+  entityType String
+  entityId   String?
+  metadata   Json?
+  severity   LogSeverity @default(INFO)
+  createdAt  DateTime    @default(now()) @db.Timestamptz(6)
+
+  user User? @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@map("activity_logs")
+}
