@@ -1,4 +1,4 @@
-import { UserRole, CategoryType } from '@prisma/client';
+import { UserRole, CategoryType, AttendanceStatus, TaskPriority, TaskStatus, PaymentStatus, ServicePricingType, PortfolioMediaType, EnquiryStatus } from '@prisma/client';
 
 export interface ApiSuccessResponse<T> {
   success: true;
@@ -44,6 +44,8 @@ export interface VendorProfileResponse {
   updatedAt: string | Date;
 }
 
+export type PublicVendorProfileResponse = VendorProfileResponse;
+
 export interface CurrentUserResponse {
   id: string;
   email: string;
@@ -71,6 +73,85 @@ export interface WeddingResponse {
   updatedAt: string | Date;
 }
 
+export interface WeddingEventResponse {
+  id: string;
+  weddingId: string;
+  name: string;
+  date: string;
+  startTime: string | null;
+  endTime: string | null;
+  timezone: string;
+  venue: string | null;
+  address: string | null;
+  notes: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export interface GuestResponse {
+  id: string;
+  weddingId: string;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  rsvpStatus: AttendanceStatus;
+  plusOne: boolean;
+  plusOneName: string | null;
+  dietaryRestrictions: string | null;
+  group: string | null;
+  tableNumber: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export interface ChecklistTaskResponse {
+  id: string;
+  weddingId: string;
+  title: string;
+  category: string;
+  dueDate: string | null;
+  priority: TaskPriority;
+  status: TaskStatus;
+  assignedTo: string | null;
+  notes: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export interface BudgetResponse {
+  id: string;
+  weddingId: string;
+  category: CategoryType;
+  allocatedAmount: string;
+  spentAmount: string;
+  notes: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export interface BudgetSummaryResponse {
+  totalAllocated: string;
+  totalSpent: string;
+  totalExpensesAmount: string;
+  totalPaidAmount: string;
+  remainingBudget: string;
+}
+
+export interface ExpenseResponse {
+  id: string;
+  weddingId: string;
+  budgetId: string | null;
+  vendorName: string;
+  category: CategoryType;
+  amount: string;
+  paidAmount: string;
+  paymentDueDate: string | null;
+  status: PaymentStatus;
+  notes: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
 export interface PaginationMeta {
   page: number;
   pageSize: number;
@@ -82,4 +163,79 @@ export interface ApiPaginatedResponse<T> {
   success: true;
   data: T[];
   meta: PaginationMeta;
+}
+
+export interface VendorServiceResponse {
+  id: string;
+  vendorId: string;
+  name: string;
+  description: string | null;
+  pricingType: ServicePricingType;
+  price: string;
+  isCustomizable: boolean;
+  features: unknown | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export type PublicVendorServiceResponse = VendorServiceResponse;
+
+export interface VendorPortfolioItemResponse {
+  id: string;
+  vendorId: string;
+  title: string;
+  description: string | null;
+  coverUrl: string;
+  images: unknown | null;
+  tags: unknown | null;
+  eventDate: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export type PublicVendorPortfolioItemResponse = VendorPortfolioItemResponse;
+
+export interface MediaAssetResponse {
+  id: string;
+  vendorId: string;
+  url: string;
+  type: PortfolioMediaType;
+  caption: string | null;
+  sortOrder: number;
+  createdAt: string | Date;
+}
+
+export type PublicMediaAssetResponse = MediaAssetResponse;
+
+export interface VendorAvailabilityResponse {
+  id: string;
+  vendorId: string;
+  date: string;
+  isAvailable: boolean;
+  notes: string | null;
+  createdAt: string | Date;
+}
+
+export type PublicVendorAvailabilityResponse = VendorAvailabilityResponse;
+
+export interface VendorEnquiryResponse {
+  id: string;
+  referenceCode: string;
+  weddingId: string;
+  vendorId: string;
+  eventDate: string;
+  guestCount: number | null;
+  estimatedBudget: string | null;
+  status: EnquiryStatus;
+  message: string;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+}
+
+export interface EnquiryMessageResponse {
+  id: string;
+  enquiryId: string;
+  senderId: string;
+  message: string;
+  sentAt: string | Date;
 }
