@@ -1,4 +1,4 @@
-import { UserRole, CategoryType, AttendanceStatus, TaskPriority, TaskStatus, PaymentStatus, ServicePricingType, PortfolioMediaType, EnquiryStatus, BookingStatus, PaymentMethod, TransactionType } from '@prisma/client';
+import { UserRole, CategoryType, AttendanceStatus, TaskPriority, TaskStatus, PaymentStatus, ServicePricingType, PortfolioMediaType, EnquiryStatus, BookingStatus, PaymentMethod, TransactionType, ReviewStatus } from '@prisma/client';
 
 
 export interface ApiSuccessResponse<T> {
@@ -307,4 +307,27 @@ export interface PaymentResponse {
   updatedAt: string | Date;
   transactions?: PaymentTransactionResponse[];
 }
+
+export interface ReviewAuthorSummary {
+  id: string;
+  fullName: string;
+  avatarUrl: string | null;
+}
+
+export interface ReviewResponse {
+  id: string;
+  bookingId: string;
+  vendorId: string;
+  authorId: string;
+  rating: number;
+  title: string | null;
+  comment: string;
+  status: ReviewStatus;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  author?: ReviewAuthorSummary;
+}
+
+export type PublicReviewResponse = ReviewResponse;
+
 
