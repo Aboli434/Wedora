@@ -1,4 +1,4 @@
-import { UserRole, CategoryType, AttendanceStatus, TaskPriority, TaskStatus, PaymentStatus, ServicePricingType, PortfolioMediaType, EnquiryStatus } from '@prisma/client';
+import { UserRole, CategoryType, AttendanceStatus, TaskPriority, TaskStatus, PaymentStatus, ServicePricingType, PortfolioMediaType, EnquiryStatus, BookingStatus } from '@prisma/client';
 
 export interface ApiSuccessResponse<T> {
   success: true;
@@ -238,4 +238,45 @@ export interface EnquiryMessageResponse {
   senderId: string;
   message: string;
   sentAt: string | Date;
+}
+
+export interface BookingServiceResponse {
+  id: string;
+  bookingId: string;
+  vendorServiceId: string | null;
+  serviceName: string;
+  unitPrice: string;
+  quantity: number;
+  totalPrice: string;
+  createdAt: string | Date;
+}
+
+export interface BookingEventResponse {
+  id: string;
+  bookingId: string;
+  weddingEventId: string | null;
+  eventName: string;
+  eventDate: string;
+  startTime: string | null;
+  endTime: string | null;
+  venue: string | null;
+  createdAt: string | Date;
+}
+
+export interface BookingResponse {
+  id: string;
+  referenceCode: string;
+  weddingId: string;
+  vendorId: string;
+  weddingVendorId: string | null;
+  enquiryId: string | null;
+  status: BookingStatus;
+  totalAmount: string;
+  advanceAmount: string;
+  paidAmount: string;
+  notes: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  services?: BookingServiceResponse[];
+  events?: BookingEventResponse[];
 }
