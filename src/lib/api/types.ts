@@ -1,4 +1,5 @@
-import { UserRole, CategoryType, AttendanceStatus, TaskPriority, TaskStatus, PaymentStatus, ServicePricingType, PortfolioMediaType, EnquiryStatus, BookingStatus } from '@prisma/client';
+import { UserRole, CategoryType, AttendanceStatus, TaskPriority, TaskStatus, PaymentStatus, ServicePricingType, PortfolioMediaType, EnquiryStatus, BookingStatus, PaymentMethod, TransactionType } from '@prisma/client';
+
 
 export interface ApiSuccessResponse<T> {
   success: true;
@@ -280,3 +281,30 @@ export interface BookingResponse {
   services?: BookingServiceResponse[];
   events?: BookingEventResponse[];
 }
+
+export interface PaymentTransactionResponse {
+  id: string;
+  paymentId: string;
+  transactionRef: string;
+  amount: string;
+  paymentMethod: PaymentMethod;
+  type: TransactionType;
+  gatewayProvider: string | null;
+  gatewayTransactionId: string | null;
+  notes: string | null;
+  transactedAt: string | Date;
+}
+
+export interface PaymentResponse {
+  id: string;
+  bookingId: string;
+  invoiceId: string | null;
+  amount: string;
+  dueDate: string;
+  status: PaymentStatus;
+  milestoneTitle: string | null;
+  createdAt: string | Date;
+  updatedAt: string | Date;
+  transactions?: PaymentTransactionResponse[];
+}
+
