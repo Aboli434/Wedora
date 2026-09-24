@@ -30,11 +30,12 @@ export class BookingServiceService {
    */
   public async verifyBookingParticipantAccess(params: {
     bookingId: string;
+    weddingId?: string;
     userId: string;
     userRole: UserRole;
     clientProfileId?: string;
   }): Promise<{ id: string; weddingId: string; vendorId: string }> {
-    const { bookingId, userId, userRole, clientProfileId } = params;
+    const { bookingId, weddingId, userId, userRole, clientProfileId } = params;
 
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
@@ -48,6 +49,10 @@ export class BookingServiceService {
     });
 
     if (!booking) {
+      throw new NotFoundError('Booking not found');
+    }
+
+    if (weddingId && booking.weddingId !== weddingId) {
       throw new NotFoundError('Booking not found');
     }
 

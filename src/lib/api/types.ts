@@ -1,4 +1,4 @@
-import { UserRole, CategoryType, AttendanceStatus, TaskPriority, TaskStatus, PaymentStatus, ServicePricingType, PortfolioMediaType, EnquiryStatus, BookingStatus, PaymentMethod, TransactionType, ReviewStatus } from '@prisma/client';
+import { UserRole, CategoryType, AttendanceStatus, TaskPriority, TaskStatus, PaymentStatus, ServicePricingType, PortfolioMediaType, EnquiryStatus, BookingStatus, PaymentMethod, TransactionType, ReviewStatus, NotificationType, LogSeverity } from '@prisma/client';
 
 
 export interface ApiSuccessResponse<T> {
@@ -329,5 +329,33 @@ export interface ReviewResponse {
 }
 
 export type PublicReviewResponse = ReviewResponse;
+
+export interface NotificationResponse {
+  id: string;
+  userId: string;
+  title: string;
+  message: string;
+  type: NotificationType;
+  isRead: boolean;
+  linkUrl: string | null;
+  createdAt: string | Date;
+}
+
+export interface NotificationSummaryResponse {
+  unreadCount: number;
+  notifications: NotificationResponse[];
+}
+
+export interface ActivityLogResponse {
+  id: string;
+  userId: string | null;
+  action: string;
+  entityType: string;
+  entityId: string | null;
+  metadata: unknown | null;
+  severity: LogSeverity;
+  createdAt: string | Date;
+}
+
 
 

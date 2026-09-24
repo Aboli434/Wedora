@@ -26,10 +26,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
       throw new ForbiddenError('Client profile is required to access payment transaction');
     }
 
-    const { bookingId, paymentId, transactionId } = await context.params;
+    const { weddingId, bookingId, paymentId, transactionId } = await context.params;
 
     const transaction = await paymentTransactionService.getTransactionForPayment({
       bookingId,
+      weddingId,
       paymentId,
       transactionId,
       userId: user.id,

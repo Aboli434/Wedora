@@ -1,4 +1,4 @@
-import { Booking, BookingStatus, EnquiryStatus, Prisma } from '@prisma/client';
+import { Booking, BookingStatus, EnquiryStatus, NotificationType, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import {
   CreateBookingInput,
@@ -9,6 +9,8 @@ import { ConflictError, NotFoundError } from '@/lib/errors';
 import { parsePaise } from '@/lib/utils/bigint';
 import { bookingServiceService } from '@/lib/services/bookingService.service';
 import { bookingEventService } from '@/lib/services/bookingEvent.service';
+import { notificationService } from '@/lib/services/notification.service';
+import { activityLogService } from '@/lib/services/activityLog.service';
 
 export class BookingService {
   /**
@@ -157,25 +159,45 @@ export class BookingService {
     input: CreateBookingInput;
   }): Promise<BookingResponse> {
     const { weddingId, clientProfileId, input } = params;
-    await this.verifyWeddingOwnership(weddingId, clientProfileId);
+
+    const wedding = await prisma.wedding.findFirst({
+      where: {
+        id: weddingId,
+        clientId: clientProfileId,
+      },
+      include: {
+        client: { select: { userId: true } },
+      },
+    });
+
+    if (!wedding) {
+      throw new NotFoundError('Wedding not found');
+    }
 
     let resolvedVendorId: string | null = null;
+    let vendorUserId: string | null = null;
 
     if (input.vendorId) {
       const vendor = await prisma.vendorProfile.findUnique({
         where: { id: input.vendorId },
-        select: { id: true },
+        select: { id: true, userId: true },
       });
-      if (vendor) resolvedVendorId = vendor.id;
+      if (vendor) {
+        resolvedVendorId = vendor.id;
+        vendorUserId = vendor.userId;
+      }
     } else if (input.vendorSlug) {
       const vendor = await prisma.vendorProfile.findUnique({
         where: { slug: input.vendorSlug },
-        select: { id: true },
+        select: { id: true, userId: true },
       });
-      if (vendor) resolvedVendorId = vendor.id;
+      if (vendor) {
+        resolvedVendorId = vendor.id;
+        vendorUserId = vendor.userId;
+      }
     }
 
-    if (!resolvedVendorId) {
+    if (!resolvedVendorId || !vendorUserId) {
       throw new NotFoundError('Target vendor not found');
     }
 
@@ -231,8 +253,26 @@ export class BookingService {
           });
         }
 
+        await notificationService.createNotification({
+          userId: vendorUserId!,
+          type: NotificationType.BOOKING,
+          title: 'New Booking Created',
+          message: `A new booking (${referenceCode}) has been created.`,
+          linkUrl: '/vendor/dashboard/bookings',
+          tx,
+        });
+
+        await activityLogService.logActivity({
+          userId: wedding.client.userId,
+          action: 'BOOKING_CREATED',
+          entityType: 'Booking',
+          entityId: createdBooking.id,
+          metadata: { referenceCode, totalAmount: totalAmountPaise.toString() },
+          tx,
+        });
+
         return createdBooking;
-      });
+      }, { maxWait: 10000, timeout: 30000 });
 
       return this.formatBookingResponse(booking);
     } catch (error) {
@@ -255,13 +295,16 @@ export class BookingService {
     clientProfileId: string;
   }): Promise<BookingResponse> {
     const { weddingId, enquiryId, clientProfileId } = params;
-    await this.verifyWeddingOwnership(weddingId, clientProfileId);
 
     const enquiry = await prisma.vendorEnquiry.findFirst({
       where: {
         id: enquiryId,
         weddingId,
         wedding: { clientId: clientProfileId },
+      },
+      include: {
+        vendor: { select: { userId: true } },
+        wedding: { include: { client: { select: { userId: true } } } },
       },
     });
 
@@ -301,8 +344,26 @@ export class BookingService {
           data: { status: EnquiryStatus.CONVERTED },
         });
 
+        await notificationService.createNotification({
+          userId: enquiry.vendor.userId,
+          type: NotificationType.BOOKING,
+          title: 'Enquiry Converted to Booking',
+          message: `Enquiry ${enquiry.referenceCode} has been converted to a booking (${referenceCode}).`,
+          linkUrl: '/vendor/dashboard/bookings',
+          tx,
+        });
+
+        await activityLogService.logActivity({
+          userId: enquiry.wedding.client.userId,
+          action: 'ENQUIRY_CONVERTED_TO_BOOKING',
+          entityType: 'Booking',
+          entityId: createdBooking.id,
+          metadata: { enquiryId: enquiry.id, referenceCode },
+          tx,
+        });
+
         return createdBooking;
-      });
+      }, { maxWait: 10000, timeout: 30000 });
 
       return this.formatBookingResponse(booking);
     } catch (error) {
@@ -333,6 +394,10 @@ export class BookingService {
         weddingId,
         wedding: { clientId: clientProfileId },
       },
+      include: {
+        vendor: { select: { userId: true } },
+        wedding: { include: { client: { select: { userId: true } } } },
+      },
     });
 
     if (!existing) {
@@ -346,14 +411,38 @@ export class BookingService {
     if (input.advanceAmount !== undefined) updateData.advanceAmount = parsePaise(input.advanceAmount);
     if (input.notes !== undefined) updateData.notes = input.notes;
 
-    const updated = await prisma.booking.update({
-      where: { id: bookingId },
-      data: updateData,
-      include: {
-        services: true,
-        events: true,
-      },
-    });
+    const updated = await prisma.$transaction(async (tx) => {
+      const res = await tx.booking.update({
+        where: { id: bookingId },
+        data: updateData,
+        include: {
+          services: true,
+          events: true,
+        },
+      });
+
+      if (input.status !== undefined && input.status !== existing.status) {
+        await notificationService.createNotification({
+          userId: existing.vendor.userId,
+          type: NotificationType.BOOKING,
+          title: 'Booking Status Updated',
+          message: `Booking ${existing.referenceCode} status updated to ${input.status}.`,
+          linkUrl: '/vendor/dashboard/bookings',
+          tx,
+        });
+      }
+
+      await activityLogService.logActivity({
+        userId: existing.wedding.client.userId,
+        action: 'BOOKING_UPDATED',
+        entityType: 'Booking',
+        entityId: bookingId,
+        metadata: { fromStatus: existing.status, toStatus: res.status },
+        tx,
+      });
+
+      return res;
+    }, { maxWait: 10000, timeout: 30000 });
 
     return this.formatBookingResponse(updated);
   }
@@ -424,6 +513,9 @@ export class BookingService {
         id: bookingId,
         vendorId,
       },
+      include: {
+        wedding: { include: { client: { select: { userId: true } } } },
+      },
     });
 
     if (!existing) {
@@ -437,14 +529,38 @@ export class BookingService {
     if (input.advanceAmount !== undefined) updateData.advanceAmount = parsePaise(input.advanceAmount);
     if (input.notes !== undefined) updateData.notes = input.notes;
 
-    const updated = await prisma.booking.update({
-      where: { id: bookingId },
-      data: updateData,
-      include: {
-        services: true,
-        events: true,
-      },
-    });
+    const updated = await prisma.$transaction(async (tx) => {
+      const res = await tx.booking.update({
+        where: { id: bookingId },
+        data: updateData,
+        include: {
+          services: true,
+          events: true,
+        },
+      });
+
+      if (input.status !== undefined && input.status !== existing.status) {
+        await notificationService.createNotification({
+          userId: existing.wedding.client.userId,
+          type: NotificationType.BOOKING,
+          title: 'Booking Status Updated',
+          message: `Booking ${existing.referenceCode} status updated to ${input.status}.`,
+          linkUrl: '/dashboard/wedding',
+          tx,
+        });
+      }
+
+      await activityLogService.logActivity({
+        userId,
+        action: 'BOOKING_UPDATED',
+        entityType: 'Booking',
+        entityId: bookingId,
+        metadata: { fromStatus: existing.status, toStatus: res.status },
+        tx,
+      });
+
+      return res;
+    }, { maxWait: 10000, timeout: 30000 });
 
     return this.formatBookingResponse(updated);
   }

@@ -1,4 +1,4 @@
-import { VendorEnquiry, EnquiryStatus, Prisma } from '@prisma/client';
+import { VendorEnquiry, EnquiryStatus, Prisma, NotificationType } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import {
   CreateVendorEnquiryInput,
@@ -7,6 +7,8 @@ import {
 import { VendorEnquiryResponse } from '@/lib/api/types';
 import { NotFoundError } from '@/lib/errors';
 import { parsePaise } from '@/lib/utils/bigint';
+import { notificationService } from '@/lib/services/notification.service';
+import { activityLogService } from '@/lib/services/activityLog.service';
 
 export class VendorEnquiryService {
   /**
@@ -140,25 +142,45 @@ export class VendorEnquiryService {
     input: CreateVendorEnquiryInput;
   }): Promise<VendorEnquiryResponse> {
     const { weddingId, clientProfileId, input } = params;
-    await this.verifyWeddingOwnership(weddingId, clientProfileId);
+
+    const wedding = await prisma.wedding.findFirst({
+      where: {
+        id: weddingId,
+        clientId: clientProfileId,
+      },
+      include: {
+        client: { select: { userId: true } },
+      },
+    });
+
+    if (!wedding) {
+      throw new NotFoundError('Wedding not found');
+    }
 
     let resolvedVendorId: string | null = null;
+    let vendorUserId: string | null = null;
 
     if (input.vendorId) {
       const vendor = await prisma.vendorProfile.findUnique({
         where: { id: input.vendorId },
-        select: { id: true },
+        select: { id: true, userId: true },
       });
-      if (vendor) resolvedVendorId = vendor.id;
+      if (vendor) {
+        resolvedVendorId = vendor.id;
+        vendorUserId = vendor.userId;
+      }
     } else if (input.vendorSlug) {
       const vendor = await prisma.vendorProfile.findUnique({
         where: { slug: input.vendorSlug },
-        select: { id: true },
+        select: { id: true, userId: true },
       });
-      if (vendor) resolvedVendorId = vendor.id;
+      if (vendor) {
+        resolvedVendorId = vendor.id;
+        vendorUserId = vendor.userId;
+      }
     }
 
-    if (!resolvedVendorId) {
+    if (!resolvedVendorId || !vendorUserId) {
       throw new NotFoundError('Target vendor not found');
     }
 
@@ -166,18 +188,40 @@ export class VendorEnquiryService {
     const eventDateObj = new Date(input.eventDate);
     const referenceCode = this.generateReferenceCode();
 
-    const enquiry = await prisma.vendorEnquiry.create({
-      data: {
-        referenceCode,
-        weddingId,
-        vendorId: resolvedVendorId,
-        eventDate: eventDateObj,
-        guestCount: input.guestCount ?? null,
-        estimatedBudget: estimatedBudgetPaise,
-        status: EnquiryStatus.NEW,
-        message: input.message,
-      },
-    });
+    const enquiry = await prisma.$transaction(async (tx) => {
+      const created = await tx.vendorEnquiry.create({
+        data: {
+          referenceCode,
+          weddingId,
+          vendorId: resolvedVendorId!,
+          eventDate: eventDateObj,
+          guestCount: input.guestCount ?? null,
+          estimatedBudget: estimatedBudgetPaise,
+          status: EnquiryStatus.NEW,
+          message: input.message,
+        },
+      });
+
+      await notificationService.createNotification({
+        userId: vendorUserId!,
+        type: NotificationType.ENQUIRY,
+        title: 'New Enquiry Received',
+        message: `You have received a new enquiry (${referenceCode}).`,
+        linkUrl: '/vendor/dashboard/enquiries',
+        tx,
+      });
+
+      await activityLogService.logActivity({
+        userId: wedding.client.userId,
+        action: 'ENQUIRY_CREATED',
+        entityType: 'VendorEnquiry',
+        entityId: created.id,
+        metadata: { referenceCode, vendorId: resolvedVendorId },
+        tx,
+      });
+
+      return created;
+    }, { maxWait: 10000, timeout: 30000 });
 
     return this.formatVendorEnquiryResponse(enquiry);
   }
@@ -199,6 +243,10 @@ export class VendorEnquiryService {
         weddingId,
         wedding: { clientId: clientProfileId },
       },
+      include: {
+        vendor: { select: { userId: true } },
+        wedding: { include: { client: { select: { userId: true } } } },
+      },
     });
 
     if (!existing) {
@@ -214,10 +262,34 @@ export class VendorEnquiryService {
     if (input.status !== undefined) updateData.status = input.status;
     if (input.message !== undefined) updateData.message = input.message;
 
-    const updated = await prisma.vendorEnquiry.update({
-      where: { id: enquiryId },
-      data: updateData,
-    });
+    const updated = await prisma.$transaction(async (tx) => {
+      const res = await tx.vendorEnquiry.update({
+        where: { id: enquiryId },
+        data: updateData,
+      });
+
+      if (input.status !== undefined && input.status !== existing.status) {
+        await notificationService.createNotification({
+          userId: existing.vendor.userId,
+          type: NotificationType.ENQUIRY,
+          title: 'Enquiry Status Updated',
+          message: `Enquiry status updated to ${input.status}.`,
+          linkUrl: '/vendor/dashboard/enquiries',
+          tx,
+        });
+      }
+
+      await activityLogService.logActivity({
+        userId: existing.wedding.client.userId,
+        action: 'ENQUIRY_STATUS_UPDATED',
+        entityType: 'VendorEnquiry',
+        entityId: enquiryId,
+        metadata: { fromStatus: existing.status, toStatus: res.status },
+        tx,
+      });
+
+      return res;
+    }, { maxWait: 10000, timeout: 30000 });
 
     return this.formatVendorEnquiryResponse(updated);
   }
@@ -280,6 +352,9 @@ export class VendorEnquiryService {
         id: enquiryId,
         vendorId,
       },
+      include: {
+        wedding: { include: { client: { select: { userId: true } } } },
+      },
     });
 
     if (!existing) {
@@ -295,10 +370,34 @@ export class VendorEnquiryService {
       updateData.estimatedBudget = input.estimatedBudget ? parsePaise(input.estimatedBudget) : null;
     if (input.message !== undefined) updateData.message = input.message;
 
-    const updated = await prisma.vendorEnquiry.update({
-      where: { id: enquiryId },
-      data: updateData,
-    });
+    const updated = await prisma.$transaction(async (tx) => {
+      const res = await tx.vendorEnquiry.update({
+        where: { id: enquiryId },
+        data: updateData,
+      });
+
+      if (input.status !== undefined && input.status !== existing.status) {
+        await notificationService.createNotification({
+          userId: existing.wedding.client.userId,
+          type: NotificationType.ENQUIRY,
+          title: 'Enquiry Status Updated',
+          message: `Enquiry status updated to ${input.status}.`,
+          linkUrl: '/dashboard/wedding',
+          tx,
+        });
+      }
+
+      await activityLogService.logActivity({
+        userId,
+        action: 'ENQUIRY_STATUS_UPDATED',
+        entityType: 'VendorEnquiry',
+        entityId: enquiryId,
+        metadata: { fromStatus: existing.status, toStatus: res.status },
+        tx,
+      });
+
+      return res;
+    }, { maxWait: 10000, timeout: 30000 });
 
     return this.formatVendorEnquiryResponse(updated);
   }

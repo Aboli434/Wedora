@@ -1,8 +1,10 @@
-import { EnquiryMessage, UserRole } from '@prisma/client';
+import { EnquiryMessage, NotificationType, UserRole } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CreateEnquiryMessageInput } from '@/lib/validation/enquiryMessage';
 import { EnquiryMessageResponse } from '@/lib/api/types';
 import { NotFoundError } from '@/lib/errors';
+import { notificationService } from '@/lib/services/notification.service';
+import { activityLogService } from '@/lib/services/activityLog.service';
 
 export class EnquiryMessageService {
   /**
@@ -86,15 +88,64 @@ export class EnquiryMessageService {
     input: CreateEnquiryMessageInput;
   }): Promise<EnquiryMessageResponse> {
     const { enquiryId, userId, userRole, clientProfileId, input } = params;
-    await this.verifyEnquiryParticipantAccess({ enquiryId, userId, userRole, clientProfileId });
 
-    const createdMessage = await prisma.enquiryMessage.create({
-      data: {
-        enquiryId,
-        senderId: userId,
-        message: input.message,
+    const enquiry = await prisma.vendorEnquiry.findUnique({
+      where: { id: enquiryId },
+      include: {
+        wedding: { include: { client: { select: { userId: true } } } },
+        vendor: { select: { userId: true } },
       },
     });
+
+    if (!enquiry) {
+      throw new NotFoundError('Enquiry not found');
+    }
+
+    let isParticipant = false;
+    if (userRole === UserRole.CLIENT && clientProfileId) {
+      isParticipant = enquiry.wedding.clientId === clientProfileId;
+    } else if (userRole === UserRole.VENDOR) {
+      isParticipant = enquiry.vendor.userId === userId;
+    }
+
+    if (!isParticipant) {
+      throw new NotFoundError('Enquiry not found');
+    }
+
+    const recipientUserId =
+      userId === enquiry.vendor.userId ? enquiry.wedding.client.userId : enquiry.vendor.userId;
+    const recipientLinkUrl =
+      userId === enquiry.vendor.userId ? '/dashboard/wedding' : '/vendor/dashboard/enquiries';
+
+    const createdMessage = await prisma.$transaction(async (tx) => {
+      const created = await tx.enquiryMessage.create({
+        data: {
+          enquiryId,
+          senderId: userId,
+          message: input.message,
+        },
+      });
+
+      await notificationService.createNotification({
+        userId: recipientUserId,
+        type: NotificationType.ENQUIRY,
+        title: 'New Enquiry Message',
+        message: `You have received a new message regarding enquiry ${enquiry.referenceCode}.`,
+        linkUrl: recipientLinkUrl,
+        tx,
+      });
+
+      await activityLogService.logActivity({
+        userId,
+        action: 'ENQUIRY_MESSAGE_SENT',
+        entityType: 'EnquiryMessage',
+        entityId: created.id,
+        metadata: { enquiryId, referenceCode: enquiry.referenceCode },
+        tx,
+      });
+
+      return created;
+    }, { maxWait: 10000, timeout: 30000 });
 
     return this.formatEnquiryMessageResponse(createdMessage);
   }

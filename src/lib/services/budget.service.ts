@@ -9,6 +9,7 @@ import {
 import { BudgetResponse, BudgetSummaryResponse, ExpenseResponse } from '@/lib/api/types';
 import { ConflictError, NotFoundError } from '@/lib/errors';
 import { parsePaise } from '@/lib/utils/bigint';
+import { activityLogService } from '@/lib/services/activityLog.service';
 
 export class BudgetService {
   /**
@@ -296,9 +297,21 @@ export class BudgetService {
     input: CreateExpenseInput;
   }): Promise<ExpenseResponse> {
     const { weddingId, clientProfileId, input } = params;
-    await this.verifyWeddingOwnership(weddingId, clientProfileId);
 
-    // If budgetId is provided, verify that the budget belongs to the same wedding
+    const wedding = await prisma.wedding.findFirst({
+      where: {
+        id: weddingId,
+        clientId: clientProfileId,
+      },
+      include: {
+        client: { select: { userId: true } },
+      },
+    });
+
+    if (!wedding) {
+      throw new NotFoundError('Wedding not found');
+    }
+
     if (input.budgetId) {
       const budget = await prisma.budget.findFirst({
         where: {
@@ -317,18 +330,31 @@ export class BudgetService {
     const paidAmountPaise = input.paidAmount !== undefined ? parsePaise(input.paidAmount) : BigInt(0);
     const dueDateObj = input.paymentDueDate ? new Date(input.paymentDueDate) : null;
 
-    const expense = await prisma.expense.create({
-      data: {
-        weddingId,
-        budgetId: input.budgetId ?? null,
-        vendorName: input.vendorName,
-        category: input.category,
-        amount: amountPaise,
-        paidAmount: paidAmountPaise,
-        paymentDueDate: dueDateObj,
-        status: input.status ?? PaymentStatus.PENDING,
-        notes: input.notes ?? null,
-      },
+    const expense = await prisma.$transaction(async (tx) => {
+      const created = await tx.expense.create({
+        data: {
+          weddingId,
+          budgetId: input.budgetId ?? null,
+          vendorName: input.vendorName,
+          category: input.category,
+          amount: amountPaise,
+          paidAmount: paidAmountPaise,
+          paymentDueDate: dueDateObj,
+          status: input.status ?? PaymentStatus.PENDING,
+          notes: input.notes ?? null,
+        },
+      });
+
+      await activityLogService.logActivity({
+        userId: wedding.client.userId,
+        action: 'EXPENSE_CREATED',
+        entityType: 'Expense',
+        entityId: created.id,
+        metadata: { vendorName: created.vendorName, amount: amountPaise.toString(), category: created.category },
+        tx,
+      });
+
+      return created;
     });
 
     return this.formatExpenseResponse(expense);
@@ -350,6 +376,9 @@ export class BudgetService {
         id: expenseId,
         weddingId,
         wedding: { clientId: clientProfileId },
+      },
+      include: {
+        wedding: { include: { client: { select: { userId: true } } } },
       },
     });
 
@@ -383,9 +412,22 @@ export class BudgetService {
     if (input.status !== undefined) updateData.status = input.status;
     if (input.notes !== undefined) updateData.notes = input.notes;
 
-    const updated = await prisma.expense.update({
-      where: { id: expenseId },
-      data: updateData,
+    const updated = await prisma.$transaction(async (tx) => {
+      const res = await tx.expense.update({
+        where: { id: expenseId },
+        data: updateData,
+      });
+
+      await activityLogService.logActivity({
+        userId: existing.wedding.client.userId,
+        action: 'EXPENSE_UPDATED',
+        entityType: 'Expense',
+        entityId: expenseId,
+        metadata: { vendorName: res.vendorName, amount: res.amount.toString(), status: res.status },
+        tx,
+      });
+
+      return res;
     });
 
     return this.formatExpenseResponse(updated);

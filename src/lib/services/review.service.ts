@@ -1,8 +1,10 @@
-import { BookingStatus, Prisma, Review, ReviewStatus } from '@prisma/client';
+import { BookingStatus, NotificationType, Prisma, Review, ReviewStatus } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { CreateReviewInput, UpdateReviewInput } from '@/lib/validation/review';
 import { ReviewResponse } from '@/lib/api/types';
 import { ConflictError, NotFoundError, ValidationError } from '@/lib/errors';
+import { notificationService } from '@/lib/services/notification.service';
+import { activityLogService } from '@/lib/services/activityLog.service';
 
 export class ReviewService {
   /**
@@ -127,6 +129,11 @@ export class ReviewService {
       throw new ConflictError('A review for this booking already exists');
     }
 
+    const vendorProfile = await prisma.vendorProfile.findUnique({
+      where: { id: booking.vendorId },
+      select: { userId: true },
+    });
+
     try {
       const review = await prisma.$transaction(async (tx) => {
         const created = await tx.review.create({
@@ -148,8 +155,28 @@ export class ReviewService {
 
         await this.recalculateVendorRating(tx, booking.vendorId);
 
+        if (created.status === ReviewStatus.PUBLISHED && vendorProfile?.userId) {
+          await notificationService.createNotification({
+            userId: vendorProfile.userId,
+            type: NotificationType.SYSTEM,
+            title: 'New Review Received',
+            message: `A client published a ${created.rating}-star review for your profile.`,
+            linkUrl: '/vendor/dashboard/reviews',
+            tx,
+          });
+        }
+
+        await activityLogService.logActivity({
+          userId,
+          action: 'REVIEW_CREATED',
+          entityType: 'Review',
+          entityId: created.id,
+          metadata: { rating: created.rating, vendorId: booking.vendorId, status: created.status },
+          tx,
+        });
+
         return created;
-      });
+      }, { maxWait: 10000, timeout: 30000 });
 
       return this.formatReviewResponse(review);
     } catch (error) {
@@ -253,8 +280,17 @@ export class ReviewService {
 
       await this.recalculateVendorRating(tx, existing.vendorId);
 
+      await activityLogService.logActivity({
+        userId: res.authorId,
+        action: 'REVIEW_UPDATED',
+        entityType: 'Review',
+        entityId: existing.id,
+        metadata: { rating: res.rating, status: res.status },
+        tx,
+      });
+
       return res;
-    });
+    }, { maxWait: 10000, timeout: 30000 });
 
     return this.formatReviewResponse(updated);
   }

@@ -27,10 +27,11 @@ export async function GET(request: NextRequest, context: RouteContext) {
       throw new ForbiddenError('Client profile is required to access payment transactions');
     }
 
-    const { bookingId, paymentId } = await context.params;
+    const { weddingId, bookingId, paymentId } = await context.params;
 
     const transactions = await paymentTransactionService.listTransactionsForPayment({
       bookingId,
+      weddingId,
       paymentId,
       userId: user.id,
       userRole: user.role,
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
       throw new ForbiddenError('Client profile is required to record a payment transaction');
     }
 
-    const { bookingId, paymentId } = await context.params;
+    const { weddingId, bookingId, paymentId } = await context.params;
 
     let rawBody: unknown;
     try {
@@ -67,6 +68,7 @@ export async function POST(request: NextRequest, context: RouteContext) {
     const input = validateData(createPaymentTransactionSchema, rawBody);
     const createdTransaction = await paymentTransactionService.createTransactionForPayment({
       bookingId,
+      weddingId,
       paymentId,
       userId: user.id,
       userRole: user.role,

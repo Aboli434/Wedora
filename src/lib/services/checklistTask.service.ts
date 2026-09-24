@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { CreateChecklistTaskInput, UpdateChecklistTaskInput } from '@/lib/validation/checklistTask';
 import { ChecklistTaskResponse } from '@/lib/api/types';
 import { NotFoundError } from '@/lib/errors';
+import { activityLogService } from '@/lib/services/activityLog.service';
 
 export class ChecklistTaskService {
   /**
@@ -110,21 +111,47 @@ export class ChecklistTaskService {
     input: CreateChecklistTaskInput;
   }): Promise<ChecklistTaskResponse> {
     const { weddingId, clientProfileId, input } = params;
-    await this.verifyWeddingOwnership(weddingId, clientProfileId);
+
+    const wedding = await prisma.wedding.findFirst({
+      where: {
+        id: weddingId,
+        clientId: clientProfileId,
+      },
+      include: {
+        client: { select: { userId: true } },
+      },
+    });
+
+    if (!wedding) {
+      throw new NotFoundError('Wedding not found');
+    }
 
     const dueDateObj = input.dueDate ? new Date(input.dueDate) : null;
 
-    const createdTask = await prisma.checklistTask.create({
-      data: {
-        weddingId,
-        title: input.title,
-        category: input.category,
-        dueDate: dueDateObj,
-        priority: input.priority ?? TaskPriority.MEDIUM,
-        status: input.status ?? TaskStatus.PENDING,
-        assignedTo: input.assignedTo ?? null,
-        notes: input.notes ?? null,
-      },
+    const createdTask = await prisma.$transaction(async (tx) => {
+      const created = await tx.checklistTask.create({
+        data: {
+          weddingId,
+          title: input.title,
+          category: input.category,
+          dueDate: dueDateObj,
+          priority: input.priority ?? TaskPriority.MEDIUM,
+          status: input.status ?? TaskStatus.PENDING,
+          assignedTo: input.assignedTo ?? null,
+          notes: input.notes ?? null,
+        },
+      });
+
+      await activityLogService.logActivity({
+        userId: wedding.client.userId,
+        action: 'CHECKLIST_TASK_CREATED',
+        entityType: 'ChecklistTask',
+        entityId: created.id,
+        metadata: { title: created.title, category: created.category, status: created.status },
+        tx,
+      });
+
+      return created;
     });
 
     return this.formatChecklistTaskResponse(createdTask);
@@ -141,7 +168,6 @@ export class ChecklistTaskService {
   }): Promise<ChecklistTaskResponse> {
     const { weddingId, taskId, clientProfileId, input } = params;
 
-    // Verify task ownership
     const existing = await prisma.checklistTask.findFirst({
       where: {
         id: taskId,
@@ -149,6 +175,9 @@ export class ChecklistTaskService {
         wedding: {
           clientId: clientProfileId,
         },
+      },
+      include: {
+        wedding: { include: { client: { select: { userId: true } } } },
       },
     });
 
@@ -166,9 +195,22 @@ export class ChecklistTaskService {
     if (input.assignedTo !== undefined) updateData.assignedTo = input.assignedTo;
     if (input.notes !== undefined) updateData.notes = input.notes;
 
-    const updatedTask = await prisma.checklistTask.update({
-      where: { id: taskId },
-      data: updateData,
+    const updatedTask = await prisma.$transaction(async (tx) => {
+      const res = await tx.checklistTask.update({
+        where: { id: taskId },
+        data: updateData,
+      });
+
+      await activityLogService.logActivity({
+        userId: existing.wedding.client.userId,
+        action: 'CHECKLIST_TASK_UPDATED',
+        entityType: 'ChecklistTask',
+        entityId: taskId,
+        metadata: { fromStatus: existing.status, toStatus: res.status },
+        tx,
+      });
+
+      return res;
     });
 
     return this.formatChecklistTaskResponse(updatedTask);

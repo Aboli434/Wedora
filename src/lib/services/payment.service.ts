@@ -48,11 +48,12 @@ export class PaymentService {
    */
   public async verifyBookingParticipantAccess(params: {
     bookingId: string;
+    weddingId?: string;
     userId: string;
     userRole: UserRole;
     clientProfileId?: string;
   }): Promise<{ id: string; weddingId: string; vendorId: string }> {
-    const { bookingId, userId, userRole, clientProfileId } = params;
+    const { bookingId, weddingId, userId, userRole, clientProfileId } = params;
 
     const booking = await prisma.booking.findUnique({
       where: { id: bookingId },
@@ -66,6 +67,10 @@ export class PaymentService {
     });
 
     if (!booking) {
+      throw new NotFoundError('Booking not found');
+    }
+
+    if (weddingId && booking.weddingId !== weddingId) {
       throw new NotFoundError('Booking not found');
     }
 
@@ -93,13 +98,14 @@ export class PaymentService {
    */
   public async verifyPaymentParticipantAccess(params: {
     bookingId: string;
+    weddingId?: string;
     paymentId: string;
     userId: string;
     userRole: UserRole;
     clientProfileId?: string;
   }): Promise<Payment> {
-    const { bookingId, paymentId, userId, userRole, clientProfileId } = params;
-    await this.verifyBookingParticipantAccess({ bookingId, userId, userRole, clientProfileId });
+    const { bookingId, weddingId, paymentId, userId, userRole, clientProfileId } = params;
+    await this.verifyBookingParticipantAccess({ bookingId, weddingId, userId, userRole, clientProfileId });
 
     const payment = await prisma.payment.findFirst({
       where: {
@@ -195,12 +201,13 @@ export class PaymentService {
    */
   public async listPaymentsForBooking(params: {
     bookingId: string;
+    weddingId?: string;
     userId: string;
     userRole: UserRole;
     clientProfileId?: string;
   }): Promise<PaymentResponse[]> {
-    const { bookingId, userId, userRole, clientProfileId } = params;
-    await this.verifyBookingParticipantAccess({ bookingId, userId, userRole, clientProfileId });
+    const { bookingId, weddingId, userId, userRole, clientProfileId } = params;
+    await this.verifyBookingParticipantAccess({ bookingId, weddingId, userId, userRole, clientProfileId });
 
     const payments = await prisma.payment.findMany({
       where: { bookingId },
@@ -216,6 +223,7 @@ export class PaymentService {
    */
   public async getPaymentForBooking(params: {
     bookingId: string;
+    weddingId?: string;
     paymentId: string;
     userId: string;
     userRole: UserRole;
@@ -230,13 +238,14 @@ export class PaymentService {
    */
   public async createPaymentForBooking(params: {
     bookingId: string;
+    weddingId?: string;
     userId: string;
     userRole: UserRole;
     clientProfileId?: string;
     input: CreatePaymentInput;
   }): Promise<PaymentResponse> {
-    const { bookingId, userId, userRole, clientProfileId, input } = params;
-    await this.verifyBookingParticipantAccess({ bookingId, userId, userRole, clientProfileId });
+    const { bookingId, weddingId, userId, userRole, clientProfileId, input } = params;
+    await this.verifyBookingParticipantAccess({ bookingId, weddingId, userId, userRole, clientProfileId });
 
     if (input.invoiceId) {
       const invoice = await prisma.invoice.findFirst({
@@ -273,6 +282,7 @@ export class PaymentService {
    */
   public async updatePaymentForBooking(params: {
     bookingId: string;
+    weddingId?: string;
     paymentId: string;
     userId: string;
     userRole: UserRole;

@@ -4,6 +4,7 @@ import { CreateWeddingInput, UpdateWeddingInput } from '@/lib/validation/wedding
 import { WeddingResponse } from '@/lib/api/types';
 import { NotFoundError } from '@/lib/errors';
 import { parsePaise } from '@/lib/utils/bigint';
+import { activityLogService } from '@/lib/services/activityLog.service';
 
 export class WeddingService {
   /**
@@ -73,20 +74,42 @@ export class WeddingService {
   }): Promise<WeddingResponse> {
     const { input, clientProfileId } = params;
 
+    const clientProfile = await prisma.clientProfile.findUnique({
+      where: { id: clientProfileId },
+      select: { userId: true },
+    });
+
+    if (!clientProfile) {
+      throw new NotFoundError('Client profile not found');
+    }
+
     const budgetPaise = parsePaise(input.totalBudget);
     const dateObj = new Date(input.weddingDate);
 
-    const wedding = await prisma.wedding.create({
-      data: {
-        clientId: clientProfileId,
-        partner1Name: input.partner1Name,
-        partner2Name: input.partner2Name,
-        title: input.title,
-        weddingDate: dateObj,
-        location: input.location,
-        totalBudget: budgetPaise,
-        status: input.status ?? 'PLANNING',
-      },
+    const wedding = await prisma.$transaction(async (tx) => {
+      const created = await tx.wedding.create({
+        data: {
+          clientId: clientProfileId,
+          partner1Name: input.partner1Name,
+          partner2Name: input.partner2Name,
+          title: input.title,
+          weddingDate: dateObj,
+          location: input.location,
+          totalBudget: budgetPaise,
+          status: input.status ?? 'PLANNING',
+        },
+      });
+
+      await activityLogService.logActivity({
+        userId: clientProfile.userId,
+        action: 'WEDDING_CREATED',
+        entityType: 'Wedding',
+        entityId: created.id,
+        metadata: { title: created.title, location: created.location },
+        tx,
+      });
+
+      return created;
     });
 
     return this.formatWeddingResponse(wedding);
@@ -103,11 +126,13 @@ export class WeddingService {
   }): Promise<WeddingResponse> {
     const { weddingId, clientProfileId, input } = params;
 
-    // Verify ownership first
     const existing = await prisma.wedding.findFirst({
       where: {
         id: weddingId,
         clientId: clientProfileId,
+      },
+      include: {
+        client: { select: { userId: true } },
       },
     });
 
@@ -125,9 +150,22 @@ export class WeddingService {
     if (input.totalBudget !== undefined) updateData.totalBudget = parsePaise(input.totalBudget);
     if (input.status !== undefined) updateData.status = input.status;
 
-    const updated = await prisma.wedding.update({
-      where: { id: weddingId },
-      data: updateData,
+    const updated = await prisma.$transaction(async (tx) => {
+      const res = await tx.wedding.update({
+        where: { id: weddingId },
+        data: updateData,
+      });
+
+      await activityLogService.logActivity({
+        userId: existing.client.userId,
+        action: 'WEDDING_UPDATED',
+        entityType: 'Wedding',
+        entityId: weddingId,
+        metadata: { title: res.title, status: res.status },
+        tx,
+      });
+
+      return res;
     });
 
     return this.formatWeddingResponse(updated);
