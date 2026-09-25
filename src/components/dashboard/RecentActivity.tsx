@@ -1,16 +1,44 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Activity, Clock } from "lucide-react";
 import { ActivityItem } from "@/data/dashboard";
+import { getActivityLogsApi } from "@/lib/api/endpoints";
+import { formatActivityAction, formatActivityCategory } from "@/lib/utils/formatActivity";
 
 interface RecentActivityProps {
-  activities: ActivityItem[];
+  activities?: ActivityItem[];
 }
 
-export function RecentActivity({ activities }: RecentActivityProps) {
+export function RecentActivity({ activities: fallbackActivities }: RecentActivityProps) {
   const shouldReduceMotion = useReducedMotion();
+  const [realActivities, setRealActivities] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadActivity() {
+      try {
+        const res = await getActivityLogsApi(1, 5);
+        if (res.data && res.data.length > 0) {
+          const mapped: ActivityItem[] = res.data.map((item) => ({
+            id: item.id,
+            category: formatActivityCategory(item.entityType),
+            title: formatActivityAction(item.action, item.metadata),
+            timestamp: new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          }));
+          setRealActivities(mapped);
+        }
+      } catch {
+        // Fallback to initial mock if unauthenticated or error
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadActivity();
+  }, []);
+
+  const displayActivities = realActivities.length > 0 ? realActivities : fallbackActivities || [];
 
   return (
     <motion.div
@@ -32,28 +60,34 @@ export function RecentActivity({ activities }: RecentActivityProps) {
         <Activity className="w-5 h-5 text-[#C5A880]" />
       </div>
 
-      <div className="space-y-4">
-        {activities.map((act) => (
-          <div
-            key={act.id}
-            className="flex items-start justify-between gap-4 p-3 bg-[#F3EFEA] border border-[#161514]/10"
-          >
-            <div className="space-y-1">
-              <span className="text-[10px] font-semibold tracking-wider uppercase text-[#C5A880] block">
-                {act.category}
-              </span>
-              <p className="text-xs font-sans text-[#161514] font-medium leading-snug">
-                {act.title}
-              </p>
-            </div>
+      {loading ? (
+        <p className="text-xs text-[#5A5650] font-sans py-4">Loading activity stream...</p>
+      ) : displayActivities.length === 0 ? (
+        <p className="text-xs text-[#5A5650] font-sans py-4">No activity logged yet.</p>
+      ) : (
+        <div className="space-y-4">
+          {displayActivities.map((act) => (
+            <div
+              key={act.id}
+              className="flex items-start justify-between gap-4 p-3 bg-[#F3EFEA] border border-[#161514]/10"
+            >
+              <div className="space-y-1">
+                <span className="text-[10px] font-semibold tracking-wider uppercase text-[#C5A880] block">
+                  {act.category}
+                </span>
+                <p className="text-xs font-sans text-[#161514] font-medium leading-snug">
+                  {act.title}
+                </p>
+              </div>
 
-            <div className="flex items-center gap-1 text-[11px] text-[#5A5650] whitespace-nowrap pt-0.5">
-              <Clock className="w-3 h-3 text-[#C5A880]" />
-              <span>{act.timestamp}</span>
+              <div className="flex items-center gap-1 text-[11px] text-[#5A5650] whitespace-nowrap pt-0.5">
+                <Clock className="w-3 h-3 text-[#C5A880]" />
+                <span>{act.timestamp}</span>
+              </div>
             </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </motion.div>
   );
 }

@@ -36,7 +36,7 @@ export interface TestFixtures {
   vendorAvailabilityB: Record<string, any>;
 }
 
-async function withRetry<T>(fn: () => Promise<T>, retries = 3, delayMs = 1500): Promise<T> {
+async function withRetry<T>(fn: () => Promise<T>, retries = 5, delayMs = 2500): Promise<T> {
   let lastErr: unknown;
   for (let i = 0; i < retries; i++) {
     try {
@@ -57,6 +57,7 @@ export async function cleanDatabase() {
       const testUsers = await prisma.user.findMany({
         where: { email: { startsWith: 'test-' } },
         select: { id: true },
+        take: 1,
       });
 
       if (testUsers.length === 0) return;

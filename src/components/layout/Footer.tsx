@@ -123,10 +123,10 @@ export function Footer() {
         <div className="flex flex-col sm:flex-row justify-between items-center text-[var(--text-muted)] text-xs font-sans tracking-widest gap-4">
           <p>© 2026 Wedora. All rights reserved.</p>
           <div className="flex space-x-6">
-            <Link href="#" className="hover:text-[var(--accent-gold)] transition-colors">
+            <Link href="/privacy-policy" className="hover:text-[var(--accent-gold)] transition-colors">
               Privacy Policy
             </Link>
-            <Link href="#" className="hover:text-[var(--accent-gold)] transition-colors">
+            <Link href="/terms-of-service" className="hover:text-[var(--accent-gold)] transition-colors">
               Terms of Service
             </Link>
           </div>

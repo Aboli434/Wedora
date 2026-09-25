@@ -1,13 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { VendorDashboardShell } from "@/components/vendor-dashboard/layout";
 import {
   INITIAL_VENDOR_ENQUIRIES,
   VendorEnquiry,
   EnquiryStatus,
   EnquiryPriority,
-  EnquiryActivity,
 } from "@/data/vendorEnquiries";
 import {
   EnquiryFilterState,
@@ -15,7 +14,6 @@ import {
   calculateStatusCounts,
   getEnquiriesNeedingAttention,
   filterVendorEnquiries,
-  formatEnquiryStatus,
 } from "@/lib/vendorEnquiries";
 import {
   EnquiriesPageHeader,
@@ -28,16 +26,17 @@ import {
   EnquiriesEmptyState,
   EnquiriesPageCTA,
 } from "@/components/vendor-dashboard/enquiries";
-import { RefreshCw } from "lucide-react";
+import {
+  getVendorEnquiriesApi,
+  updateVendorEnquiryStatusApi,
+} from "@/lib/api/endpoints";
 
 export default function VendorEnquiriesPage() {
   const [enquiries, setEnquiries] = useState<VendorEnquiry[]>(
     INITIAL_VENDOR_ENQUIRIES
   );
-
-  const [selectedEnquiryId, setSelectedEnquiryId] = useState<string | null>(
-    null
-  );
+  const [selectedEnquiryId, setSelectedEnquiryId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const [filters, setFilters] = useState<EnquiryFilterState>({
     status: "ALL",
@@ -50,18 +49,103 @@ export default function VendorEnquiriesPage() {
     sortBy: "NEWEST",
   });
 
+  useEffect(() => {
+    let isMounted = true;
+    async function loadEnquiries() {
+      try {
+        setLoading(true);
+        const apiEnquiries = await getVendorEnquiriesApi();
+        if (Array.isArray(apiEnquiries) && isMounted) {
+          const mapped: VendorEnquiry[] = apiEnquiries.map((eq) => ({
+            id: eq.id,
+            coupleName: `Client (${eq.weddingId.slice(0, 8)})`,
+            email: "client@wedora.com",
+            phone: "+91 98765 43210",
+            weddingDate: eq.eventDate ? new Date(eq.eventDate).toISOString().split("T")[0] : undefined,
+            dateStatus: "CONFIRMED",
+            destination: "Destination Venue",
+            guestCount: eq.guestCount || 100,
+            serviceRequested: "Full Service",
+            budgetRange: eq.estimatedBudget ? `₹${(Number(eq.estimatedBudget) / 100).toLocaleString()}` : "Flexible",
+            message: eq.message,
+            status: (eq.status as EnquiryStatus) || "NEW",
+            priority: "NORMAL",
+            source: "WEDORA",
+            receivedAt: new Date(eq.createdAt).toLocaleDateString(),
+            lastUpdatedAt: new Date(eq.updatedAt).toLocaleDateString(),
+            preferredContactMethod: "EMAIL",
+            notes: eq.referenceCode ? `Ref: ${eq.referenceCode}` : undefined,
+            unread: false,
+            activities: [],
+          }));
+          setEnquiries(mapped);
+        }
+      } catch {
+        // Retain initial state on network failure
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadEnquiries();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // Derived computations
   const summary = calculateEnquiriesSummary(enquiries);
   const statusCounts = calculateStatusCounts(enquiries);
   const needsAttentionList = getEnquiriesNeedingAttention(enquiries);
   const filteredEnquiries = filterVendorEnquiries(enquiries, filters);
 
-  const selectedEnquiry =
-    enquiries.find((e) => e.id === selectedEnquiryId) || null;
+  const selectedEnquiry = enquiries.find((e) => e.id === selectedEnquiryId) || null;
 
-  // Handlers
-  const handleFilterChange = (updates: Partial<EnquiryFilterState>) => {
-    setFilters((prev) => ({ ...prev, ...updates }));
+  const handleUpdateStatus = async (id: string, newStatus: EnquiryStatus) => {
+    setEnquiries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, status: newStatus } : e))
+    );
+
+    try {
+      await updateVendorEnquiryStatusApi(id, newStatus);
+    } catch {
+      // Retain optimistic state
+    }
+  };
+
+  const handleUpdatePriority = (id: string, priority: EnquiryPriority) => {
+    setEnquiries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, priority } : e))
+    );
+  };
+
+  const handleToggleUnread = (id: string) => {
+    setEnquiries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, unread: !e.unread } : e))
+    );
+  };
+
+  const handleSaveNotes = (id: string, notes: string) => {
+    setEnquiries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, notes } : e))
+    );
+  };
+
+  const handleDeleteNotes = (id: string) => {
+    setEnquiries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, notes: undefined } : e))
+    );
+  };
+
+  const handleSaveDraft = (id: string, draftResponse: string) => {
+    setEnquiries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, draftResponse } : e))
+    );
+  };
+
+  const handleMarkResponseSent = (id: string) => {
+    setEnquiries((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, status: "RESPONDED" as EnquiryStatus } : e))
+    );
   };
 
   const handleResetFilters = () => {
@@ -77,248 +161,42 @@ export default function VendorEnquiriesPage() {
     });
   };
 
-  const handleOpenDetail = (enquiry: VendorEnquiry) => {
-    setSelectedEnquiryId(enquiry.id);
-
-    // Automatically mark as read when opened if it was unread
-    if (enquiry.unread) {
-      setEnquiries((prev) =>
-        prev.map((item) =>
-          item.id === enquiry.id ? { ...item, unread: false } : item
-        )
-      );
-    }
-  };
-
-  const handleCloseDetail = () => {
-    setSelectedEnquiryId(null);
-  };
-
-  const handleUpdateStatus = (
-    enquiryId: string,
-    newStatus: EnquiryStatus
-  ) => {
-    const timestamp = new Date().toISOString();
-    setEnquiries((prev) =>
-      prev.map((e) => {
-        if (e.id !== enquiryId) return e;
-
-        const newActivity: EnquiryActivity = {
-          id: `act-${Date.now()}`,
-          enquiryId,
-          type: "STATUS_CHANGED",
-          description: `Status changed from ${formatEnquiryStatus(
-            e.status
-          )} to ${formatEnquiryStatus(newStatus)}.`,
-          createdAt: timestamp,
-        };
-
-        return {
-          ...e,
-          status: newStatus,
-          lastUpdatedAt: timestamp,
-          activities: [newActivity, ...e.activities],
-        };
-      })
-    );
-  };
-
-  const handleUpdatePriority = (
-    enquiryId: string,
-    priority: EnquiryPriority
-  ) => {
-    const timestamp = new Date().toISOString();
-    setEnquiries((prev) =>
-      prev.map((e) => {
-        if (e.id !== enquiryId) return e;
-        return {
-          ...e,
-          priority,
-          lastUpdatedAt: timestamp,
-        };
-      })
-    );
-  };
-
-  const handleToggleUnread = (enquiryId: string) => {
-    setEnquiries((prev) =>
-      prev.map((e) => (e.id === enquiryId ? { ...e, unread: !e.unread } : e))
-    );
-  };
-
-  const handleSaveDraft = (enquiryId: string, draftResponse: string) => {
-    const timestamp = new Date().toISOString();
-    setEnquiries((prev) =>
-      prev.map((e) => {
-        if (e.id !== enquiryId) return e;
-
-        const newActivity: EnquiryActivity = {
-          id: `act-${Date.now()}`,
-          enquiryId,
-          type: "RESPONSE_DRAFTED",
-          description: "Saved draft response.",
-          createdAt: timestamp,
-        };
-
-        return {
-          ...e,
-          draftResponse,
-          lastUpdatedAt: timestamp,
-          activities: [newActivity, ...e.activities],
-        };
-      })
-    );
-  };
-
-  const handleMarkResponseSent = (enquiryId: string) => {
-    const timestamp = new Date().toISOString();
-    setEnquiries((prev) =>
-      prev.map((e) => {
-        if (e.id !== enquiryId) return e;
-
-        const newActivity: EnquiryActivity = {
-          id: `act-${Date.now()}`,
-          enquiryId,
-          type: "RESPONSE_SENT",
-          description: "Official proposal & availability response sent.",
-          createdAt: timestamp,
-        };
-
-        return {
-          ...e,
-          status: "RESPONDED",
-          unread: false,
-          draftResponse: undefined,
-          lastUpdatedAt: timestamp,
-          activities: [newActivity, ...e.activities],
-        };
-      })
-    );
-  };
-
-  const handleSaveNotes = (enquiryId: string, notes: string) => {
-    const timestamp = new Date().toISOString();
-    setEnquiries((prev) =>
-      prev.map((e) => {
-        if (e.id !== enquiryId) return e;
-
-        const newActivity: EnquiryActivity = {
-          id: `act-${Date.now()}`,
-          enquiryId,
-          type: "NOTE_ADDED",
-          description: "Updated internal studio note.",
-          createdAt: timestamp,
-        };
-
-        return {
-          ...e,
-          notes,
-          lastUpdatedAt: timestamp,
-          activities: [newActivity, ...e.activities],
-        };
-      })
-    );
-  };
-
-  const handleDeleteNotes = (enquiryId: string) => {
-    const timestamp = new Date().toISOString();
-    setEnquiries((prev) =>
-      prev.map((e) => {
-        if (e.id !== enquiryId) return e;
-        return {
-          ...e,
-          notes: undefined,
-          lastUpdatedAt: timestamp,
-        };
-      })
-    );
-  };
-
-  const handleResetDataset = () => {
-    setEnquiries(INITIAL_VENDOR_ENQUIRIES);
-    handleResetFilters();
-    setSelectedEnquiryId(null);
-  };
-
   return (
     <VendorDashboardShell>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
-        <EnquiriesPageHeader
-          onFilterNew={() => handleFilterChange({ status: "NEW" })}
-        />
+      <div className="space-y-8 pb-12">
+        <EnquiriesPageHeader onFilterNew={() => setFilters((prev) => ({ ...prev, status: "NEW" }))} />
 
-        {enquiries.length === 0 ? (
-          <EnquiriesEmptyState />
+        {loading ? (
+          <div className="p-8 text-center text-xs text-[#6E6B65] font-sans">Loading enquiries...</div>
         ) : (
           <>
-            {/* Metric Overview */}
             <EnquiriesOverview
               summary={summary}
               activeFilterStatus={filters.status}
-              onSelectStatusFilter={(status) => {
-                if (status === "UNREAD") {
-                  handleFilterChange({ unread: "UNREAD", status: "ALL" });
-                } else {
-                  handleFilterChange({ status: status as EnquiryStatus | "ALL", unread: "ALL" });
-                }
-              }}
+              onSelectStatusFilter={(s) => setFilters((prev) => ({ ...prev, status: s as "ALL" | EnquiryStatus }))}
             />
+            <EnquiriesNeedsAttention enquiriesNeedingAttention={needsAttentionList} onSelectEnquiry={(e) => setSelectedEnquiryId(e.id)} />
+            <EnquiryPipeline statusCounts={statusCounts} activeStatus={filters.status} onSelectStatus={(s) => setFilters((prev) => ({ ...prev, status: s as "ALL" | EnquiryStatus }))} />
+            <EnquiryFilters filters={filters} onFilterChange={(updates) => setFilters((prev) => ({ ...prev, ...updates }))} onResetFilters={handleResetFilters} totalFilteredCount={filteredEnquiries.length} />
 
-            {/* Needs Attention */}
-            <EnquiriesNeedsAttention
-              enquiriesNeedingAttention={needsAttentionList}
-              onSelectEnquiry={handleOpenDetail}
-            />
+            {filteredEnquiries.length === 0 ? (
+              <EnquiriesEmptyState />
+            ) : (
+              <EnquiryList
+                enquiries={filteredEnquiries}
+                selectedEnquiryId={selectedEnquiryId || undefined}
+                onSelectEnquiry={(e) => setSelectedEnquiryId(e.id)}
+                onResetFilters={handleResetFilters}
+              />
+            )}
 
-            {/* Pipeline visualizer */}
-            <EnquiryPipeline
-              statusCounts={statusCounts}
-              activeStatus={filters.status}
-              onSelectStatus={(status) =>
-                handleFilterChange({
-                  status: status as EnquiryStatus | "ALL",
-                })
-              }
-            />
-
-            {/* Filters bar */}
-            <EnquiryFilters
-              filters={filters}
-              onFilterChange={handleFilterChange}
-              onResetFilters={handleResetFilters}
-              totalFilteredCount={filteredEnquiries.length}
-            />
-
-            {/* Enquiries List */}
-            <EnquiryList
-              enquiries={filteredEnquiries}
-              selectedEnquiryId={selectedEnquiryId || undefined}
-              onSelectEnquiry={handleOpenDetail}
-              onResetFilters={handleResetFilters}
-            />
+            <EnquiriesPageCTA />
           </>
         )}
 
-        {/* Reset Demo Data Controls */}
-        <div className="flex items-center justify-between pt-6 border-t border-[#161514]/10 text-xs text-[#5A5650]">
-          <span>Frontend Interactive State Workspace</span>
-          <button
-            onClick={handleResetDataset}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#161514]/20 text-[#161514] hover:bg-[#FAF8F5] transition-colors"
-          >
-            <RefreshCw className="w-3.5 h-3.5 text-[#C5A880]" />
-            Reset Demo Dataset
-          </button>
-        </div>
-
-        {/* Bottom CTA */}
-        <EnquiriesPageCTA />
-
-        {/* Detail Side Panel Modal */}
         <EnquiryDetail
           enquiry={selectedEnquiry}
-          onClose={handleCloseDetail}
+          onClose={() => setSelectedEnquiryId(null)}
           onUpdateStatus={handleUpdateStatus}
           onUpdatePriority={handleUpdatePriority}
           onToggleUnread={handleToggleUnread}

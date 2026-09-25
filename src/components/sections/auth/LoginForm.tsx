@@ -2,14 +2,19 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
 import { DEFAULT_LOGIN_VALUES, LoginValues } from "@/data/auth";
 import { PasswordField } from "./PasswordField";
 import { AuthSuccess } from "./AuthSuccess";
 
+import { createClient } from "@/lib/supabase/client";
+import { getCurrentUserApi } from "@/lib/api/endpoints";
+
 interface LoginFormErrors {
   email?: string;
   password?: string;
+  general?: string;
 }
 
 export function LoginForm() {
@@ -17,6 +22,7 @@ export function LoginForm() {
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -54,13 +60,29 @@ export function LoginForm() {
     if (!validate()) return;
 
     setIsSubmitting(true);
+    setErrors({});
 
     try {
-      // Simulation delay for smooth transition
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      const supabase = createClient();
+      const { error: authError } = await supabase.auth.signInWithPassword({
+        email: formValues.email.trim(),
+        password: formValues.password,
+      });
+
+      if (authError) {
+        setErrors({ general: authError.message });
+        return;
+      }
+
       setIsSubmitted(true);
-    } catch {
-      // Error handling boundary
+      const user = await getCurrentUserApi();
+      if (user.role === 'VENDOR') {
+        router.push('/vendor/dashboard');
+      } else {
+        router.push('/dashboard');
+      }
+    } catch (err) {
+      setErrors({ general: err instanceof Error ? err.message : 'Login failed. Please try again.' });
     } finally {
       setIsSubmitting(false);
     }
@@ -90,6 +112,12 @@ export function LoginForm() {
           Pick up where you left off.
         </p>
       </div>
+
+      {errors.general && (
+        <div className="p-4 rounded bg-red-50 border border-red-200 text-red-700 text-xs font-sans">
+          {errors.general}
+        </div>
+      )}
 
       {/* Form */}
       <form onSubmit={handleSubmit} noValidate className="space-y-6">

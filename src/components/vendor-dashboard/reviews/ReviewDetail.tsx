@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect } from "react";
-import Link from "next/link";
 import { VendorReview, ReviewStatus, ReviewActivity as ActivityItem } from "@/data/vendorReviews";
 import { formatReviewSource } from "@/lib/vendorReviews";
 import { ReviewStatusControl } from "./ReviewStatusControl";

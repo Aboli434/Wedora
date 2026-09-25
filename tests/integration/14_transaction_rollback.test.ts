@@ -40,7 +40,6 @@ describe('Phase 43 — 14. Transaction Rollback Tests', () => {
 
   it('should rollback payment transaction creation if processing fails', async () => {
     const payment = fixtures.paymentA;
-    const initialPaidAmount = payment.paidAmount;
 
     // Attempt creating a transaction with an invalid amount format causing failure inside transaction
     await expect(

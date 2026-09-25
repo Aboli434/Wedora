@@ -17,6 +17,7 @@ import {
 import { RoleSelector } from "./RoleSelector";
 import { PasswordField } from "./PasswordField";
 import { AuthSuccess } from "./AuthSuccess";
+import { createClient } from "@/lib/supabase/client";
 
 interface RegisterFormErrors {
   role?: string;
@@ -28,6 +29,7 @@ interface RegisterFormErrors {
   password?: string;
   confirmPassword?: string;
   destination?: string;
+  general?: string;
   guestCount?: string;
   category?: string;
   location?: string;
@@ -204,12 +206,33 @@ export function RegisterForm() {
     if (!validateStep2()) return;
 
     setIsSubmitting(true);
+    setErrors({});
 
     try {
-      await new Promise((resolve) => setTimeout(resolve, 400));
+      const supabase = createClient();
+      const email = role === "CLIENT" ? clientValues.email.trim() : vendorValues.email.trim();
+      const password = role === "CLIENT" ? clientValues.password : vendorValues.password;
+      const fullName = role === "CLIENT" ? clientValues.name.trim() : vendorValues.contactPerson.trim();
+
+      const { error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            fullName,
+            role,
+          },
+        },
+      });
+
+      if (signUpError) {
+        setErrors({ general: signUpError.message });
+        return;
+      }
+
       setIsSubmitted(true);
-    } catch {
-      // Error handling boundary
+    } catch (err) {
+      setErrors({ general: err instanceof Error ? err.message : "Registration failed. Please try again." });
     } finally {
       setIsSubmitting(false);
     }
@@ -734,13 +757,21 @@ export function RegisterForm() {
               />
               <span className="text-xs font-sans text-[#161514] leading-normal">
                 I agree to the{" "}
-                <span className="underline underline-offset-2 hover:text-[#C5A880] cursor-pointer">
+                <Link
+                  href="/terms-of-service"
+                  target="_blank"
+                  className="underline underline-offset-2 hover:text-[#C5A880]"
+                >
                   Wedora Terms
-                </span>{" "}
+                </Link>{" "}
                 and{" "}
-                <span className="underline underline-offset-2 hover:text-[#C5A880] cursor-pointer">
+                <Link
+                  href="/privacy-policy"
+                  target="_blank"
+                  className="underline underline-offset-2 hover:text-[#C5A880]"
+                >
                   Privacy Policy
-                </span>
+                </Link>
                 . <span className="text-[#C5A880]">*</span>
               </span>
             </label>
