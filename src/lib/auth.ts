@@ -19,13 +19,62 @@ export async function getCurrentUser() {
       return null;
     }
 
-    const appUser = await prisma.user.findUnique({
+    let appUser = await prisma.user.findUnique({
       where: { supabaseAuthUserId: supabaseUser.id },
       include: {
         clientProfile: true,
         vendorProfile: true,
       },
     });
+
+    // Auto-provision application User and profile in PostgreSQL DB if not present
+    if (!appUser && supabaseUser.email) {
+      const rawRole = supabaseUser.user_metadata?.role;
+      const userRole = rawRole === 'VENDOR' ? UserRole.VENDOR : rawRole === 'ADMIN' ? UserRole.ADMIN : UserRole.CLIENT;
+      const fullName = (supabaseUser.user_metadata?.fullName as string) || (supabaseUser.user_metadata?.name as string) || 'User';
+
+      appUser = await prisma.$transaction(async (tx) => {
+        const newUser = await tx.user.create({
+          data: {
+            supabaseAuthUserId: supabaseUser.id,
+            email: supabaseUser.email!.toLowerCase(),
+            role: userRole,
+            fullName,
+          },
+        });
+
+        if (userRole === UserRole.VENDOR) {
+          const businessName = fullName.includes('Studio') || fullName.includes('Services') ? fullName : `${fullName} Studio`;
+          const baseSlug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'vendor-studio';
+          const slug = `${baseSlug}-${Date.now().toString(36)}`;
+
+          await tx.vendorProfile.create({
+            data: {
+              userId: newUser.id,
+              businessName,
+              slug,
+              category: 'PHOTOGRAPHY',
+              city: 'Mumbai',
+              startingPrice: BigInt(5000000),
+            },
+          });
+        } else if (userRole === UserRole.CLIENT) {
+          await tx.clientProfile.create({
+            data: {
+              userId: newUser.id,
+            },
+          });
+        }
+
+        return tx.user.findUnique({
+          where: { id: newUser.id },
+          include: {
+            clientProfile: true,
+            vendorProfile: true,
+          },
+        });
+      });
+    }
 
     return appUser;
   } catch {
