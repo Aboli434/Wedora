@@ -66,22 +66,27 @@ export function LoginForm() {
 
     try {
       const supabase = createClient();
-      const { error: authError } = await supabase.auth.signInWithPassword({
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email: formValues.email.trim(),
         password: formValues.password,
       });
 
-      if (authError) {
-        setErrors({ general: authError.message });
+      if (authError || !authData?.user) {
+        setErrors({ general: authError?.message || "Authentication failed. Please try again." });
         return;
       }
 
-      let detectedRole: "CLIENT" | "VENDOR" | "ADMIN" = "CLIENT";
-      try {
-        const user = await getCurrentUserApi();
-        detectedRole = user.role;
-      } catch {
-        // Fallback if DB user sync is pending
+      // Check role directly from Supabase Auth user_metadata first
+      let detectedRole: "CLIENT" | "VENDOR" | "ADMIN" | null = (authData.user.user_metadata?.role as "CLIENT" | "VENDOR" | "ADMIN") || null;
+
+      // Fallback to API if metadata role is not present
+      if (!detectedRole) {
+        try {
+          const user = await getCurrentUserApi();
+          detectedRole = user.role;
+        } catch {
+          detectedRole = "CLIENT";
+        }
       }
 
       setUserRole(detectedRole);
