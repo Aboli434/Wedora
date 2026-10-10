@@ -8,11 +8,11 @@ import { weddingService } from '@/lib/services/wedding.service';
 import { ForbiddenError, ValidationError } from '@/lib/errors';
 
 interface RouteContext {
-  params: Promise<{ id: string }>;
+  params: Promise<{ weddingId: string }>;
 }
 
 /**
- * GET /api/v1/weddings/[id]
+ * GET /api/v1/weddings/[weddingId]
  * Retrieves a specific wedding owned by the authenticated client.
  * Returns 404 if not found or if wedding belongs to another client.
  */
@@ -24,7 +24,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
       throw new ForbiddenError('Client profile is required to access weddings');
     }
 
-    const { id: weddingId } = await context.params;
+    const { weddingId } = await context.params;
 
     const wedding = await weddingService.getWeddingForClient({
       weddingId,
@@ -38,7 +38,7 @@ export async function GET(request: NextRequest, context: RouteContext) {
 }
 
 /**
- * PATCH /api/v1/weddings/[id]
+ * PATCH /api/v1/weddings/[weddingId]
  * Updates a specific wedding owned by the authenticated client.
  * Returns 404 if not found or if wedding belongs to another client.
  */
@@ -50,7 +50,7 @@ export async function PATCH(request: NextRequest, context: RouteContext) {
       throw new ForbiddenError('Client profile is required to update a wedding');
     }
 
-    const { id: weddingId } = await context.params;
+    const { weddingId } = await context.params;
 
     let rawBody: unknown;
     try {
