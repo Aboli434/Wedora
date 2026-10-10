@@ -43,7 +43,7 @@ export async function getCurrentUser() {
           },
         });
 
-        if (userRole === UserRole.VENDOR) {
+        if (userRole === UserRole.VENDOR || userRole === UserRole.ADMIN) {
           const businessName = fullName.includes('Studio') || fullName.includes('Services') ? fullName : `${fullName} Studio`;
           const baseSlug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'vendor-studio';
           const slug = `${baseSlug}-${Date.now().toString(36)}`;
@@ -58,7 +58,9 @@ export async function getCurrentUser() {
               startingPrice: BigInt(5000000),
             },
           });
-        } else if (userRole === UserRole.CLIENT) {
+        }
+        
+        if (userRole === UserRole.CLIENT || userRole === UserRole.ADMIN) {
           await tx.clientProfile.create({
             data: {
               userId: newUser.id,
@@ -74,6 +76,42 @@ export async function getCurrentUser() {
           },
         });
       });
+    }
+
+    // Ensure existing ADMIN users also get missing profiles provisioned
+    if (appUser && appUser.role === UserRole.ADMIN) {
+      if (!appUser.clientProfile || !appUser.vendorProfile) {
+        await prisma.$transaction(async (tx) => {
+          if (!appUser!.clientProfile) {
+            await tx.clientProfile.create({
+              data: { userId: appUser!.id },
+            });
+          }
+          if (!appUser!.vendorProfile) {
+            const businessName = `${appUser!.fullName} Admin Studio`;
+            const baseSlug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'admin-studio';
+            const slug = `${baseSlug}-${Date.now().toString(36)}`;
+            await tx.vendorProfile.create({
+              data: {
+                userId: appUser!.id,
+                businessName,
+                slug,
+                category: 'PHOTOGRAPHY',
+                city: 'Mumbai',
+                startingPrice: BigInt(5000000),
+              },
+            });
+          }
+        });
+
+        appUser = await prisma.user.findUnique({
+          where: { id: appUser.id },
+          include: {
+            clientProfile: true,
+            vendorProfile: true,
+          },
+        });
+      }
     }
 
     return appUser;
@@ -100,13 +138,14 @@ export async function requireAuthenticatedUser() {
 /**
  * Requires an authenticated user with one of the specified allowed roles.
  * Role is verified strictly against application User database record, never client claims.
+ * Allows ADMIN role superuser access across all application endpoints.
  * Throws UnauthorizedError if unauthenticated, ForbiddenError if role does not match.
  */
 export async function requireRole(allowedRoles: UserRole | UserRole[]) {
   const user = await requireAuthenticatedUser();
   const roles = Array.isArray(allowedRoles) ? allowedRoles : [allowedRoles];
 
-  if (!roles.includes(user.role)) {
+  if (!roles.includes(user.role) && user.role !== UserRole.ADMIN) {
     throw new ForbiddenError(`Access denied. Required role: ${roles.join(', ')}`);
   }
 
