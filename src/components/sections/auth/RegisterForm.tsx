@@ -232,7 +232,12 @@ export function RegisterForm() {
 
       setIsSubmitted(true);
     } catch (err) {
-      setErrors({ general: err instanceof Error ? err.message : "Registration failed. Please try again." });
+      const msg = err instanceof Error ? err.message : "Registration failed. Please try again.";
+      if (msg.includes("Failed to fetch")) {
+        setErrors({ general: "Unable to connect to Supabase Auth. Please check your network connection and Supabase API keys in .env." });
+      } else {
+        setErrors({ general: msg });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -317,6 +322,12 @@ export function RegisterForm() {
               {role === "CLIENT" ? "Tell us about you." : "Tell us about your work."}
             </h2>
           </div>
+
+          {errors.general && (
+            <div className="p-4 rounded bg-red-50 border border-red-200 text-red-700 text-xs font-sans leading-relaxed">
+              {errors.general}
+            </div>
+          )}
 
           {/* CLIENT FIELDS */}
           {role === "CLIENT" && (

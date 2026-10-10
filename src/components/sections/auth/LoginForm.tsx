@@ -24,6 +24,8 @@ export function LoginForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const router = useRouter();
 
+  const [userRole, setUserRole] = useState<"CLIENT" | "VENDOR" | "ADMIN" | null>(null);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
     setFormValues((prev) => ({
@@ -74,15 +76,24 @@ export function LoginForm() {
         return;
       }
 
+      let detectedRole: "CLIENT" | "VENDOR" | "ADMIN" = "CLIENT";
+      try {
+        const user = await getCurrentUserApi();
+        detectedRole = user.role;
+      } catch {
+        // Fallback if DB user sync is pending
+      }
+
+      setUserRole(detectedRole);
       setIsSubmitted(true);
-      const user = await getCurrentUserApi();
-      if (user.role === 'VENDOR') {
-        router.push('/vendor/dashboard');
+
+      if (detectedRole === "VENDOR") {
+        router.push("/vendor/dashboard");
       } else {
-        router.push('/dashboard');
+        router.push("/dashboard");
       }
     } catch (err) {
-      setErrors({ general: err instanceof Error ? err.message : 'Login failed. Please try again.' });
+      setErrors({ general: err instanceof Error ? err.message : "Login failed. Please try again." });
     } finally {
       setIsSubmitting(false);
     }
@@ -92,10 +103,11 @@ export function LoginForm() {
     setFormValues(DEFAULT_LOGIN_VALUES);
     setErrors({});
     setIsSubmitted(false);
+    setUserRole(null);
   };
 
   if (isSubmitted) {
-    return <AuthSuccess type="login" onReset={handleReset} />;
+    return <AuthSuccess type="login" role={userRole} onReset={handleReset} />;
   }
 
   return (
