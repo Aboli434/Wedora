@@ -14,9 +14,7 @@ export const VendorDashboardCommandCenter: React.FC<
   VendorDashboardCommandCenterProps
 > = ({ data }) => {
   const nextAction = getVendorDashboardNextAction(data);
-  const hour = new Date().getHours();
-  const timeGreeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  const firstName = data.profile.ownerName.split(" ")[0];
+  const vendorName = data.profile.ownerName ? data.profile.ownerName.split(" ")[0] : data.profile.businessName;
 
   return (
     <section aria-label="Vendor Command Center Overview" className="space-y-6">
@@ -27,7 +25,7 @@ export const VendorDashboardCommandCenter: React.FC<
             STUDIO COMMAND CENTER
           </span>
           <h1 className="font-serif text-3xl md:text-5xl text-[#161514] font-normal leading-tight">
-            {timeGreeting}, {firstName}
+            Welcome, {vendorName}
           </h1>
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#5A5650] mt-2 font-sans">
             <span className="flex items-center gap-1.5 font-medium text-[#161514]">
