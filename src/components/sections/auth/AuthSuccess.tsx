@@ -15,7 +15,12 @@ export function AuthSuccess({ type, role, onReset }: AuthSuccessProps) {
   const shouldReduceMotion = useReducedMotion();
 
   const isLogin = type === "login";
-  const dashboardHref = role === "VENDOR" ? "/vendor/dashboard" : "/dashboard";
+  const dashboardHref =
+    role === "ADMIN"
+      ? "/admin/dashboard"
+      : role === "VENDOR"
+      ? "/vendor/dashboard"
+      : "/dashboard";
 
   return (
     <motion.div
@@ -54,7 +59,14 @@ export function AuthSuccess({ type, role, onReset }: AuthSuccessProps) {
           href={dashboardHref}
           className="w-full px-6 py-3.5 bg-[#C5A880] text-[#161514] font-semibold text-xs tracking-[0.2em] uppercase inline-flex items-center justify-center hover:bg-[#161514] hover:text-[#FAF8F5] transition-colors"
         >
-          <span>Go to {role === "VENDOR" ? "Vendor Dashboard" : "Dashboard"}</span>
+          <span>
+            Go to{" "}
+            {role === "ADMIN"
+              ? "Admin Command Center"
+              : role === "VENDOR"
+              ? "Vendor Dashboard"
+              : "Dashboard"}
+          </span>
           <ArrowRight className="w-4 h-4 ml-2" />
         </Link>
 

@@ -92,7 +92,9 @@ export function LoginForm() {
       setUserRole(detectedRole);
       setIsSubmitted(true);
 
-      if (detectedRole === "VENDOR") {
+      if (detectedRole === "ADMIN") {
+        router.push("/admin/dashboard");
+      } else if (detectedRole === "VENDOR") {
         router.push("/vendor/dashboard");
       } else {
         router.push("/dashboard");
