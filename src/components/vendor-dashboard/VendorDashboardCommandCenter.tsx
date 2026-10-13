@@ -5,6 +5,7 @@ import Link from "next/link";
 import { FullVendorDashboardData } from "@/data/vendorDashboard";
 import { getVendorDashboardNextAction } from "@/lib/vendorDashboardNextAction";
 import { Building2, MapPin, ArrowRight, Sparkles, Tag } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface VendorDashboardCommandCenterProps {
   data: FullVendorDashboardData;
@@ -13,8 +14,22 @@ interface VendorDashboardCommandCenterProps {
 export const VendorDashboardCommandCenter: React.FC<
   VendorDashboardCommandCenterProps
 > = ({ data }) => {
+  const { user } = useAuth();
   const nextAction = getVendorDashboardNextAction(data);
-  const vendorName = data.profile.ownerName ? data.profile.ownerName.split(" ")[0] : data.profile.businessName;
+
+  const vendorProfile = user?.profile as {
+    businessName?: string;
+    category?: string;
+    city?: string;
+    slug?: string;
+  } | null;
+
+  const rawOwnerName = user?.fullName || data.profile.ownerName;
+  const businessName = vendorProfile?.businessName || data.profile.businessName;
+  const vendorName = rawOwnerName ? rawOwnerName.split(" ")[0] : businessName;
+  const category = vendorProfile?.category || data.profile.category;
+  const location = vendorProfile?.city || data.profile.location;
+  const publicSlug = vendorProfile?.slug || data.profile.publicSlug;
 
   return (
     <section aria-label="Vendor Command Center Overview" className="space-y-6">
@@ -30,23 +45,23 @@ export const VendorDashboardCommandCenter: React.FC<
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#5A5650] mt-2 font-sans">
             <span className="flex items-center gap-1.5 font-medium text-[#161514]">
               <Building2 className="w-3.5 h-3.5 text-[#C5A880]" />
-              {data.profile.businessName}
+              {businessName}
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
               <Tag className="w-3.5 h-3.5 text-[#C5A880]" />
-              {data.profile.category}
+              {category}
             </span>
             <span>•</span>
             <span className="flex items-center gap-1">
               <MapPin className="w-3.5 h-3.5 text-[#C5A880]" />
-              {data.profile.location}
+              {location}
             </span>
           </div>
         </div>
 
         <Link
-          href={`/vendors/${data.profile.publicSlug}`}
+          href={`/vendors/${publicSlug}`}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs font-medium uppercase tracking-wider text-[#5A5650] hover:text-[#161514] underline self-start md:self-end"

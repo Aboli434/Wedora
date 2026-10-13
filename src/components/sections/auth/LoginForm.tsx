@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowRight } from "lucide-react";
@@ -10,6 +10,7 @@ import { AuthSuccess } from "./AuthSuccess";
 
 import { createClient } from "@/lib/supabase/client";
 import { getCurrentUserApi } from "@/lib/api/endpoints";
+import { useAuth } from "@/hooks/useAuth";
 
 interface LoginFormErrors {
   email?: string;
@@ -23,6 +24,20 @@ export function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
   const router = useRouter();
+
+  const { user, isAuthenticated, loading } = useAuth();
+
+  useEffect(() => {
+    if (!loading && isAuthenticated && user) {
+      if (user.role === "ADMIN") {
+        router.replace("/admin/dashboard");
+      } else if (user.role === "VENDOR") {
+        router.replace("/vendor/dashboard");
+      } else {
+        router.replace("/dashboard");
+      }
+    }
+  }, [loading, isAuthenticated, user, router]);
 
   const [userRole, setUserRole] = useState<"CLIENT" | "VENDOR" | "ADMIN" | null>(null);
 

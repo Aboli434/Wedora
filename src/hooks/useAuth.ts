@@ -28,10 +28,20 @@ export function useAuth() {
 
   useEffect(() => {
     let isMounted = true;
+    const supabase = createClient();
+
     async function load() {
       try {
         setLoading(true);
         setError(null);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          if (isMounted) {
+            setUser(null);
+            setLoading(false);
+          }
+          return;
+        }
         const currentUser = await getCurrentUserApi();
         if (isMounted) setUser(currentUser);
       } catch (err) {
@@ -43,9 +53,25 @@ export function useAuth() {
         if (isMounted) setLoading(false);
       }
     }
+
     load();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        load();
+      } else {
+        if (isMounted) {
+          setUser(null);
+          setLoading(false);
+        }
+      }
+    });
+
     return () => {
       isMounted = false;
+      subscription.unsubscribe();
     };
   }, []);
 
@@ -67,7 +93,9 @@ export function useAuth() {
     isAuthenticated: !!user,
     isClient: user?.role === 'CLIENT',
     isVendor: user?.role === 'VENDOR',
+    isAdmin: user?.role === 'ADMIN',
     refetchUser: fetchUser,
     logout,
   };
 }
+

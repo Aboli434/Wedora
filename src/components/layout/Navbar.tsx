@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { cn } from "@/lib/utils";
 import { useScrollPosition } from "@/hooks/useScrollPosition";
+import { useAuth } from "@/hooks/useAuth";
 
 const DESKTOP_NAV_LINKS = [
   { label: "Vendors", href: "/vendors" },
@@ -69,8 +70,26 @@ export function Navbar() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [isMobileMenuOpen]);
 
-  if (pathname?.startsWith("/dashboard")) {
+  const { user, isAuthenticated, loading, logout } = useAuth();
+
+  if (
+    pathname?.startsWith("/dashboard") ||
+    pathname === "/vendor" ||
+    pathname?.startsWith("/vendor/") ||
+    pathname?.startsWith("/admin")
+  ) {
     return null;
+  }
+
+  let dashboardHref = "/dashboard";
+  let dashboardLabel = "Dashboard";
+
+  if (user?.role === "VENDOR") {
+    dashboardHref = "/vendor/dashboard";
+    dashboardLabel = "Vendor Studio";
+  } else if (user?.role === "ADMIN") {
+    dashboardHref = "/admin/dashboard";
+    dashboardLabel = "Admin Center";
   }
 
   const navContainerVariants: Variants = {
@@ -218,27 +237,56 @@ export function Navbar() {
             {/* Desktop Action Buttons (>= 1024px) */}
             <motion.div
               variants={navItemVariants}
-              className="hidden lg:flex items-center space-x-4"
+              className="hidden lg:flex items-center space-x-3"
             >
-              <Link href="/login">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className={cn(
-                    "tracking-wider transition-colors duration-300",
-                    isScrolled
-                      ? "text-[var(--text-primary)] hover:text-[var(--accent-gold)]"
-                      : "text-[var(--text-light)] hover:text-[var(--accent-gold)]"
-                  )}
-                >
-                  Login
-                </Button>
-              </Link>
-              <Link href="/register">
-                <Button variant="primary" size="sm">
-                  Begin Planning
-                </Button>
-              </Link>
+              {!loading && isAuthenticated ? (
+                <>
+                  <Link href={dashboardHref}>
+                    <Button
+                      variant="primary"
+                      size="sm"
+                      className="tracking-wider"
+                    >
+                      {dashboardLabel}
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={logout}
+                    className={cn(
+                      "tracking-wider transition-colors duration-300",
+                      isScrolled
+                        ? "text-[var(--text-secondary)] hover:text-red-600"
+                        : "text-[var(--text-light)]/80 hover:text-red-400"
+                    )}
+                  >
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href="/login">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className={cn(
+                        "tracking-wider transition-colors duration-300",
+                        isScrolled
+                          ? "text-[var(--text-primary)] hover:text-[var(--accent-gold)]"
+                          : "text-[var(--text-light)] hover:text-[var(--accent-gold)]"
+                      )}
+                    >
+                      Login
+                    </Button>
+                  </Link>
+                  <Link href="/register">
+                    <Button variant="primary" size="sm">
+                      Begin Planning
+                    </Button>
+                  </Link>
+                </>
+              )}
             </motion.div>
 
             {/* Mobile Menu Trigger (< 1024px) */}
@@ -327,18 +375,42 @@ export function Navbar() {
                 <span className="caption text-[10px] tracking-[0.25em] text-[var(--accent-gold)] uppercase font-semibold block">
                   ACCOUNT
                 </span>
-                <div className="flex flex-col space-y-3">
-                  <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="primary" size="lg" className="w-full">
-                      Begin Planning
+                {!loading && isAuthenticated ? (
+                  <div className="flex flex-col space-y-3">
+                    <div className="text-xs text-[var(--text-secondary)] font-sans">
+                      Signed in as <span className="font-medium text-[var(--text-primary)]">{user?.fullName || user?.email}</span>
+                    </div>
+                    <Link href={dashboardHref} onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="primary" size="lg" className="w-full">
+                        {dashboardLabel}
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="outline"
+                      size="md"
+                      className="w-full text-red-600 border-red-300 hover:bg-red-50"
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        logout();
+                      }}
+                    >
+                      Logout
                     </Button>
-                  </Link>
-                  <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
-                    <Button variant="outline" size="md" className="w-full">
-                      Login
-                    </Button>
-                  </Link>
-                </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col space-y-3">
+                    <Link href="/register" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="primary" size="lg" className="w-full">
+                        Begin Planning
+                      </Button>
+                    </Link>
+                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)}>
+                      <Button variant="outline" size="md" className="w-full">
+                        Login
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </motion.div>
 
               {/* Group 3: MORE RESOURCES */}

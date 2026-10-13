@@ -50,6 +50,37 @@ export class UserService {
         createdAt: vendorProfile.createdAt,
         updatedAt: vendorProfile.updatedAt,
       };
+    } else if (user.role === 'ADMIN') {
+      if (vendorProfile) {
+        profileData = {
+          id: vendorProfile.id,
+          businessName: vendorProfile.businessName,
+          slug: vendorProfile.slug,
+          category: vendorProfile.category,
+          rating: vendorProfile.rating,
+          reviewCount: vendorProfile.reviewCount,
+          city: vendorProfile.city,
+          startingPrice: vendorProfile.startingPrice.toString(),
+          coverImage: vendorProfile.coverImage,
+          description: vendorProfile.description,
+          experienceYears: vendorProfile.experienceYears,
+          teamSize: vendorProfile.teamSize,
+          verified: vendorProfile.verified,
+          featured: vendorProfile.featured,
+          createdAt: vendorProfile.createdAt,
+          updatedAt: vendorProfile.updatedAt,
+        };
+      } else if (clientProfile) {
+        profileData = {
+          id: clientProfile.id,
+          location: clientProfile.location,
+          phone: clientProfile.phone,
+          budgetRange: clientProfile.budgetRange,
+          notes: clientProfile.notes,
+          createdAt: clientProfile.createdAt,
+          updatedAt: clientProfile.updatedAt,
+        };
+      }
     }
 
     return {

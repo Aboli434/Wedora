@@ -16,7 +16,9 @@ import {
   Star,
   Settings,
   ArrowLeft,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface NavGroup {
   label: string;
@@ -78,6 +80,7 @@ interface VendorSidebarProps {
 
 export function VendorSidebar({ onNavClick, className = "" }: VendorSidebarProps) {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   return (
     <aside
@@ -144,8 +147,8 @@ export function VendorSidebar({ onNavClick, className = "" }: VendorSidebarProps
         </nav>
       </div>
 
-      {/* Footer Link */}
-      <div className="p-6 border-t border-[#2C2A28]">
+      {/* Footer Links */}
+      <div className="p-6 border-t border-[#2C2A28] flex items-center justify-between">
         <Link
           href="/"
           onClick={onNavClick}
@@ -154,6 +157,14 @@ export function VendorSidebar({ onNavClick, className = "" }: VendorSidebarProps
           <ArrowLeft className="w-3.5 h-3.5 text-[#8C857B] group-hover:text-[#C5A880] transition-colors" />
           <span>Back to Wedora</span>
         </Link>
+        <button
+          onClick={logout}
+          className="flex items-center gap-1.5 text-xs text-[#8C857B] hover:text-red-400 transition-colors cursor-pointer"
+          title="Sign Out"
+        >
+          <LogOut className="w-3.5 h-3.5" />
+          <span>Logout</span>
+        </button>
       </div>
     </aside>
   );

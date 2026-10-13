@@ -9,7 +9,12 @@ import { Divider } from "@/components/ui/Divider";
 export function Footer() {
   const pathname = usePathname();
 
-  if (pathname?.startsWith("/dashboard")) {
+  if (
+    pathname?.startsWith("/dashboard") ||
+    pathname === "/vendor" ||
+    pathname?.startsWith("/vendor/") ||
+    pathname?.startsWith("/admin")
+  ) {
     return null;
   }
   return (
