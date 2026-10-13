@@ -1,10 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { ClientDashboardData } from "@/data/dashboard";
 import { getDashboardNextAction } from "@/lib/dashboardNextAction";
 import { Calendar, MapPin, ArrowRight, Sparkles } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getWeddingsApi } from "@/lib/api/endpoints";
 
 interface DashboardCommandCenterProps {
   data: ClientDashboardData;
@@ -13,30 +15,81 @@ interface DashboardCommandCenterProps {
 export const DashboardCommandCenter: React.FC<DashboardCommandCenterProps> = ({
   data,
 }) => {
+  const { user } = useAuth();
+  const [coupleTitle, setCoupleTitle] = useState<string>("");
+  const [weddingMeta, setWeddingMeta] = useState<{
+    daysRemaining?: number;
+    location?: string;
+    weddingDate?: string;
+  } | null>(null);
+
   const nextAction = getDashboardNextAction(data);
-  const hour = new Date().getHours();
-  const timeGreeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadClientWedding() {
+      try {
+        const weddings = await getWeddingsApi();
+        if (weddings && weddings.length > 0 && isMounted) {
+          const w = weddings[0];
+          const names =
+            w.partner1Name && w.partner2Name
+              ? `${w.partner1Name} & ${w.partner2Name}`
+              : w.partner1Name || w.title || "";
+          if (names) setCoupleTitle(names);
+
+          if (w.weddingDate) {
+            const targetDate = new Date(w.weddingDate);
+            const now = new Date();
+            const diffTime = targetDate.getTime() - now.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            setWeddingMeta({
+              daysRemaining: diffDays > 0 ? diffDays : 0,
+              location: w.location || data.identity.location,
+              weddingDate: targetDate.toLocaleDateString("en-US", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              }),
+            });
+          }
+        }
+      } catch {
+        // Fallback to auth user or mock data
+      }
+    }
+    loadClientWedding();
+    return () => {
+      isMounted = false;
+    };
+  }, [data.identity.location]);
+
+  // Priority: 1. DB Wedding couple names, 2. Logged-in client's full name, 3. data.identity.coupleNames
+  const clientName = coupleTitle || user?.fullName || data.identity.coupleNames;
+  const daysRemaining = weddingMeta?.daysRemaining ?? data.countdown.daysRemaining;
+  const weddingLocation = weddingMeta?.location ?? data.identity.location;
+  const weddingDateStr = weddingMeta?.weddingDate ?? data.identity.weddingDate;
 
   return (
     <section aria-label="Command Center Overview" className="space-y-6">
       {/* Top Greeting & Subtitle */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-[#161514]/10">
         <div>
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#C5A880] block mb-1">
+          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-[#C5A880] block mb-1 font-sans">
             CLIENT COMMAND CENTER
           </span>
           <h1 className="font-serif text-3xl md:text-5xl text-[#161514] font-normal leading-tight">
-            {timeGreeting}, {data.identity.coupleNames}
+            Welcome, {clientName}
           </h1>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-[#5A5650] mt-2 font-sans">
             <span className="flex items-center gap-1.5 font-medium text-[#161514]">
               <Calendar className="w-3.5 h-3.5 text-[#C5A880]" />
-              {data.countdown.daysRemaining} days until your celebration
+              {daysRemaining} days until your celebration
             </span>
             <span>•</span>
             <span className="flex items-center gap-1.5">
               <MapPin className="w-3.5 h-3.5 text-[#C5A880]" />
-              {data.identity.location} ({data.identity.weddingDate})
+              {weddingLocation} ({weddingDateStr})
             </span>
           </div>
         </div>

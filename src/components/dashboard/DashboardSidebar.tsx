@@ -13,7 +13,9 @@ import {
   Calendar,
   Settings,
   ArrowLeft,
+  LogOut,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 export interface NavItem {
   label: string;
@@ -37,6 +39,7 @@ export const DASHBOARD_SECONDARY_ITEMS: NavItem[] = [
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const { logout } = useAuth();
 
   return (
     <aside className="hidden lg:flex flex-col w-64 xl:w-72 bg-[#FAF8F5] border-r border-[#161514]/15 min-h-screen fixed top-0 left-0 bottom-0 z-30 p-8 justify-between">
@@ -117,14 +120,22 @@ export function DashboardSidebar() {
             );
           })}
 
-          <li>
+          <li className="flex items-center justify-between pt-2">
             <Link
               href="/"
-              className="flex items-center gap-3 px-3 py-2 text-xs font-medium tracking-wider uppercase text-[#5A5650] hover:text-[#C5A880] transition-colors mt-2"
+              className="flex items-center gap-2 px-3 py-2 text-xs font-medium tracking-wider uppercase text-[#5A5650] hover:text-[#C5A880] transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               <span>Back to Wedora</span>
             </Link>
+            <button
+              onClick={logout}
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium tracking-wider uppercase text-[#5A5650] hover:text-red-600 transition-colors cursor-pointer"
+              title="Sign Out"
+            >
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Logout</span>
+            </button>
           </li>
         </ul>
       </div>
