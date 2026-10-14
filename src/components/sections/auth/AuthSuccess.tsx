@@ -72,10 +72,13 @@ export function AuthSuccess({ type, role, businessName, onReset }: AuthSuccessPr
         <div className="pt-6 border-t border-[#161514]/15 flex flex-col gap-3">
           <Link
             href="/login"
-            className="w-full px-6 py-3.5 bg-[#161514] text-[#FAF8F5] font-semibold text-xs tracking-[0.2em] uppercase inline-flex items-center justify-center hover:bg-[#C5A880] hover:text-[#161514] transition-colors rounded-xs shadow-xs"
+            style={{ color: "#FAF8F5" }}
+            className="w-full px-6 py-3.5 bg-[#161514] hover:bg-[#C5A880] !text-[#FAF8F5] hover:!text-[#161514] font-semibold text-xs tracking-[0.2em] uppercase inline-flex items-center justify-center gap-2 transition-colors rounded-xs shadow-xs"
           >
-            <span>Go to Sign In</span>
-            <ArrowRight className="w-4 h-4 ml-2" />
+            <span style={{ color: "#FAF8F5" }} className="!text-[#FAF8F5] font-sans">
+              Go to Sign In
+            </span>
+            <ArrowRight className="w-4 h-4 !text-[#FAF8F5]" />
           </Link>
 
           <Link

@@ -97,8 +97,11 @@ button {
 }
 
 a {
-  color: inherit;
   text-decoration: none;
+}
+
+a:not([class*="text-"]) {
+  color: inherit;
 }
 
 /* Custom Sleek Scrollbar */

@@ -27,10 +27,13 @@ export default function NotFoundPage() {
         <div className="pt-2">
           <Link
             href="/"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#161514] text-[#FAF8F5] text-xs font-medium uppercase tracking-[0.15em] hover:bg-[#C5A880] hover:text-[#161514] transition-all duration-300 focus:outline-none shadow-sm"
+            style={{ color: "#FAF8F5" }}
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#161514] !text-[#FAF8F5] text-xs font-medium uppercase tracking-[0.15em] hover:bg-[#C5A880] hover:!text-[#161514] transition-all duration-300 focus:outline-none shadow-sm rounded-xs"
           >
             <Home className="w-4 h-4 text-[#C5A880]" />
-            <span>Return to Homepage</span>
+            <span style={{ color: "#FAF8F5" }} className="!text-[#FAF8F5] font-sans">
+              Return to Homepage
+            </span>
           </Link>
         </div>
       </div>
