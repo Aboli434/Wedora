@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence, Variants } from "framer-motion";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
@@ -239,31 +239,17 @@ export function Navbar() {
               variants={navItemVariants}
               className="hidden lg:flex items-center space-x-3"
             >
-              {!loading && isAuthenticated ? (
-                <>
-                  <Link href={dashboardHref}>
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      className="tracking-wider"
-                    >
-                      {dashboardLabel}
-                    </Button>
-                  </Link>
+              {isAuthenticated ? (
+                <Link href={dashboardHref}>
                   <Button
-                    variant="ghost"
+                    variant="primary"
                     size="sm"
-                    onClick={logout}
-                    className={cn(
-                      "tracking-wider transition-colors duration-300",
-                      isScrolled
-                        ? "text-[var(--text-secondary)] hover:text-red-600"
-                        : "text-[var(--text-light)]/80 hover:text-red-400"
-                    )}
+                    className="tracking-wider inline-flex items-center gap-2 px-5 py-2 font-medium"
                   >
-                    Logout
+                    <span>Dashboard</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
                   </Button>
-                </>
+                </Link>
               ) : (
                 <>
                   <Link href="/login">
@@ -375,27 +361,17 @@ export function Navbar() {
                 <span className="caption text-[10px] tracking-[0.25em] text-[var(--accent-gold)] uppercase font-semibold block">
                   ACCOUNT
                 </span>
-                {!loading && isAuthenticated ? (
+                {isAuthenticated ? (
                   <div className="flex flex-col space-y-3">
                     <div className="text-xs text-[var(--text-secondary)] font-sans">
                       Signed in as <span className="font-medium text-[var(--text-primary)]">{user?.fullName || user?.email}</span>
                     </div>
                     <Link href={dashboardHref} onClick={() => setIsMobileMenuOpen(false)}>
-                      <Button variant="primary" size="lg" className="w-full">
-                        {dashboardLabel}
+                      <Button variant="primary" size="lg" className="w-full inline-flex items-center justify-center gap-2">
+                        <span>Dashboard</span>
+                        <ArrowRight className="w-4 h-4" />
                       </Button>
                     </Link>
-                    <Button
-                      variant="outline"
-                      size="md"
-                      className="w-full text-red-600 border-red-300 hover:bg-red-50"
-                      onClick={() => {
-                        setIsMobileMenuOpen(false);
-                        logout();
-                      }}
-                    >
-                      Logout
-                    </Button>
                   </div>
                 ) : (
                   <div className="flex flex-col space-y-3">

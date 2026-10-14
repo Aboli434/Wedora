@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { DEFAULT_LOGIN_VALUES, LoginValues } from "@/data/auth";
 import { PasswordField } from "./PasswordField";
 import { AuthSuccess } from "./AuthSuccess";
@@ -11,6 +11,7 @@ import { AuthSuccess } from "./AuthSuccess";
 import { createClient } from "@/lib/supabase/client";
 import { getCurrentUserApi } from "@/lib/api/endpoints";
 import { useAuth } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface LoginFormErrors {
   email?: string;
@@ -25,19 +26,7 @@ export function LoginForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
   const router = useRouter();
 
-  const { user, isAuthenticated, loading } = useAuth();
-
-  useEffect(() => {
-    if (!loading && isAuthenticated && user) {
-      if (user.role === "ADMIN") {
-        router.replace("/admin/dashboard");
-      } else if (user.role === "VENDOR") {
-        router.replace("/vendor/dashboard");
-      } else {
-        router.replace("/dashboard");
-      }
-    }
-  }, [loading, isAuthenticated, user, router]);
+  const { user, isAuthenticated, dashboardHref, logout } = useAuth();
 
   const [userRole, setUserRole] = useState<"CLIENT" | "VENDOR" | "ADMIN" | null>(null);
 
@@ -104,6 +93,24 @@ export function LoginForm() {
         }
       }
 
+      const immediateUser = {
+        id: authData.user.id,
+        email: authData.user.email || formValues.email.trim(),
+        role: detectedRole,
+        fullName:
+          (authData.user.user_metadata?.fullName as string) ||
+          (authData.user.user_metadata?.name as string) ||
+          "User",
+        phoneNumber: authData.user.phone || null,
+        avatarUrl: null,
+        isActive: true,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        profile: null,
+      };
+
+      useAuthStore.getState().setUser(immediateUser);
+
       setUserRole(detectedRole);
       setIsSubmitted(true);
 
@@ -130,6 +137,46 @@ export function LoginForm() {
 
   if (isSubmitted) {
     return <AuthSuccess type="login" role={userRole} onReset={handleReset} />;
+  }
+
+  if (isAuthenticated && user) {
+    return (
+      <div className="space-y-8 bg-[#FAF8F5] p-8 sm:p-10 border border-[#161514]/15">
+        <div className="flex items-center gap-3">
+          <CheckCircle2 className="w-6 h-6 text-[#C5A880]" />
+          <span className="text-[11px] font-semibold tracking-[0.25em] uppercase text-[#C5A880]">
+            ALREADY SIGNED IN
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          <h1 className="font-serif text-3xl sm:text-4xl font-light text-[#161514] leading-snug">
+            Welcome, {user.fullName || user.email}
+          </h1>
+          <p className="font-sans text-sm text-[#5A5650] font-light">
+            You are currently signed in with an active {user.role.toLowerCase()} account.
+          </p>
+        </div>
+
+        <div className="pt-6 border-t border-[#161514]/15 space-y-3">
+          <Link
+            href={dashboardHref}
+            className="w-full py-4 bg-[#161514] text-[#FAF8F5] text-xs font-semibold tracking-[0.2em] uppercase inline-flex items-center justify-center gap-2 hover:bg-[#C5A880] hover:text-[#161514] transition-colors"
+          >
+            <span>Go to Dashboard</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+
+          <button
+            type="button"
+            onClick={logout}
+            className="w-full py-3.5 bg-transparent text-[#161514] border border-[#161514]/30 font-semibold text-xs tracking-[0.2em] uppercase inline-flex items-center justify-center hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors cursor-pointer"
+          >
+            Sign Out / Switch Account
+          </button>
+        </div>
+      </div>
+    );
   }
 
   return (

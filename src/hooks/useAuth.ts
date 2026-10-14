@@ -1,100 +1,35 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
-import { getCurrentUserApi } from '@/lib/api/endpoints';
-import { CurrentUserResponse } from '@/lib/api/types';
+import { useEffect } from "react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export function useAuth() {
-  const [user, setUser] = useState<CurrentUserResponse | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
-
-  const fetchUser = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const currentUser = await getCurrentUserApi();
-      setUser(currentUser);
-    } catch (err) {
-      setUser(null);
-      setError(err instanceof Error ? err.message : 'Not authenticated');
-    } finally {
-      setLoading(false);
-    }
-  };
+  const user = useAuthStore((s) => s.user);
+  const loading = useAuthStore((s) => s.loading);
+  const initialize = useAuthStore((s) => s.initialize);
+  const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
-    let isMounted = true;
-    const supabase = createClient();
+    initialize();
+  }, [initialize]);
 
-    async function load() {
-      try {
-        setLoading(true);
-        setError(null);
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          if (isMounted) {
-            setUser(null);
-            setLoading(false);
-          }
-          return;
-        }
-        const currentUser = await getCurrentUserApi();
-        if (isMounted) setUser(currentUser);
-      } catch (err) {
-        if (isMounted) {
-          setUser(null);
-          setError(err instanceof Error ? err.message : 'Not authenticated');
-        }
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    }
-
-    load();
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) {
-        load();
-      } else {
-        if (isMounted) {
-          setUser(null);
-          setLoading(false);
-        }
-      }
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const logout = async () => {
-    try {
-      const supabase = createClient();
-      await supabase.auth.signOut();
-      setUser(null);
-      router.push('/login');
-    } catch {
-      router.push('/login');
-    }
-  };
+  const dashboardHref =
+    user?.role === "ADMIN"
+      ? "/admin/dashboard"
+      : user?.role === "VENDOR"
+      ? "/vendor/dashboard"
+      : "/dashboard";
 
   return {
     user,
     loading,
-    error,
+    error: null,
     isAuthenticated: !!user,
-    isClient: user?.role === 'CLIENT',
-    isVendor: user?.role === 'VENDOR',
-    isAdmin: user?.role === 'ADMIN',
-    refetchUser: fetchUser,
+    isClient: user?.role === "CLIENT",
+    isVendor: user?.role === "VENDOR",
+    isAdmin: user?.role === "ADMIN",
+    dashboardHref,
+    refetchUser: initialize,
     logout,
   };
 }
