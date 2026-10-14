@@ -1,4 +1,4 @@
-import { UserRole } from '@prisma/client';
+import { UserRole, CategoryType } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { UnauthorizedError, ForbiddenError } from '@/lib/errors';
@@ -89,18 +89,37 @@ export async function getCurrentUser() {
         });
 
         if (userRole === UserRole.VENDOR || userRole === UserRole.ADMIN) {
-          const businessName = fullName.includes('Studio') || fullName.includes('Services') ? fullName : `${fullName} Studio`;
-          const baseSlug = businessName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'vendor-studio';
+          const rawBiz = (supabaseUser.user_metadata?.businessName as string)?.trim();
+          const businessName =
+            rawBiz ||
+            (fullName.includes('Studio') || fullName.includes('Services')
+              ? fullName
+              : `${fullName} Studio`);
+          const baseSlug =
+            businessName
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/(^-|-$)+/g, '') || 'vendor-studio';
           const slug = `${baseSlug}-${Date.now().toString(36)}`;
+          const rawCategory = (supabaseUser.user_metadata?.category as string)?.toUpperCase();
+          const category = (Object.values(CategoryType) as string[]).includes(rawCategory)
+            ? (rawCategory as CategoryType)
+            : CategoryType.PHOTOGRAPHY;
+          const city =
+            (supabaseUser.user_metadata?.city as string) ||
+            (supabaseUser.user_metadata?.location as string) ||
+            'Mumbai';
 
           await tx.vendorProfile.create({
             data: {
               userId: newUser.id,
               businessName,
               slug,
-              category: 'PHOTOGRAPHY',
-              city: 'Mumbai',
+              category,
+              city,
               startingPrice: BigInt(5000000),
+              verified: userRole === UserRole.ADMIN ? true : false,
+              featured: false,
             },
           });
         }

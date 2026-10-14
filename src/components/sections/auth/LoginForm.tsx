@@ -24,9 +24,11 @@ export function LoginForm() {
   const [errors, setErrors] = useState<LoginFormErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isUnderReview, setIsUnderReview] = useState(false);
+  const [underReviewInfo, setUnderReviewInfo] = useState<{ businessName: string; email: string } | null>(null);
   const router = useRouter();
 
-  const { user, isAuthenticated, dashboardHref, logout } = useAuth();
+  const { user, isAuthenticated, dashboardHref, logout, refetchUser } = useAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -72,6 +74,7 @@ export function LoginForm() {
 
     setIsSubmitting(true);
     setErrors({});
+    setIsUnderReview(false);
 
     try {
       const supabase = createClient();
@@ -95,6 +98,28 @@ export function LoginForm() {
           detectedRole = user.role;
         } catch {
           detectedRole = "CLIENT";
+        }
+      }
+
+      // Check if vendor is verified by Admin
+      if (detectedRole === "VENDOR") {
+        try {
+          const statusRes = await fetch(`/api/v1/auth/check-vendor?email=${encodeURIComponent(authData.user.email || formValues.email.trim())}`);
+          const statusJson = await statusRes.json();
+          if (statusJson.success && statusJson.data && !statusJson.data.verified) {
+            // Unverified vendor: log out and show Profile Under Review screen
+            await supabase.auth.signOut();
+            useAuthStore.getState().setUser(null);
+            setIsUnderReview(true);
+            setUnderReviewInfo({
+              businessName: statusJson.data.businessName || "Your Studio",
+              email: authData.user.email || formValues.email.trim(),
+            });
+            setIsSubmitting(false);
+            return;
+          }
+        } catch {
+          // If check endpoint fails, continue
         }
       }
 
@@ -137,6 +162,8 @@ export function LoginForm() {
     setFormValues(DEFAULT_LOGIN_VALUES);
     setErrors({});
     setIsSubmitted(false);
+    setIsUnderReview(false);
+    setUnderReviewInfo(null);
     setUserRole(null);
   };
 
@@ -144,7 +171,113 @@ export function LoginForm() {
     return <AuthSuccess type="login" role={userRole} onReset={handleReset} />;
   }
 
+  // Profile Under Review Screen (when unverified vendor attempts login)
+  if (isUnderReview) {
+    return (
+      <div className="space-y-8 bg-[#FAF8F5] p-8 sm:p-10 border border-[#161514]/15">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center">
+            <CheckCircle2 className="w-5 h-5 text-amber-800" />
+          </div>
+          <span className="text-[11px] font-semibold tracking-[0.25em] uppercase text-amber-800">
+            PROFILE UNDER REVIEW
+          </span>
+        </div>
+
+        <div className="space-y-3">
+          <h1 className="font-serif text-3xl sm:text-4xl font-light text-[#161514] leading-snug">
+            {underReviewInfo?.businessName || "Vendor Studio"} is Pending Verification
+          </h1>
+          <p className="font-sans text-sm text-[#5A5650] font-light leading-relaxed">
+            Your vendor account has been created, but access to the Vendor Studio is restricted until an administrator verifies and approves your credentials.
+          </p>
+        </div>
+
+        <div className="p-4 bg-white border border-[#161514]/10 rounded-xs space-y-2 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold uppercase tracking-wider text-[10px] text-[#5A5650]">
+              Account Status
+            </span>
+            <span className="px-2.5 py-0.5 bg-amber-50 text-amber-900 border border-amber-200 text-[10px] font-bold uppercase tracking-wider rounded-xs">
+              Pending Admin Approval
+            </span>
+          </div>
+          <p className="text-[11px] text-[#5A5650]">
+            The Wedora Admin reviews all vendor accounts to maintain directory authenticity. Once verified by the Admin in the Admin Console, you will be able to sign in and your profile will be published to client directories.
+          </p>
+        </div>
+
+        <div className="pt-6 border-t border-[#161514]/15 space-y-3">
+          <button
+            type="button"
+            onClick={handleReset}
+            className="w-full py-4 bg-[#161514] !text-[#FAF8F5] text-xs font-semibold tracking-[0.2em] uppercase inline-flex items-center justify-center gap-2 hover:bg-[#C5A880] hover:!text-[#161514] transition-colors rounded-xs shadow-xs"
+          >
+            <span className="!text-[#FAF8F5]">Try Signing In Again</span>
+            <ArrowRight className="w-4 h-4 !text-[#FAF8F5]" />
+          </button>
+
+          <Link
+            href="/"
+            className="w-full py-3.5 bg-transparent text-[#161514] border border-[#161514]/30 font-semibold text-xs tracking-[0.2em] uppercase inline-flex items-center justify-center hover:bg-[#FAF8F5] transition-colors rounded-xs"
+          >
+            Return to Homepage
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
   if (mounted && isAuthenticated && user) {
+    const isUnverified =
+      user.role === "VENDOR" &&
+      user.profile &&
+      "verified" in user.profile &&
+      !user.profile.verified;
+
+    if (isUnverified) {
+      const biz = user.profile && "businessName" in user.profile ? (user.profile.businessName as string) : "Your Studio";
+      return (
+        <div className="space-y-8 bg-[#FAF8F5] p-8 sm:p-10 border border-[#161514]/15">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-amber-800" />
+            </div>
+            <span className="text-[11px] font-semibold tracking-[0.25em] uppercase text-amber-800">
+              PROFILE UNDER REVIEW
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            <h1 className="font-serif text-3xl sm:text-4xl font-light text-[#161514] leading-snug">
+              {biz} is Under Review
+            </h1>
+            <p className="font-sans text-sm text-[#5A5650] font-light">
+              Your vendor profile is registered and pending admin review. You will be able to access your studio once approved.
+            </p>
+          </div>
+
+          <div className="pt-6 border-t border-[#161514]/15 space-y-3">
+            <button
+              type="button"
+              onClick={() => refetchUser()}
+              className="w-full py-4 bg-[#161514] !text-[#FAF8F5] text-xs font-semibold tracking-[0.2em] uppercase inline-flex items-center justify-center gap-2 hover:bg-[#C5A880] hover:!text-[#161514] transition-colors rounded-xs shadow-xs"
+            >
+              <span className="!text-[#FAF8F5]">Refresh Verification Status</span>
+              <ArrowRight className="w-4 h-4 !text-[#FAF8F5]" />
+            </button>
+
+            <button
+              type="button"
+              onClick={logout}
+              className="w-full py-3.5 bg-transparent text-[#161514] border border-[#161514]/30 font-semibold text-xs tracking-[0.2em] uppercase inline-flex items-center justify-center hover:bg-red-50 hover:text-red-700 hover:border-red-300 transition-colors cursor-pointer rounded-xs"
+            >
+              Sign Out / Switch Account
+            </button>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="space-y-8 bg-[#FAF8F5] p-8 sm:p-10 border border-[#161514]/15">
         <div className="flex items-center gap-3">

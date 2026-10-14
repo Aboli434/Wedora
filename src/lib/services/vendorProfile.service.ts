@@ -133,7 +133,9 @@ export class VendorProfileService {
   ): Promise<{ data: PublicVendorProfileResponse[]; meta: PaginationMeta }> {
     const { search, category, city, featured, sort, page, limit } = query;
 
-    const where: Prisma.VendorProfileWhereInput = {};
+    const where: Prisma.VendorProfileWhereInput = {
+      verified: true,
+    };
 
     if (category) {
       where.category = category;

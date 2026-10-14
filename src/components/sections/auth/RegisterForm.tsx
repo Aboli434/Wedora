@@ -213,14 +213,22 @@ export function RegisterForm() {
       const email = role === "CLIENT" ? clientValues.email.trim() : vendorValues.email.trim();
       const password = role === "CLIENT" ? clientValues.password : vendorValues.password;
       const fullName = role === "CLIENT" ? clientValues.name.trim() : vendorValues.contactPerson.trim();
+      const businessName = role === "VENDOR" ? vendorValues.businessName.trim() : undefined;
+      const category = role === "VENDOR" ? vendorValues.category : undefined;
+      const city = role === "VENDOR" ? vendorValues.location : clientValues.destination;
+      const phone = role === "VENDOR" ? vendorValues.phone.trim() : clientValues.phone.trim();
 
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
             fullName,
             role,
+            businessName,
+            category,
+            city,
+            phoneNumber: phone,
           },
         },
       });
@@ -228,6 +236,37 @@ export function RegisterForm() {
       if (signUpError) {
         setErrors({ general: signUpError.message });
         return;
+      }
+
+      // Immediately provision into database so Admin sees it in Console under Pending Verification
+      if (signUpData?.user) {
+        try {
+          await fetch("/api/v1/auth/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              supabaseAuthUserId: signUpData.user.id,
+              email,
+              fullName,
+              role,
+              businessName,
+              category,
+              city,
+              phoneNumber: phone,
+            }),
+          });
+        } catch {
+          // Non-blocking: will auto-provision on first request
+        }
+      }
+
+      // For vendors, sign out immediately so they cannot bypass Admin verification
+      if (role === "VENDOR") {
+        try {
+          await supabase.auth.signOut();
+        } catch {
+          // Ignore signout error
+        }
       }
 
       setIsSubmitted(true);
@@ -253,7 +292,14 @@ export function RegisterForm() {
   };
 
   if (isSubmitted) {
-    return <AuthSuccess type="register" role={role} onReset={handleReset} />;
+    return (
+      <AuthSuccess
+        type="register"
+        role={role}
+        businessName={role === "VENDOR" ? vendorValues.businessName.trim() : undefined}
+        onReset={handleReset}
+      />
+    );
   }
 
   return (
