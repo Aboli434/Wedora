@@ -1,4 +1,5 @@
 import { ApiErrorResponse, ApiSuccessResponse } from './types';
+import { createClient } from '@/lib/supabase/client';
 
 export class ApiError extends Error {
   status: number;
@@ -25,6 +26,20 @@ async function request<T>(url: string, options: RequestOptions = {}): Promise<T>
     'Content-Type': 'application/json',
     ...(customHeaders as Record<string, string>),
   };
+
+  if (typeof window !== 'undefined' && !headers['Authorization'] && !headers['authorization']) {
+    try {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+    } catch {
+      // Ignore session errors
+    }
+  }
 
   const config: RequestInit = {
     ...restOptions,

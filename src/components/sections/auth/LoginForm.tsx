@@ -166,10 +166,10 @@ export function LoginForm() {
         <div className="pt-6 border-t border-[#161514]/15 space-y-3">
           <Link
             href={dashboardHref}
-            className="w-full py-4 bg-[#161514] text-[#FAF8F5] text-xs font-semibold tracking-[0.2em] uppercase inline-flex items-center justify-center gap-2 hover:bg-[#C5A880] hover:text-[#161514] transition-colors"
+            className="w-full py-4 bg-[#161514] !text-[#FAF8F5] text-xs font-semibold tracking-[0.2em] uppercase inline-flex items-center justify-center gap-2 hover:bg-[#C5A880] hover:!text-[#161514] transition-colors rounded-xs shadow-xs"
           >
-            <span>Go to Dashboard</span>
-            <ArrowRight className="w-4 h-4" />
+            <span className="!text-[#FAF8F5] font-sans">Go to Dashboard</span>
+            <ArrowRight className="w-4 h-4 !text-[#FAF8F5]" />
           </Link>
 
           <button

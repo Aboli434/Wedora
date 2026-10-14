@@ -2,6 +2,7 @@ import { UserRole } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { UnauthorizedError, ForbiddenError } from '@/lib/errors';
+import { headers } from 'next/headers';
 
 /**
  * Retrieves the current authenticated application User record mapped from Supabase Auth.
@@ -10,12 +11,34 @@ import { UnauthorizedError, ForbiddenError } from '@/lib/errors';
 export async function getCurrentUser() {
   try {
     const supabase = await createClient();
-    const {
-      data: { user: supabaseUser },
-      error,
-    } = await supabase.auth.getUser();
 
-    if (error || !supabaseUser) {
+    // Check Authorization header first if passed by client
+    let supabaseUser = null;
+    try {
+      const headerList = await headers();
+      const authHeader = headerList.get('authorization') || headerList.get('Authorization');
+      const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
+      if (token) {
+        const { data, error } = await supabase.auth.getUser(token);
+        if (!error && data?.user) {
+          supabaseUser = data.user;
+        }
+      }
+    } catch {
+      // In contexts where headers() isn't accessible, continue to cookie session
+    }
+
+    if (!supabaseUser) {
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+      if (!error && user) {
+        supabaseUser = user;
+      }
+    }
+
+    if (!supabaseUser) {
       return null;
     }
 
@@ -26,6 +49,28 @@ export async function getCurrentUser() {
         vendorProfile: true,
       },
     });
+
+    // Fallback: search by email if not found by supabaseAuthUserId
+    if (!appUser && supabaseUser.email) {
+      appUser = await prisma.user.findUnique({
+        where: { email: supabaseUser.email.toLowerCase() },
+        include: {
+          clientProfile: true,
+          vendorProfile: true,
+        },
+      });
+
+      if (appUser && appUser.supabaseAuthUserId !== supabaseUser.id) {
+        appUser = await prisma.user.update({
+          where: { id: appUser.id },
+          data: { supabaseAuthUserId: supabaseUser.id },
+          include: {
+            clientProfile: true,
+            vendorProfile: true,
+          },
+        });
+      }
+    }
 
     // Auto-provision application User and profile in PostgreSQL DB if not present
     if (!appUser && supabaseUser.email) {

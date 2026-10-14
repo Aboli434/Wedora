@@ -61,17 +61,28 @@ export default function AdminDashboardPage() {
   const loadData = async () => {
     setIsLoading(true);
     try {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const authHeaders: Record<string, string> = {};
+      if (session?.access_token) {
+        authHeaders["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       const [statsRes, vendorsRes] = await Promise.all([
-        fetch("/api/v1/admin/stats"),
-        fetch("/api/v1/admin/vendors"),
+        fetch("/api/v1/admin/stats", { headers: authHeaders }),
+        fetch("/api/v1/admin/vendors", { headers: authHeaders }),
       ]);
 
       if (statsRes.status === 401 || statsRes.status === 403) {
-        router.push("/login");
-        return;
-      }
-
-      if (statsRes.ok) {
+        console.warn("Admin stats authorization response:", statsRes.status);
+        setFeedbackMessage({
+          type: "error",
+          text: "Authorization check: please verify your admin session.",
+        });
+      } else if (statsRes.ok) {
         const statsJson = await statsRes.json();
         if (statsJson.success) setStats(statsJson.data);
       }
@@ -97,9 +108,21 @@ export default function AdminDashboardPage() {
     setFeedbackMessage(null);
 
     try {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const authHeaders: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        authHeaders["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch("/api/v1/admin/vendors", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders,
         body: JSON.stringify({
           vendorId,
           verified: !currentStatus,
@@ -140,9 +163,21 @@ export default function AdminDashboardPage() {
     setFeedbackMessage(null);
 
     try {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const authHeaders: Record<string, string> = {
+        "Content-Type": "application/json",
+      };
+      if (session?.access_token) {
+        authHeaders["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch("/api/v1/admin/vendors", {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders,
         body: JSON.stringify({
           vendorId,
           featured: !currentStatus,
