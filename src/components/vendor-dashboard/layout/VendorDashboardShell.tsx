@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { VendorSidebar } from "./VendorSidebar";
 import { VendorMobileNav } from "./VendorMobileNav";
 import { VendorHeader } from "./VendorHeader";
 import { useAuth } from "@/hooks/useAuth";
-import { ShieldAlert, RefreshCw, LogOut, CheckCircle2, Building2 } from "lucide-react";
+import { ShieldAlert, RefreshCw, LogOut, CheckCircle2, Building2, AlertCircle } from "lucide-react";
 
 interface VendorDashboardShellProps {
   children: React.ReactNode;
@@ -15,6 +15,7 @@ interface VendorDashboardShellProps {
 export function VendorDashboardShell({ children }: VendorDashboardShellProps) {
   const { user, refetchUser, logout } = useAuth();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
 
   const isUnverifiedVendor =
     user?.role === "VENDOR" &&
@@ -22,10 +23,39 @@ export function VendorDashboardShell({ children }: VendorDashboardShellProps) {
     "verified" in user.profile &&
     !user.profile.verified;
 
+  // Auto-verify on mount whenever this review screen is active
+  useEffect(() => {
+    let active = true;
+    if (isUnverifiedVendor && user?.email) {
+      refetchUser().then((fresh) => {
+        if (!active) return;
+        if (fresh?.profile && "verified" in fresh.profile && fresh.profile.verified) {
+          setFeedback("Account approved! Entering vendor dashboard...");
+        }
+      });
+    }
+    return () => {
+      active = false;
+    };
+  }, [isUnverifiedVendor, user?.email, refetchUser]);
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
+    setFeedback(null);
     try {
-      await refetchUser();
+      const updated = await refetchUser();
+      const isVerifiedNow =
+        updated?.profile &&
+        "verified" in updated.profile &&
+        Boolean(updated.profile.verified);
+
+      if (isVerifiedNow) {
+        setFeedback("Verification confirmed! Loading dashboard...");
+      } else {
+        setFeedback("Checked database: Your vendor account is still awaiting platform admin approval. Please check back shortly.");
+      }
+    } catch {
+      setFeedback("Unable to check status right now. Please try again in a moment.");
     } finally {
       setTimeout(() => setIsRefreshing(false), 500);
     }
@@ -132,6 +162,13 @@ export function VendorDashboardShell({ children }: VendorDashboardShellProps) {
                 </li>
               </ul>
             </div>
+
+            {feedback && (
+              <div className="p-3.5 bg-amber-50 border border-amber-200 text-amber-900 rounded-xs text-xs flex items-start gap-2">
+                <AlertCircle className="w-4 h-4 text-amber-700 shrink-0 mt-0.5" />
+                <span>{feedback}</span>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="pt-6 border-t border-[#161514]/15 flex flex-col sm:flex-row items-center gap-3">

@@ -36,6 +36,7 @@ interface AuthState {
   isInitialized: boolean;
   setUser: (user: CurrentUserResponse | null) => void;
   initialize: () => Promise<void>;
+  refetchUser: () => Promise<CurrentUserResponse | null>;
   logout: () => Promise<void>;
 }
 
@@ -48,6 +49,57 @@ export const useAuthStore = create<AuthState>((set, get) => {
     setUser: (user) => {
       setCachedUser(user);
       set({ user, loading: false });
+    },
+
+    refetchUser: async (): Promise<CurrentUserResponse | null> => {
+      try {
+        // 1. Fetch fresh profile from /api/v1/me
+        let apiUser: CurrentUserResponse | null = null;
+        try {
+          apiUser = await getCurrentUserApi();
+        } catch (err) {
+          console.warn("[AuthStore] getCurrentUserApi failed:", err);
+        }
+
+        // 2. Synchronize vendor verification status directly with DB endpoint
+        const targetUser = apiUser || get().user;
+        if (targetUser?.email && (targetUser.role === "VENDOR" || targetUser.profile)) {
+          try {
+            const res = await fetch(
+              `/api/v1/auth/check-vendor?email=${encodeURIComponent(targetUser.email)}&_t=${Date.now()}`,
+              { cache: "no-store", headers: { "Cache-Control": "no-cache" } }
+            );
+            const json = await res.json();
+            if (json.success && json.data) {
+              const vendorData = json.data;
+              if (apiUser?.profile && "verified" in apiUser.profile) {
+                (apiUser.profile as any).verified = vendorData.verified;
+                if (vendorData.businessName) (apiUser.profile as any).businessName = vendorData.businessName;
+                if (vendorData.city) (apiUser.profile as any).city = vendorData.city;
+                if (vendorData.category) (apiUser.profile as any).category = vendorData.category;
+              }
+              if (targetUser.profile && "verified" in targetUser.profile) {
+                (targetUser.profile as any).verified = vendorData.verified;
+                if (vendorData.businessName) (targetUser.profile as any).businessName = vendorData.businessName;
+                if (vendorData.city) (targetUser.profile as any).city = vendorData.city;
+                if (vendorData.category) (targetUser.profile as any).category = vendorData.category;
+              }
+            }
+          } catch (checkErr) {
+            console.warn("[AuthStore] check-vendor verification sync failed:", checkErr);
+          }
+        }
+
+        const finalUser = apiUser || targetUser;
+        if (finalUser) {
+          get().setUser(finalUser);
+          return finalUser;
+        }
+        return null;
+      } catch (err) {
+        console.error("[AuthStore] refetchUser failed:", err);
+        return null;
+      }
     },
 
     initialize: async () => {
@@ -122,15 +174,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
         get().setUser(current);
 
-        // Fetch full profile in background
-        try {
-          const apiUser = await getCurrentUserApi();
-          if (apiUser) {
-            get().setUser(apiUser);
-          }
-        } catch {
-          // If API fails or is slow, keep current session user
-        }
+        // Fetch fresh profile & DB verification status from server
+        await get().refetchUser();
       } catch {
         get().setUser(null);
       } finally {
@@ -142,58 +187,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
         if (event === "SIGNED_OUT" || !session?.user) {
           get().setUser(null);
         } else if (session?.user) {
-          const rawRole = (session.user.user_metadata?.role as UserRole) || "CLIENT";
-          const fullName =
-            (session.user.user_metadata?.fullName as string) ||
-            (session.user.user_metadata?.name as string) ||
-            session.user.email?.split("@")[0] ||
-            "User";
-
-          const initialProfile =
-            rawRole === "VENDOR"
-              ? ({
-                  id: session.user.id,
-                  businessName:
-                    (session.user.user_metadata?.businessName as string) ||
-                    `${fullName} Studio`,
-                  category:
-                    (session.user.user_metadata?.category as any) ||
-                    "CHOREOGRAPHY",
-                  city:
-                    (session.user.user_metadata?.city as string) || "Mumbai",
-                  rating: 0,
-                  reviewCount: 0,
-                  startingPrice: "50000",
-                  verified: false,
-                  featured: false,
-                  description: null,
-                  coverImage: null,
-                  experienceYears: null,
-                  teamSize: null,
-                  createdAt: new Date(),
-                  updatedAt: new Date(),
-                } as any)
-              : null;
-
-          get().setUser({
-            id: session.user.id,
-            email: session.user.email || "",
-            role: rawRole,
-            fullName,
-            phoneNumber: session.user.phone || null,
-            avatarUrl: (session.user.user_metadata?.avatar_url as string) || null,
-            isActive: true,
-            createdAt: new Date(),
-            updatedAt: new Date(),
-            profile: initialProfile,
-          });
-
-          try {
-            const apiUser = await getCurrentUserApi();
-            if (apiUser) get().setUser(apiUser);
-          } catch {
-            // Keep session user
-          }
+          await get().refetchUser();
         }
       });
     },

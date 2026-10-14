@@ -7,6 +7,7 @@ export function useAuth() {
   const user = useAuthStore((s) => s.user);
   const loading = useAuthStore((s) => s.loading);
   const initialize = useAuthStore((s) => s.initialize);
+  const refetchUser = useAuthStore((s) => s.refetchUser);
   const logout = useAuthStore((s) => s.logout);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function useAuth() {
     isVendor: user?.role === "VENDOR",
     isAdmin: user?.role === "ADMIN",
     dashboardHref,
-    refetchUser: initialize,
+    refetchUser,
     logout,
   };
 }

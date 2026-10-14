@@ -6,6 +6,9 @@ import { updateMeSchema } from '@/lib/validation/me';
 import { userService } from '@/lib/services/user.service';
 import { ValidationError } from '@/lib/errors';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 /**
  * GET /api/v1/me
  * Retrieves current authenticated user profile DTO.
@@ -14,7 +17,9 @@ export async function GET() {
   try {
     const user = await requireAuthenticatedUser();
     const userDto = userService.formatUserResponse(user);
-    return apiResponse.success(userDto);
+    const res = apiResponse.success(userDto);
+    res.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    return res;
   } catch (error) {
     return apiResponse.handleError(error);
   }
