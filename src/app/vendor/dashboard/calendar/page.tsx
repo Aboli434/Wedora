@@ -37,7 +37,6 @@ import {
   CalendarEmptyState,
   CalendarPageCTA,
 } from "@/components/vendor-dashboard/calendar";
-import { RefreshCw } from "lucide-react";
 
 export default function VendorCalendarPage() {
   const [events, setEvents] = useState<VendorCalendarEvent[]>(
@@ -319,18 +318,6 @@ export default function VendorCalendarPage() {
             />
           </>
         )}
-
-        {/* Reset Demo Dataset Footer Control */}
-        <div className="flex items-center justify-between pt-6 border-t border-[#161514]/10 text-xs text-[#5A5650]">
-          <span>Frontend Interactive State Workspace</span>
-          <button
-            onClick={handleResetDataset}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#161514]/20 text-[#161514] hover:bg-[#FAF8F5] transition-colors"
-          >
-            <RefreshCw className="w-3.5 h-3.5 text-[#C5A880]" />
-            Reset Demo Dataset
-          </button>
-        </div>
 
         {/* Closing CTA */}
         <CalendarPageCTA />

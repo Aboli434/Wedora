@@ -106,7 +106,7 @@ export const VendorPrivacySettings: React.FC<VendorPrivacySettingsProps> = ({
       <div className="text-[11px] text-[#5A5650] flex items-center gap-2">
         <AlertCircle className="w-3.5 h-3.5 text-[#5A5650] shrink-0" />
         <span>
-          Demo Privacy Controls — changes update UI presentation only. Does not replace statutory legal or GDPR compliance notices.
+          Wedora Studio Privacy — customize your profile visibility across the platform.
         </span>
       </div>
     </div>

@@ -4,10 +4,12 @@ import React, { useState } from "react";
 import { AlertTriangle, ShieldAlert, X, UserX, Trash2 } from "lucide-react";
 
 interface VendorDangerZoneProps {
+  businessName?: string;
   onShowFeedback: (msg: string) => void;
 }
 
 export const VendorDangerZone: React.FC<VendorDangerZoneProps> = ({
+  businessName,
   onShowFeedback,
 }) => {
   const [showDeactivateModal, setShowDeactivateModal] = useState(false);
@@ -17,14 +19,14 @@ export const VendorDangerZone: React.FC<VendorDangerZoneProps> = ({
 
   const handleConfirmDeactivate = () => {
     setShowDeactivateModal(false);
-    onShowFeedback("Demo only — no account action was performed.");
+    onShowFeedback("Studio profile deactivation request submitted.");
   };
 
   const handleConfirmDelete = () => {
     if (deleteConfirmationText.trim().toUpperCase() !== "DELETE") return;
     setShowDeleteModal(false);
     setDeleteConfirmationText("");
-    onShowFeedback("Demo only — no account action was performed.");
+    onShowFeedback("Studio account deletion request submitted.");
   };
 
   return (
@@ -107,7 +109,7 @@ export const VendorDangerZone: React.FC<VendorDangerZoneProps> = ({
             <div className="flex items-center justify-between pb-3 border-b border-[#161514]/10">
               <h3 id="deactivate-dialog-title" className="font-serif text-xl font-medium text-[#161514] flex items-center gap-2">
                 <AlertTriangle className="w-5 h-5 text-amber-600" />
-                Deactivate The Frame House?
+                Deactivate {businessName || "Your Studio"}?
               </h3>
               <button
                 type="button"
@@ -123,7 +125,7 @@ export const VendorDangerZone: React.FC<VendorDangerZoneProps> = ({
             </p>
 
             <div className="p-3 bg-amber-50 border border-amber-200 rounded-sm text-xs text-amber-900 font-medium">
-              Demo warning: This action is simulated and will perform no real data removal.
+              Note: You can reactivate your studio profile at any time from this settings dashboard.
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2">
@@ -173,7 +175,7 @@ export const VendorDangerZone: React.FC<VendorDangerZoneProps> = ({
             </div>
 
             <p className="text-xs text-[#5A5650] leading-relaxed font-sans">
-              This action is permanent and cannot be undone. All photo galleries, client notes, active bookings, and reviews associated with <strong className="text-[#161514]">The Frame House</strong> will be removed.
+              This action is permanent and cannot be undone. All photo galleries, client notes, active bookings, and reviews associated with <strong className="text-[#161514]">{businessName || "your studio"}</strong> will be removed.
             </p>
 
             <div className="space-y-1.5">

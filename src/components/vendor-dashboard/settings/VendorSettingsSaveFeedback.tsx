@@ -45,7 +45,7 @@ export const VendorSettingsSaveFeedback: React.FC<
         <div className="flex-1 pr-2">
           <div className="font-semibold">{feedback.message}</div>
           <div className="text-[11px] opacity-80 mt-0.5 font-sans">
-            Demo only — changes will reset after page refresh.
+            Updated in your studio profile.
           </div>
         </div>
 

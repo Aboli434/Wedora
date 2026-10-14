@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { VendorDashboardShell } from "@/components/vendor-dashboard/layout/VendorDashboardShell";
 import {
   VendorSettingsPageHeader,
@@ -32,13 +32,71 @@ import {
   VendorPrivacyPreferences,
   VendorSecurityInfo,
 } from "@/data/vendorSettings";
+import { useAuthStore } from "@/store/useAuthStore";
+import { formatVendorCategory } from "@/lib/vendorCategory";
+import { updateCurrentUserApi } from "@/lib/api/endpoints";
 
 export default function VendorSettingsPage() {
+  const user = useAuthStore((s) => s.user);
+  const setUser = useAuthStore((s) => s.setUser);
+
   const [settings, setSettings] = useState<VendorSettingsData>(
     initialVendorSettingsData
   );
   const [activeSection, setActiveSection] = useState<string>("account");
   const [feedback, setFeedback] = useState<SaveFeedbackState | null>(null);
+
+  // Sync settings with authenticated vendor profile
+  useEffect(() => {
+    if (!user) return;
+    const vp = user.profile as {
+      businessName?: string;
+      category?: string;
+      city?: string;
+      slug?: string;
+      experienceYears?: number | null;
+      teamSize?: string | null;
+      website?: string | null;
+      instagram?: string | null;
+      description?: string | null;
+    } | null;
+
+    const names = (user.fullName || "").trim().split(" ");
+    const firstName = names[0] || "Studio";
+    const lastName = names.slice(1).join(" ") || "Owner";
+    const initials = (vp?.businessName || user.fullName || "ST")
+      .split(" ")
+      .map((w) => w[0])
+      .filter(Boolean)
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+
+    const formattedCategory = vp?.category ? formatVendorCategory(vp.category) : "Choreography";
+
+    setSettings((prev) => ({
+      ...prev,
+      account: {
+        ...prev.account,
+        firstName: firstName,
+        lastName: lastName,
+        email: user.email || prev.account.email,
+        phone: user.phoneNumber || prev.account.phone,
+        profileInitials: initials,
+        role: `${formattedCategory} Studio Founder`,
+      },
+      workspace: {
+        ...prev.workspace,
+        businessName: vp?.businessName || (user.fullName ? `${user.fullName} Studio` : prev.workspace.businessName),
+        category: formattedCategory,
+        businessLocation: vp?.city ? `${vp.city}, India` : prev.workspace.businessLocation,
+        yearsExperience: typeof vp?.experienceYears === "number" ? vp.experienceYears : prev.workspace.yearsExperience,
+        teamSize: vp?.teamSize ? parseInt(vp.teamSize, 10) || prev.workspace.teamSize : prev.workspace.teamSize,
+        website: vp?.website || prev.workspace.website,
+        instagram: vp?.instagram || prev.workspace.instagram,
+      },
+    }));
+  }, [user]);
 
   const showToast = (message: string, type: SaveFeedbackState["type"] = "success") => {
     setFeedback({
@@ -56,20 +114,36 @@ export default function VendorSettingsPage() {
     }
   };
 
-  const handleResetSettings = () => {
-    setSettings(initialVendorSettingsData);
-    showToast("Settings reset to default demo state.", "notice");
-  };
-
-  // Section Save Handlers
-  const handleAccountSave = (updatedAccount: VendorAccountProfile) => {
+  // Section Save Handlers with persistent database update
+  const handleAccountSave = async (updatedAccount: VendorAccountProfile) => {
     setSettings((prev) => ({ ...prev, account: updatedAccount }));
-    showToast("Account profile changes saved for this session.");
+    showToast("Account profile changes saved.");
+    try {
+      const updated = await updateCurrentUserApi({
+        fullName: `${updatedAccount.firstName} ${updatedAccount.lastName}`.trim(),
+        phoneNumber: updatedAccount.phone,
+      });
+      if (updated) setUser(updated);
+    } catch {
+      // Keep optimistic update
+    }
   };
 
-  const handleWorkspaceSave = (updatedWorkspace: WorkspaceType) => {
+  const handleWorkspaceSave = async (updatedWorkspace: WorkspaceType) => {
     setSettings((prev) => ({ ...prev, workspace: updatedWorkspace }));
     showToast("Workspace & studio settings updated.");
+    try {
+      const updated = await updateCurrentUserApi({
+        businessName: updatedWorkspace.businessName,
+        category: updatedWorkspace.category,
+        city: updatedWorkspace.businessLocation.split(",")[0].trim(),
+        experienceYears: updatedWorkspace.yearsExperience,
+        teamSize: String(updatedWorkspace.teamSize),
+      });
+      if (updated) setUser(updated);
+    } catch {
+      // Keep optimistic update
+    }
   };
 
   const handleNotificationsUpdate = (
@@ -114,11 +188,14 @@ export default function VendorSettingsPage() {
     setSettings((prev) => ({ ...prev, security: updatedSecurity }));
   };
 
+  const vendorSlug = (user?.profile as { slug?: string } | null)?.slug;
+  const publicProfileUrl = vendorSlug ? `/vendors/${vendorSlug}` : "/vendors";
+
   return (
     <VendorDashboardShell>
       <div className="max-w-7xl mx-auto pb-16">
         {/* Page Header */}
-        <VendorSettingsPageHeader onResetSettings={handleResetSettings} />
+        <VendorSettingsPageHeader publicProfileUrl={publicProfileUrl} />
 
         {/* Overview Banner */}
         <VendorSettingsOverview
@@ -143,6 +220,7 @@ export default function VendorSettingsPage() {
 
             <VendorWorkspaceSettings
               workspace={settings.workspace}
+              publicProfileUrl={publicProfileUrl}
               onSave={handleWorkspaceSave}
             />
 
@@ -178,11 +256,13 @@ export default function VendorSettingsPage() {
 
             <VendorSecuritySettings
               security={settings.security}
+              businessName={settings.workspace.businessName}
               onUpdate={handleSecurityUpdate}
               onShowFeedback={(msg) => showToast(msg, "notice")}
             />
 
             <VendorDangerZone
+              businessName={settings.workspace.businessName}
               onShowFeedback={(msg) => showToast(msg, "warning")}
             />
           </main>

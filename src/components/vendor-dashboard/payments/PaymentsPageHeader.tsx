@@ -2,18 +2,17 @@
 
 import React from "react";
 import Link from "next/link";
-import { FileText, RefreshCw, CreditCard } from "lucide-react";
+import { FileText, CreditCard } from "lucide-react";
 
 interface PaymentsPageHeaderProps {
   onRecordPayment: () => void;
   onCreateInvoice: () => void;
-  onResetData: () => void;
+  onResetData?: () => void;
 }
 
 export const PaymentsPageHeader: React.FC<PaymentsPageHeaderProps> = ({
   onRecordPayment,
   onCreateInvoice,
-  onResetData,
 }) => {
   return (
     <header className="mb-10 pb-8 border-b border-[#161514]/10">
@@ -69,22 +68,7 @@ export const PaymentsPageHeader: React.FC<PaymentsPageHeaderProps> = ({
             Create Invoice
           </button>
 
-          <button
-            type="button"
-            onClick={onResetData}
-            title="Reset to default demo financial dataset"
-            className="p-2.5 border border-[#161514]/15 text-[#5A5650] hover:text-[#161514] hover:bg-[#161514]/5 transition-colors rounded-sm"
-            aria-label="Reset Demo Dataset"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
         </div>
-      </div>
-
-      {/* Demo Workspace Notice */}
-      <div className="mt-6 inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#C5A880]/10 border border-[#C5A880]/30 rounded-sm text-xs text-[#161514]">
-        <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880] animate-pulse" />
-        <span className="font-medium">Demo finance workspace</span> — payment processing and invoicing integrations are not connected yet. Session-only demo data.
       </div>
     </header>
   );

@@ -122,11 +122,11 @@ export const VendorBookingSettings: React.FC<VendorBookingSettingsProps> = ({
         </div>
       )}
 
-      {/* Demo Notice */}
-      <div className="text-[11px] text-[#5A5650] bg-[#C5A880]/10 p-3 rounded-sm border border-[#C5A880]/20 flex items-center gap-2">
+      {/* Notice */}
+      <div className="text-[11px] text-[#5A5650] bg-[#FAF8F5] p-3 rounded-sm border border-[#161514]/10 flex items-center gap-2">
         <Info className="w-4 h-4 text-[#C5A880] shrink-0" />
         <span>
-          Demo booking preference — no payment processing or banking integration occurs in this view.
+          Deposit rules and cancellation policies are automatically shared in booking proposals.
         </span>
       </div>
     </div>

@@ -3,6 +3,7 @@ import { VendorEnquiry } from "@/data/vendorEnquiries";
 import { validateEnquiryResponse } from "@/lib/vendorEnquiries";
 import { sendEnquiryMessageApi } from "@/lib/api/endpoints";
 import { Send, Save, CheckCircle2, Loader2 } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface EnquiryResponseComposerProps {
   enquiry: VendorEnquiry;
@@ -15,11 +16,20 @@ export const EnquiryResponseComposer: React.FC<EnquiryResponseComposerProps> = (
   onSaveDraft,
   onMarkResponseSent,
 }) => {
-  const defaultSubject = `Your ${enquiry.serviceRequested} Enquiry — The Frame House`;
+  const user = useAuthStore((s) => s.user);
+  const studioName =
+    (user?.profile as { businessName?: string } | null)?.businessName ||
+    user?.fullName ||
+    "Wedora Studio";
+  const ownerName = user?.fullName || "Studio Team";
+
+  const buildDefaultMessage = () =>
+    `Dear ${enquiry.coupleName}${enquiry.partnerName ? ` & ${enquiry.partnerName}` : ""},\n\nThank you for considering ${studioName} for your upcoming celebration in ${enquiry.destination}. We would be thrilled to work with you on your special days.\n\nBased on your requested events, we have availability and would love to schedule an introductory call to walk through our signature offerings.\n\nWarm regards,\n${ownerName}\n${studioName}`;
+
+  const defaultSubject = `Your ${enquiry.serviceRequested} Enquiry — ${studioName}`;
   const [prevId, setPrevId] = useState(enquiry.id);
   const [message, setMessage] = useState(
-    enquiry.draftResponse ||
-      `Dear ${enquiry.coupleName}${enquiry.partnerName ? ` & ${enquiry.partnerName}` : ""},\n\nThank you for considering The Frame House for your upcoming celebration in ${enquiry.destination}. We would be thrilled to document your special days.\n\nBased on your requested events, we have availability and would love to schedule a introductory video call to walk through our signature deliverables.\n\nWarm regards,\nRiya Mehta\nThe Frame House`
+    enquiry.draftResponse || buildDefaultMessage()
   );
 
   const [error, setError] = useState<string | null>(null);
@@ -28,10 +38,7 @@ export const EnquiryResponseComposer: React.FC<EnquiryResponseComposerProps> = (
 
   if (enquiry.id !== prevId) {
     setPrevId(enquiry.id);
-    setMessage(
-      enquiry.draftResponse ||
-        `Dear ${enquiry.coupleName}${enquiry.partnerName ? ` & ${enquiry.partnerName}` : ""},\n\nThank you for considering The Frame House for your upcoming celebration in ${enquiry.destination}. We would be thrilled to document your special days.\n\nBased on your requested events, we have availability and would love to schedule a introductory video call to walk through our signature deliverables.\n\nWarm regards,\nRiya Mehta\nThe Frame House`
-    );
+    setMessage(enquiry.draftResponse || buildDefaultMessage());
     setError(null);
     setFeedback(null);
   }

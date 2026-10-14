@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { VendorAccountProfile } from "@/data/vendorSettings";
 import { validateVendorAccountProfile } from "@/lib/vendorSettings";
 import { User, Check, AlertCircle, Edit3, X } from "lucide-react";
@@ -17,6 +17,10 @@ export const VendorAccountSettings: React.FC<VendorAccountSettingsProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<VendorAccountProfile>(account);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setFormData(account);
+  }, [account]);
 
   const handleChange = (field: keyof VendorAccountProfile, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));

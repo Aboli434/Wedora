@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { VendorWorkspaceSettings as WorkspaceType } from "@/data/vendorSettings";
 import { validateWorkspaceSettings } from "@/lib/vendorSettings";
@@ -8,17 +8,24 @@ import { Building2, ExternalLink, Check, AlertCircle, Edit3, X, Eye } from "luci
 
 interface VendorWorkspaceSettingsProps {
   workspace: WorkspaceType;
+  publicProfileUrl?: string;
   onSave: (updatedWorkspace: WorkspaceType) => void;
 }
 
 export const VendorWorkspaceSettings: React.FC<VendorWorkspaceSettingsProps> = ({
   workspace,
+  publicProfileUrl,
   onSave,
 }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState<WorkspaceType>(workspace);
   const [serviceAreaInput, setServiceAreaInput] = useState(workspace.serviceAreas.join(", "));
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    setFormData(workspace);
+    setServiceAreaInput(workspace.serviceAreas.join(", "));
+  }, [workspace]);
 
   const handleChange = (field: keyof WorkspaceType, value: unknown) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -80,7 +87,7 @@ export const VendorWorkspaceSettings: React.FC<VendorWorkspaceSettingsProps> = (
 
         <div className="flex items-center gap-2 self-start">
           <Link
-            href="/vendors/the-frame-house"
+            href={publicProfileUrl || "/vendors"}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-3 py-1.5 border border-[#161514]/20 bg-[#FAF8F5] text-[#161514] text-xs font-medium uppercase hover:bg-[#161514]/5 transition-colors rounded-sm"

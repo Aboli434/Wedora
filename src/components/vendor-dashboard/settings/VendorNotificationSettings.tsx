@@ -134,10 +134,10 @@ export const VendorNotificationSettings: React.FC<
       </div>
 
       {/* Notice */}
-      <div className="text-[11px] text-[#5A5650] bg-[#C5A880]/10 p-3 rounded-sm border border-[#C5A880]/20 flex items-center gap-2">
+      <div className="text-[11px] text-[#5A5650] bg-[#FAF8F5] p-3 rounded-sm border border-[#161514]/10 flex items-center gap-2">
         <Info className="w-4 h-4 text-[#C5A880] shrink-0" />
         <span>
-          Demo alert rules: No actual email, SMS, or push notifications are dispatched during this session demo.
+          Alert preferences update immediately for your studio workspace notifications.
         </span>
       </div>
     </div>

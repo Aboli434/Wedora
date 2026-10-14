@@ -2,16 +2,15 @@
 
 import React from "react";
 import Link from "next/link";
-import { MessageSquarePlus, Users, RefreshCw } from "lucide-react";
+import { MessageSquarePlus, Users } from "lucide-react";
 
 interface ReviewsPageHeaderProps {
   onRequestReview: () => void;
-  onResetData: () => void;
+  onResetData?: () => void;
 }
 
 export const ReviewsPageHeader: React.FC<ReviewsPageHeaderProps> = ({
   onRequestReview,
-  onResetData,
 }) => {
   return (
     <header className="mb-10 pb-8 border-b border-[#161514]/10">
@@ -66,28 +65,7 @@ export const ReviewsPageHeader: React.FC<ReviewsPageHeaderProps> = ({
             View Clients
           </Link>
 
-          <button
-            type="button"
-            onClick={onResetData}
-            title="Reset to original sample review dataset"
-            className="p-2.5 border border-[#161514]/15 text-[#5A5650] hover:text-[#161514] hover:bg-[#161514]/5 transition-colors rounded-sm"
-            aria-label="Reset Demo Dataset"
-          >
-            <RefreshCw className="w-4 h-4" />
-          </button>
         </div>
-      </div>
-
-      {/* Demo Notice */}
-      <div className="mt-6 flex flex-wrap items-center gap-3">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 bg-[#C5A880]/10 border border-[#C5A880]/30 rounded-sm text-xs text-[#161514]">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880] animate-pulse" />
-          <span className="font-medium">Demo reputation workspace</span> — review publishing and messaging integrations are not connected yet.
-        </div>
-
-        <span className="text-[11px] font-mono text-[#5A5650] bg-white border border-[#161514]/10 px-2.5 py-1 rounded-sm">
-          Sample data for The Frame House studio
-        </span>
       </div>
     </header>
   );

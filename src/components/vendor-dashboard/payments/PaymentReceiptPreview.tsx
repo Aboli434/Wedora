@@ -8,6 +8,7 @@ import {
   formatPaymentType,
 } from "@/lib/vendorPayments";
 import { X, CheckCircle2, ShieldCheck } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface PaymentReceiptPreviewProps {
   transaction: PaymentTransaction | null;
@@ -18,6 +19,12 @@ export const PaymentReceiptPreview: React.FC<PaymentReceiptPreviewProps> = ({
   transaction,
   onClose,
 }) => {
+  const user = useAuthStore((s) => s.user);
+  const studioName =
+    (user?.profile as { businessName?: string } | null)?.businessName ||
+    user?.fullName ||
+    "Wedora Studio";
+
   if (!transaction) return null;
 
   return (
@@ -50,7 +57,7 @@ export const PaymentReceiptPreview: React.FC<PaymentReceiptPreviewProps> = ({
         <div className="p-6 bg-white space-y-6 font-sans">
           <div className="text-center pb-4 border-b border-[#161514]/10">
             <span className="font-serif text-xl text-[#161514] font-medium block">
-              The Frame House
+              {studioName}
             </span>
             <span className="text-xs text-[#5A5650] block mt-0.5">
               Official Payment Acknowledgment Receipt

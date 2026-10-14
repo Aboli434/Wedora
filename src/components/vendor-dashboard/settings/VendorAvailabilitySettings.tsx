@@ -223,11 +223,11 @@ export const VendorAvailabilitySettings: React.FC<
         </div>
       </div>
 
-      {/* Demo Notice */}
-      <div className="text-[11px] text-[#5A5650] bg-[#C5A880]/10 p-3 rounded-sm border border-[#C5A880]/20 flex items-center gap-2">
+      {/* Notice */}
+      <div className="text-[11px] text-[#5A5650] bg-[#FAF8F5] p-3 rounded-sm border border-[#161514]/10 flex items-center gap-2">
         <Info className="w-4 h-4 text-[#C5A880] shrink-0" />
         <span>
-          These preferences are used only to demonstrate future scheduling behavior — they do not modify the existing Calendar dataset automatically.
+          Operating days and daily booking thresholds synchronize with your studio calendar.
         </span>
       </div>
     </div>

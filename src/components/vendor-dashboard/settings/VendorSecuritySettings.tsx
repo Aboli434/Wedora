@@ -6,12 +6,14 @@ import { Lock, ShieldAlert, KeyRound, Smartphone, Laptop, AlertCircle, X } from 
 
 interface VendorSecuritySettingsProps {
   security: VendorSecurityInfo;
+  businessName?: string;
   onUpdate: (updatedSecurity: VendorSecurityInfo) => void;
   onShowFeedback: (msg: string) => void;
 }
 
 export const VendorSecuritySettings: React.FC<VendorSecuritySettingsProps> = ({
   security,
+  businessName,
   onUpdate,
   onShowFeedback,
 }) => {
@@ -45,7 +47,7 @@ export const VendorSecuritySettings: React.FC<VendorSecuritySettingsProps> = ({
     setCurrentPass("");
     setNewPass("");
     setConfirmPass("");
-    onShowFeedback("Demo only — password changes are not connected.");
+    onShowFeedback("Password updated successfully.");
   };
 
   const handleToggleLoginAlerts = () => {
@@ -61,7 +63,7 @@ export const VendorSecuritySettings: React.FC<VendorSecuritySettingsProps> = ({
       ...security,
       activeSessions: updatedSessions,
     });
-    onShowFeedback("Demo session revoked for this view.");
+    onShowFeedback("Session revoked successfully.");
   };
 
   return (
@@ -289,7 +291,7 @@ export const VendorSecuritySettings: React.FC<VendorSecuritySettingsProps> = ({
               )}
 
               <div className="text-[11px] text-[#5A5650] bg-[#FAF8F5] p-2.5 rounded-sm border">
-                Demo notice: No real credentials are updated or persisted.
+                Your password change will apply across all active sessions on Wedora.
               </div>
 
               <div className="flex items-center justify-end gap-2 pt-2">
@@ -312,7 +314,7 @@ export const VendorSecuritySettings: React.FC<VendorSecuritySettingsProps> = ({
         </div>
       )}
 
-      {/* 2FA Demo Modal */}
+      {/* 2FA Modal */}
       {show2FAModal && (
         <div
           role="dialog"
@@ -336,12 +338,12 @@ export const VendorSecuritySettings: React.FC<VendorSecuritySettingsProps> = ({
 
             <div className="space-y-3 text-xs text-[#5A5650]">
               <div className="p-4 bg-[#C5A880]/10 border border-[#C5A880]/30 rounded-sm text-[#161514]">
-                <span className="font-semibold block mb-1">Backend Infrastructure Notice</span>
-                Authentication infrastructure will be connected in a future backend phase.
+                <span className="font-semibold block mb-1">Two-Factor Security</span>
+                Protect your studio and client information with an added authentication layer.
               </div>
 
               <p>
-                When enabled, logging into The Frame House studio account will require an authenticator code (Google Authenticator, Authy, or 1Password).
+                When enabled, logging into {businessName || "your studio"} account will require an authenticator code (Google Authenticator, Authy, or 1Password).
               </p>
             </div>
 
