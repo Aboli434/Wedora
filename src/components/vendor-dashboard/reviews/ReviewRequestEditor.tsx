@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { ReviewRequest } from "@/data/vendorReviews";
 import { X, Send, ShieldAlert } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 interface ReviewRequestEditorProps {
   isOpen: boolean;
@@ -15,10 +17,14 @@ export const ReviewRequestEditor: React.FC<ReviewRequestEditorProps> = ({
   onClose,
   onSave,
 }) => {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
+
   const [coupleName, setCoupleName] = useState("");
   const clientReference = "CLI-2026-001";
   const [bookingId, setBookingId] = useState("BK-2026-001");
-  const [service, setService] = useState("Full Wedding Photography & Cinematography");
+  const [service, setService] = useState(catDef.defaultServiceName);
   const [weddingDate, setWeddingDate] = useState("2026-11-15");
   const [notes, setNotes] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -137,7 +143,7 @@ export const ReviewRequestEditor: React.FC<ReviewRequestEditorProps> = ({
                 type="text"
                 value={service}
                 onChange={(e) => setService(e.target.value)}
-                placeholder="e.g. Destination Wedding Photography"
+                placeholder={`e.g. ${catDef.defaultServiceName}`}
                 className="w-full p-2.5 bg-white border border-[#161514]/20 focus:outline-none focus:ring-1 focus:ring-[#C5A880] rounded-sm"
               />
             </div>

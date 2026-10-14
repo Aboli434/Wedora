@@ -35,12 +35,33 @@ import {
   PaymentsPageCTA,
 } from "@/components/vendor-dashboard/payments";
 import { CreditCard, Receipt, FileText } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 export default function VendorPaymentsPage() {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
+
+  const initialPayments = useMemo(() => {
+    if (!vendorProfile?.category || vendorProfile.category === "PHOTOGRAPHY") {
+      return INITIAL_VENDOR_PAYMENTS;
+    }
+    return INITIAL_VENDOR_PAYMENTS.map((p) => ({
+      ...p,
+      service: catDef.defaultServiceName,
+    }));
+  }, [vendorProfile?.category, catDef]);
+
   // Master Datasets State
-  const [payments, setPayments] = useState<VendorPayment[]>(INITIAL_VENDOR_PAYMENTS);
+  const [payments, setPayments] = useState<VendorPayment[]>(initialPayments);
   const [transactions, setTransactions] = useState<PaymentTransaction[]>(INITIAL_PAYMENT_TRANSACTIONS);
   const [invoices, setInvoices] = useState<VendorInvoice[]>(INITIAL_VENDOR_INVOICES);
+
+  // Sync payments when category changes
+  React.useEffect(() => {
+    setPayments(initialPayments);
+  }, [initialPayments]);
 
   // Active Workspace Tab State
   const [activeTab, setActiveTab] = useState<"ledger" | "transactions" | "invoices">("ledger");
@@ -157,7 +178,7 @@ export default function VendorPaymentsPage() {
         bookingId: paymentData.bookingId || "BK-2026-001",
         clientReference: paymentData.clientReference || "CLI-2026-001",
         coupleName: paymentData.coupleName || "New Couple",
-        service: paymentData.service || "Full Wedding Photography & Cinematography",
+        service: paymentData.service || catDef.defaultServiceName,
         packageName: paymentData.packageName || "Custom Package",
         destination: paymentData.destination || "Mumbai",
         weddingDate: paymentData.weddingDate || "2026-11-15",

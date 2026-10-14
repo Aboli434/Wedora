@@ -6,6 +6,7 @@ import { FullVendorDashboardData } from "@/data/vendorDashboard";
 import { getVendorDashboardNextAction } from "@/lib/vendorDashboardNextAction";
 import { Building2, MapPin, ArrowRight, Sparkles, Tag } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { formatVendorCategory } from "@/lib/vendorCategory";
 
 interface VendorDashboardCommandCenterProps {
   data: FullVendorDashboardData;
@@ -25,9 +26,9 @@ export const VendorDashboardCommandCenter: React.FC<
   } | null;
 
   const rawOwnerName = user?.fullName || data.profile.ownerName;
-  const businessName = vendorProfile?.businessName || data.profile.businessName;
+  const businessName = vendorProfile?.businessName || (user?.fullName ? `${user.fullName} Studio` : data.profile.businessName);
   const vendorName = rawOwnerName ? rawOwnerName.split(" ")[0] : businessName;
-  const category = vendorProfile?.category || data.profile.category;
+  const category = vendorProfile?.category ? formatVendorCategory(vendorProfile.category) : formatVendorCategory(data.profile.category);
   const location = vendorProfile?.city || data.profile.location;
   const publicSlug = vendorProfile?.slug || data.profile.publicSlug;
 

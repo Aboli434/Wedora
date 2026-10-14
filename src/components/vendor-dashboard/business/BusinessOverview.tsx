@@ -22,14 +22,18 @@ export function BusinessOverview({ profile, completionScore }: BusinessOverviewP
             <h2 className="font-serif text-2xl md:text-3xl text-[#2C2A29] font-light">
               {profile.businessName}
             </h2>
-            {profile.verifiedStatus && (
+            {profile.verifiedStatus ? (
               <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#F2ECE4] border border-[#E5DEC9] text-[10px] font-mono tracking-wider uppercase text-[#594B3C]">
                 <CheckCircle2 className="w-3 h-3 text-[#C5A880]" />
                 VERIFIED STUDIO
               </span>
+            ) : (
+              <span className="inline-flex items-center px-2 py-0.5 rounded bg-amber-50 border border-amber-200/60 text-[10px] font-mono tracking-wider uppercase text-amber-800 font-medium">
+                PENDING APPROVAL
+              </span>
             )}
-            <span className="inline-flex items-center px-2 py-0.5 rounded bg-amber-50 border border-amber-200/60 text-[10px] font-mono tracking-wider uppercase text-amber-800 font-medium">
-              DEMO PROFILE
+            <span className="inline-flex items-center px-2 py-0.5 rounded bg-emerald-50 border border-emerald-200/60 text-[10px] font-mono tracking-wider uppercase text-emerald-800 font-medium">
+              LIVE PROFILE
             </span>
           </div>
 

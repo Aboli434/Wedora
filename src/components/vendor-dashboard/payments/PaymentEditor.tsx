@@ -8,6 +8,8 @@ import {
   PaymentStatus,
 } from "@/data/vendorPayments";
 import { X, ShieldAlert } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 interface PaymentEditorProps {
   isOpen: boolean;
@@ -22,13 +24,17 @@ export const PaymentEditor: React.FC<PaymentEditorProps> = ({
   paymentToEdit,
   onSave,
 }) => {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
+
   const isEdit = !!paymentToEdit;
 
   const [coupleName, setCoupleName] = useState(paymentToEdit?.coupleName || "");
   const [bookingId, setBookingId] = useState(paymentToEdit?.bookingId || "BK-2026-001");
   const clientReference = paymentToEdit?.clientReference || "CLI-2026-001";
-  const service = paymentToEdit?.service || "Full Wedding Photography & Cinematography";
-  const packageName = paymentToEdit?.packageName || "Royal Heritage Collection";
+  const service = paymentToEdit?.service || catDef.defaultServiceName;
+  const packageName = paymentToEdit?.packageName || catDef.sampleBookingPackage;
   const destination = paymentToEdit?.destination || "Udaipur";
   const weddingDate = paymentToEdit?.weddingDate || "2026-11-15";
 

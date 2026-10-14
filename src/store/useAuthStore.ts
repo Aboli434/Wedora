@@ -81,6 +81,32 @@ export const useAuthStore = create<AuthState>((set, get) => {
           session.user.email?.split("@")[0] ||
           "User";
 
+        const initialProfile =
+          rawRole === "VENDOR"
+            ? ({
+                id: session.user.id,
+                businessName:
+                  (session.user.user_metadata?.businessName as string) ||
+                  `${fullName} Studio`,
+                category:
+                  (session.user.user_metadata?.category as any) ||
+                  "CHOREOGRAPHY",
+                city:
+                  (session.user.user_metadata?.city as string) || "Mumbai",
+                rating: 0,
+                reviewCount: 0,
+                startingPrice: "50000",
+                verified: false,
+                featured: false,
+                description: null,
+                coverImage: null,
+                experienceYears: null,
+                teamSize: null,
+                createdAt: new Date(),
+                updatedAt: new Date(),
+              } as any)
+            : null;
+
         const current = get().user || {
           id: session.user.id,
           email: session.user.email || "",
@@ -91,7 +117,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
           isActive: true,
           createdAt: new Date(),
           updatedAt: new Date(),
-          profile: null,
+          profile: initialProfile,
         };
 
         get().setUser(current);
@@ -123,6 +149,32 @@ export const useAuthStore = create<AuthState>((set, get) => {
             session.user.email?.split("@")[0] ||
             "User";
 
+          const initialProfile =
+            rawRole === "VENDOR"
+              ? ({
+                  id: session.user.id,
+                  businessName:
+                    (session.user.user_metadata?.businessName as string) ||
+                    `${fullName} Studio`,
+                  category:
+                    (session.user.user_metadata?.category as any) ||
+                    "CHOREOGRAPHY",
+                  city:
+                    (session.user.user_metadata?.city as string) || "Mumbai",
+                  rating: 0,
+                  reviewCount: 0,
+                  startingPrice: "50000",
+                  verified: false,
+                  featured: false,
+                  description: null,
+                  coverImage: null,
+                  experienceYears: null,
+                  teamSize: null,
+                  createdAt: new Date(),
+                  updatedAt: new Date(),
+                } as any)
+              : null;
+
           get().setUser({
             id: session.user.id,
             email: session.user.email || "",
@@ -133,7 +185,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
             isActive: true,
             createdAt: new Date(),
             updatedAt: new Date(),
-            profile: null,
+            profile: initialProfile,
           });
 
           try {

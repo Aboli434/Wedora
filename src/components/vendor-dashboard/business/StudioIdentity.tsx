@@ -9,25 +9,16 @@ interface StudioIdentityProps {
   onSave: (updated: Partial<VendorBusinessProfile>) => void;
 }
 
-const CATEGORY_OPTIONS = [
-  "Photography",
-  "Videography",
-  "Bridal Wear",
-  "Groom Wear",
-  "Makeup & Hair",
-  "Decor & Design",
-  "Wedding Planning",
-  "Venues",
-  "Catering",
-  "Music & DJ",
-];
+import { VENDOR_CATEGORY_OPTIONS, formatVendorCategory } from "@/lib/vendorCategory";
+
+const CATEGORY_OPTIONS = VENDOR_CATEGORY_OPTIONS.map((c) => c.label);
 
 export function StudioIdentity({ profile, onSave }: StudioIdentityProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [formData, setFormData] = useState({
     businessName: profile.businessName,
     ownerName: profile.ownerName,
-    category: profile.category,
+    category: formatVendorCategory(profile.category),
     subcategory: profile.subcategory,
     location: profile.location,
   });
@@ -39,7 +30,7 @@ export function StudioIdentity({ profile, onSave }: StudioIdentityProps) {
     setFormData({
       businessName: profile.businessName,
       ownerName: profile.ownerName,
-      category: profile.category,
+      category: formatVendorCategory(profile.category),
       subcategory: profile.subcategory,
       location: profile.location,
     });
@@ -72,7 +63,7 @@ export function StudioIdentity({ profile, onSave }: StudioIdentityProps) {
     onSave(formData);
     setIsEditing(false);
     setErrors({});
-    setFeedback("Business identity updated for this session.");
+    setFeedback("Business identity saved successfully.");
   };
 
   return (
@@ -217,8 +208,8 @@ export function StudioIdentity({ profile, onSave }: StudioIdentityProps) {
           </div>
 
           <div className="pt-2 border-t border-[#E8E2D9] flex flex-wrap items-center justify-between gap-4">
-            <p className="text-xs text-[#8C857B] italic">
-              Demo only — changes reset after refresh.
+            <p className="text-xs text-[#8C857B]">
+              Updates are saved directly to your Wedora profile.
             </p>
             <div className="flex items-center gap-3">
               <button

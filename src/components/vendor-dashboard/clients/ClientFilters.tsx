@@ -158,9 +158,10 @@ export const ClientFilters: React.FC<ClientFiltersProps> = ({
             className="w-full bg-white border border-[#161514]/15 text-xs text-[#161514] px-2.5 py-1.5 focus:outline-none focus:ring-1 focus:ring-[#C5A880]"
           >
             <option value="ALL">All Services</option>
-            <option value="Photography">Photography</option>
-            <option value="Cinematography">Cinematography</option>
-            <option value="Storytelling">Storytelling</option>
+            <option value="Full">Full Experience Package</option>
+            <option value="Ceremony">Ceremony Coverage</option>
+            <option value="Consultation">Consultation & Rehearsals</option>
+            <option value="Custom">Custom Service</option>
           </select>
         </div>
 

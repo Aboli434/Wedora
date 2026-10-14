@@ -9,6 +9,8 @@ import {
   BookingPaymentStatus,
 } from "@/data/vendorBookings";
 import { X, Check } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 interface BookingEditorProps {
   isOpen: boolean;
@@ -23,6 +25,10 @@ export const BookingEditor: React.FC<BookingEditorProps> = ({
   bookingToEdit,
   onSave,
 }) => {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
+
   const isEdit = !!bookingToEdit;
 
   const [coupleName, setCoupleName] = useState(bookingToEdit?.coupleName || "");
@@ -40,10 +46,10 @@ export const BookingEditor: React.FC<BookingEditorProps> = ({
   );
 
   const [serviceName, setServiceName] = useState(
-    bookingToEdit?.serviceName || "Wedding Photography & Cinematography"
+    bookingToEdit?.serviceName || catDef.defaultServiceName
   );
   const [packageName, setPackageName] = useState(
-    bookingToEdit?.packageName || "Signature Luxury Package"
+    bookingToEdit?.packageName || catDef.sampleBookingPackage
   );
 
   const [totalAmount, setTotalAmount] = useState<number>(

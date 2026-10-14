@@ -5,12 +5,17 @@ import Link from "next/link";
 import Image from "next/image";
 import { VendorBusinessProfile } from "@/data/vendorBusiness";
 import { ArrowUpRight, MapPin, Sparkles } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 
 interface PublicProfilePreviewProps {
   profile: VendorBusinessProfile;
 }
 
 export function PublicProfilePreview({ profile }: PublicProfilePreviewProps) {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { slug?: string } | null;
+  const targetHref = vendorProfile?.slug ? `/vendors/${vendorProfile.slug}` : "/vendors";
+
   return (
     <section id="preview" className="bg-[#FAF8F5] border border-[#E8E2D9] rounded-xl p-6 md:p-8 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#E8E2D9] pb-4">
@@ -21,7 +26,7 @@ export function PublicProfilePreview({ profile }: PublicProfilePreviewProps) {
           </p>
         </div>
         <Link
-          href="/vendors/the-frame-house"
+          href={targetHref}
           className="inline-flex items-center gap-1.5 text-xs font-medium text-[#2C2A29] hover:text-[#C5A880] transition-colors group self-start sm:self-auto"
         >
           <span>View full public profile</span>

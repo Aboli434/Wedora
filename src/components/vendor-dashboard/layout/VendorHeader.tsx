@@ -3,12 +3,15 @@
 import React from "react";
 import { NotificationBell } from "@/components/common/NotificationBell";
 import { useAuth } from "@/hooks/useAuth";
-import { MOCK_VENDOR_DASHBOARD_DATA } from "@/data/vendorDashboard";
+import { formatVendorCategory } from "@/lib/vendorCategory";
 import { LogOut } from "lucide-react";
 
 export function VendorHeader() {
   const { user, logout } = useAuth();
-  const vendorProfile = (user?.profile as { businessName?: string; category?: string } | null) || MOCK_VENDOR_DASHBOARD_DATA.profile;
+  const vendorProfile = user?.profile as { businessName?: string; category?: string } | null;
+
+  const businessName = vendorProfile?.businessName || (user?.fullName ? `${user.fullName} Studio` : "Vendor Studio");
+  const displayCategory = vendorProfile?.category ? formatVendorCategory(vendorProfile.category) : null;
 
   const initials = user?.fullName
     ? user.fullName
@@ -28,11 +31,11 @@ export function VendorHeader() {
         </span>
         <span className="hidden sm:inline-block text-[#D9D3C7]">•</span>
         <h1 className="font-serif text-lg md:text-xl text-[#2C2A29] font-light">
-          {vendorProfile.businessName || "Vendor Studio"}
+          {businessName}
         </h1>
-        {vendorProfile.category && (
+        {displayCategory && (
           <span className="text-[10px] font-sans uppercase tracking-wider px-2 py-0.5 rounded bg-[#F2ECE4] border border-[#E5DEC9] text-[#594B3C] font-medium hidden md:inline-block">
-            {vendorProfile.category}
+            {displayCategory}
           </span>
         )}
       </div>

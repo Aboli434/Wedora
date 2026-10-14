@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { createClient } from '@/lib/supabase/server';
 import { UnauthorizedError, ForbiddenError } from '@/lib/errors';
 import { headers } from 'next/headers';
+import { parseVendorCategory } from '@/lib/vendorCategory';
 
 /**
  * Retrieves the current authenticated application User record mapped from Supabase Auth.
@@ -101,10 +102,8 @@ export async function getCurrentUser() {
               .replace(/[^a-z0-9]+/g, '-')
               .replace(/(^-|-$)+/g, '') || 'vendor-studio';
           const slug = `${baseSlug}-${Date.now().toString(36)}`;
-          const rawCategory = (supabaseUser.user_metadata?.category as string)?.toUpperCase();
-          const category = (Object.values(CategoryType) as string[]).includes(rawCategory)
-            ? (rawCategory as CategoryType)
-            : CategoryType.PHOTOGRAPHY;
+          const rawCategory = (supabaseUser.user_metadata?.category as string) || (supabaseUser.user_metadata?.businessCategory as string);
+          const category = parseVendorCategory(rawCategory);
           const city =
             (supabaseUser.user_metadata?.city as string) ||
             (supabaseUser.user_metadata?.location as string) ||

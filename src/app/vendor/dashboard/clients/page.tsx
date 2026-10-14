@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { VendorDashboardShell } from "@/components/vendor-dashboard/layout/VendorDashboardShell";
 import {
   VendorClient,
@@ -28,10 +28,31 @@ import {
   ClientsEmptyState,
   ClientsPageCTA,
 } from "@/components/vendor-dashboard/clients";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 export default function VendorClientsPage() {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
+
+  const initialClients = useMemo(() => {
+    if (!vendorProfile?.category || vendorProfile.category === "PHOTOGRAPHY") {
+      return INITIAL_VENDOR_CLIENTS;
+    }
+    return INITIAL_VENDOR_CLIENTS.map((c) => ({
+      ...c,
+      services: [catDef.defaultServiceName, `${catDef.label} Coordination`],
+    }));
+  }, [vendorProfile?.category, catDef]);
+
   // Master clients state
-  const [clients, setClients] = useState<VendorClient[]>(INITIAL_VENDOR_CLIENTS);
+  const [clients, setClients] = useState<VendorClient[]>(initialClients);
+
+  // Sync clients when category changes
+  useEffect(() => {
+    setClients(initialClients);
+  }, [initialClients]);
 
   // Filters state
   const [filters, setFilters] = useState<ClientFilterState>({
@@ -153,7 +174,7 @@ export default function VendorClientsPage() {
         enquiryId: clientData.enquiryId,
         bookingIds: clientData.bookingIds || [],
         serviceIds: clientData.serviceIds || [],
-        services: clientData.services || ["Wedding Photography"],
+        services: clientData.services || [catDef.defaultServiceName],
         notes: clientData.notes,
         nextAction: clientData.nextAction || "Initial consultation",
         nextActionDate: clientData.nextActionDate || new Date(Date.now() + 86400000 * 3).toISOString().split("T")[0],

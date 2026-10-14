@@ -28,9 +28,62 @@ import {
   getVendorServicesApi,
   createVendorServiceApi,
 } from "@/lib/api/endpoints";
+import { useAuth } from "@/hooks/useAuth";
+import { formatVendorCategory, getCategoryDefinition } from "@/lib/vendorCategory";
 
 export default function VendorServicesPage() {
-  const [services, setServices] = useState<VendorService[]>(MOCK_VENDOR_SERVICES);
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const currentCategory = vendorProfile?.category
+    ? formatVendorCategory(vendorProfile.category)
+    : "Wedding Services";
+  const catDef = getCategoryDefinition(vendorProfile?.category);
+
+  const initialServices = useMemo(() => {
+    if (!vendorProfile?.category || vendorProfile.category === "PHOTOGRAPHY") {
+      return MOCK_VENDOR_SERVICES;
+    }
+    return [
+      {
+        id: "srv-cat-1",
+        name: catDef.sampleBookingPackage,
+        category: currentCategory,
+        shortDescription: `Signature ${currentCategory} experience designed for premier Indian celebrations.`,
+        description: `Comprehensive ${currentCategory} package including personalized consultation, expert team deployment, and complete event coverage.`,
+        pricingType: "STARTING_FROM" as PricingType,
+        price: 150000,
+        currency: "INR" as const,
+        duration: "Full Event",
+        delivery: "Direct On-site Delivery & Media",
+        inclusions: ["Professional Dedicated Team", "Full Event Coordination", "Customized Program"],
+        addOns: [],
+        availability: "AVAILABLE" as const,
+        visibility: "PUBLIC" as const,
+        featured: true,
+        updatedAt: "Today",
+      },
+      {
+        id: "srv-cat-2",
+        name: `${currentCategory} Essential Package`,
+        category: currentCategory,
+        shortDescription: `Focused celebration package for key rituals and intimate ceremonies.`,
+        description: `Dedicated ${currentCategory} service crafted for intimate pre-wedding or wedding day highlights.`,
+        pricingType: "FIXED" as PricingType,
+        price: 85000,
+        currency: "INR" as const,
+        duration: "Single Day",
+        delivery: "Direct On-site Delivery",
+        inclusions: ["Lead Specialist", "Core Event Execution"],
+        addOns: [],
+        availability: "AVAILABLE" as const,
+        visibility: "PUBLIC" as const,
+        featured: false,
+        updatedAt: "Recently",
+      },
+    ];
+  }, [vendorProfile?.category, currentCategory, catDef]);
+
+  const [services, setServices] = useState<VendorService[]>(initialServices);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<ServiceFiltersState>({
     search: "",
@@ -45,23 +98,27 @@ export default function VendorServicesPage() {
   const [editingService, setEditingService] = useState<VendorService | null>(null);
 
   useEffect(() => {
+    setServices(initialServices);
+  }, [initialServices]);
+
+  useEffect(() => {
     let isMounted = true;
     async function loadServices() {
       try {
         setLoading(true);
         const apiServices = await getVendorServicesApi();
-        if (Array.isArray(apiServices) && isMounted) {
+        if (Array.isArray(apiServices) && apiServices.length > 0 && isMounted) {
           const mapped: VendorService[] = apiServices.map((s) => ({
             id: s.id,
             name: s.name,
-            category: "Wedding Photography",
+            category: formatVendorCategory(vendorProfile?.category),
             shortDescription: s.description || "Comprehensive vendor service package.",
             description: s.description || "Comprehensive vendor service package.",
             pricingType: (s.pricingType === "FIXED" ? "FIXED" : "STARTING_FROM") as PricingType,
             price: Number(s.price) / 100,
             currency: "INR",
             duration: "Full Event",
-            delivery: "Digital Delivery",
+            delivery: "Direct Delivery",
             inclusions: ["Professional Service", "Dedicated Team"],
             addOns: [],
             availability: "AVAILABLE",
@@ -116,7 +173,7 @@ export default function VendorServicesPage() {
         const newServiceItem: VendorService = {
           id: created.id,
           name: created.name,
-          category: "Wedding Photography",
+          category: serviceData.category || currentCategory,
           shortDescription: created.description || "",
           description: created.description || "",
           pricingType: (created.pricingType === "FIXED" ? "FIXED" : "STARTING_FROM") as PricingType,

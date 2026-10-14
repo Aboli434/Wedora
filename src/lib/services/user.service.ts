@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { UpdateMeInput } from '@/lib/validation/me';
 import { CurrentUserResponse } from '@/lib/api/types';
 import { ValidationError, NotFoundError } from '@/lib/errors';
+import { parseVendorCategory } from '@/lib/vendorCategory';
 
 export type UserWithProfiles = Prisma.UserGetPayload<{
   include: {
@@ -170,6 +171,9 @@ export class UserService {
         const vendorProfileData: Prisma.VendorProfileUncheckedUpdateInput = {};
 
         if (input.businessName !== undefined) vendorProfileData.businessName = input.businessName;
+        if (input.category !== undefined && input.category !== null) {
+          vendorProfileData.category = parseVendorCategory(input.category);
+        }
         if (input.city !== undefined && input.city !== null) vendorProfileData.city = input.city;
         if (input.description !== undefined) vendorProfileData.description = input.description;
         if (input.coverImage !== undefined) vendorProfileData.coverImage = input.coverImage;

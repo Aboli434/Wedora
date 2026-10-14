@@ -39,6 +39,27 @@ export async function getCurrentUserApi(): Promise<CurrentUserResponse> {
   return apiClient.get<CurrentUserResponse>('/api/v1/me');
 }
 
+export async function updateCurrentUserApi(
+  data: Partial<{
+    fullName: string;
+    avatarUrl: string | null;
+    phoneNumber: string | null;
+    location: string | null;
+    phone: string | null;
+    budgetRange: string | null;
+    notes: string | null;
+    businessName: string;
+    category: string | null;
+    city: string | null;
+    description: string | null;
+    coverImage: string | null;
+    experienceYears: number | null;
+    teamSize: string | null;
+  }>
+): Promise<CurrentUserResponse> {
+  return apiClient.patch<CurrentUserResponse>('/api/v1/me', data);
+}
+
 // ==========================================
 // 2. CLIENT WEDDINGS ENDPOINTS
 // ==========================================

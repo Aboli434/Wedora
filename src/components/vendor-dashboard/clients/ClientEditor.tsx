@@ -10,6 +10,8 @@ import {
   ClientWeddingStatus,
 } from "@/data/vendorClients";
 import { X, Check } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 interface ClientEditorProps {
   isOpen: boolean;
@@ -24,6 +26,9 @@ export const ClientEditor: React.FC<ClientEditorProps> = ({
   clientToEdit,
   onSave,
 }) => {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
   const isEdit = !!clientToEdit;
 
   const [coupleName, setCoupleName] = useState(clientToEdit?.coupleName || "");
@@ -59,7 +64,7 @@ export const ClientEditor: React.FC<ClientEditorProps> = ({
   );
 
   const [servicesInput, setServicesInput] = useState(
-    clientToEdit?.services.join(", ") || "Wedding Photography & Cinematography"
+    clientToEdit?.services.join(", ") || catDef.defaultServiceName
   );
   const [nextAction, setNextAction] = useState(clientToEdit?.nextAction || "");
   const [nextActionDate, setNextActionDate] = useState(clientToEdit?.nextActionDate || "");
@@ -405,7 +410,7 @@ export const ClientEditor: React.FC<ClientEditorProps> = ({
               type="text"
               value={servicesInput}
               onChange={(e) => setServicesInput(e.target.value)}
-              placeholder="e.g. Wedding Photography, Drone Coverage"
+              placeholder={`e.g. ${catDef.defaultServiceName}, Event Coordination`}
               className="w-full p-2.5 bg-white border border-[#161514]/20 focus:outline-none focus:ring-1 focus:ring-[#C5A880]"
             />
           </div>

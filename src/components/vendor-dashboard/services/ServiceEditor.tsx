@@ -14,6 +14,12 @@ import { ServiceAddOns } from "./ServiceAddOns";
 import { ServiceAvailability } from "./ServiceAvailability";
 import { ServiceVisibility } from "./ServiceVisibility";
 import { ServiceCompletion } from "./ServiceCompletion";
+import { useAuth } from "@/hooks/useAuth";
+import {
+  VENDOR_CATEGORY_OPTIONS,
+  formatVendorCategory,
+  getCategoryDefinition,
+} from "@/lib/vendorCategory";
 import { X, Sparkles } from "lucide-react";
 
 interface ServiceEditorProps {
@@ -23,26 +29,27 @@ interface ServiceEditorProps {
   onSave: (service: VendorService) => void;
 }
 
-const CATEGORIES = [
-  "Wedding Photography",
-  "Pre-Wedding",
-  "Engagement",
-  "Events",
-  "Other Services",
-];
+const CATEGORIES = VENDOR_CATEGORY_OPTIONS.map((c) => c.label);
 
 export function ServiceEditor({ service, isOpen, onClose, onSave }: ServiceEditorProps) {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const defaultCategory = vendorProfile?.category
+    ? formatVendorCategory(vendorProfile.category)
+    : "Wedding Services";
+  const defaultCatDef = getCategoryDefinition(vendorProfile?.category);
+
   const [formData, setFormData] = useState<Partial<VendorService>>({
     name: "",
-    category: "Wedding Photography",
+    category: defaultCategory,
     shortDescription: "",
     description: "",
     pricingType: "STARTING_FROM",
     price: 150000,
     currency: "INR",
-    duration: "1 Day / Up to 10 Hours",
-    delivery: "Edited Digital Gallery (3-4 Weeks)",
-    inclusions: ["Lead Photographer", "Digital Gallery Delivery"],
+    duration: "Full Event",
+    delivery: "Professional Delivery",
+    inclusions: ["Professional Dedicated Team", "On-site Coordination"],
     addOns: [],
     availability: "AVAILABLE",
     visibility: "PUBLIC",
@@ -62,15 +69,15 @@ export function ServiceEditor({ service, isOpen, onClose, onSave }: ServiceEdito
       } else {
         setFormData({
           name: "",
-          category: "Wedding Photography",
+          category: defaultCategory,
           shortDescription: "",
           description: "",
           pricingType: "STARTING_FROM",
           price: 150000,
           currency: "INR",
-          duration: "1 Day / Up to 10 Hours",
-          delivery: "Edited Digital Gallery (3-4 Weeks)",
-          inclusions: ["Lead Photographer", "Digital Gallery Delivery"],
+          duration: "Full Event",
+          delivery: "Professional Delivery",
+          inclusions: ["Professional Dedicated Team", "On-site Coordination"],
           addOns: [],
           availability: "AVAILABLE",
           visibility: "PUBLIC",

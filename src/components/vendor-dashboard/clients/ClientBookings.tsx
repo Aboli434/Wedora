@@ -3,6 +3,8 @@
 import React from "react";
 import Link from "next/link";
 import { CalendarCheck, ArrowUpRight } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 interface ClientBookingsProps {
   bookingIds: string[];
@@ -13,6 +15,9 @@ export const ClientBookings: React.FC<ClientBookingsProps> = ({
   bookingIds,
   coupleName,
 }) => {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
   return (
     <div className="bg-white border border-[#161514]/10 p-5 mb-8">
       <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#161514]/10">
@@ -47,7 +52,7 @@ export const ClientBookings: React.FC<ClientBookingsProps> = ({
                   BOOKING REFERENCE #{bId}
                 </span>
                 <div className="font-serif text-base font-medium text-[#161514]">
-                  Wedding Photography & Cinematography Contract
+                  {catDef.defaultServiceName} Contract
                 </div>
               </div>
               <Link

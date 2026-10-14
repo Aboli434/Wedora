@@ -31,11 +31,32 @@ import {
   ReviewsPageCTA,
 } from "@/components/vendor-dashboard/reviews";
 import { Star, Send } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 export default function VendorReviewsPage() {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
+
+  const initialReviews = useMemo(() => {
+    if (!vendorProfile?.category || vendorProfile.category === "PHOTOGRAPHY") {
+      return INITIAL_VENDOR_REVIEWS;
+    }
+    return INITIAL_VENDOR_REVIEWS.map((r) => ({
+      ...r,
+      service: catDef.defaultServiceName,
+    }));
+  }, [vendorProfile?.category, catDef]);
+
   // Master Datasets State
-  const [reviews, setReviews] = useState<VendorReview[]>(INITIAL_VENDOR_REVIEWS);
+  const [reviews, setReviews] = useState<VendorReview[]>(initialReviews);
   const [requests, setRequests] = useState<ReviewRequest[]>(INITIAL_REVIEW_REQUESTS);
+
+  // Sync reviews when category changes
+  React.useEffect(() => {
+    setReviews(initialReviews);
+  }, [initialReviews]);
 
   // Active Workspace Tab State
   const [activeTab, setActiveTab] = useState<"reviews" | "requests">("reviews");
@@ -186,7 +207,7 @@ export default function VendorReviewsPage() {
       bookingId: requestData.bookingId || "BK-2026-001",
       coupleName: requestData.coupleName || "New Couple",
       weddingDate: requestData.weddingDate || "2026-11-15",
-      service: requestData.service || "Wedding Photography",
+      service: requestData.service || catDef.defaultServiceName,
       requestStatus: "REQUESTED",
       requestedAt: now,
       notes: requestData.notes,

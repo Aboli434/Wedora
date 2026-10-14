@@ -4,6 +4,8 @@ import React from "react";
 import { VendorInvoice } from "@/data/vendorPayments";
 import { formatIndianCurrency, formatInvoiceStatus } from "@/lib/vendorPayments";
 import { X, Download } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { formatVendorCategory } from "@/lib/vendorCategory";
 
 interface InvoiceDetailProps {
   invoice: VendorInvoice | null;
@@ -14,6 +16,12 @@ export const InvoiceDetail: React.FC<InvoiceDetailProps> = ({
   invoice,
   onClose,
 }) => {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { businessName?: string; category?: string; city?: string } | null;
+  const businessName = vendorProfile?.businessName || (user?.fullName ? `${user.fullName} Studio` : "Wedora Partner Studio");
+  const categorySubtitle = vendorProfile?.category ? `${formatVendorCategory(vendorProfile.category)} Studio` : "Wedora Luxury Partner";
+  const locationText = vendorProfile?.city ? `${vendorProfile.city} • Pan-India` : "Mumbai • Udaipur • Jaipur • Goa";
+
   if (!invoice) return null;
 
   return (
@@ -50,13 +58,13 @@ export const InvoiceDetail: React.FC<InvoiceDetailProps> = ({
           <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-6 pb-6 border-b border-[#161514]/15">
             <div>
               <span className="font-serif text-2xl text-[#161514] font-medium tracking-wide block">
-                The Frame House
+                {businessName}
               </span>
               <p className="text-xs text-[#5A5650] mt-1 font-sans">
-                Fine Art Wedding Photography & Cinematography Studio
+                {categorySubtitle}
               </p>
               <p className="text-[11px] text-[#5A5650] mt-0.5 font-sans">
-                Mumbai • Udaipur • Jaipur • Goa
+                {locationText}
               </p>
             </div>
 

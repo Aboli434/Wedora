@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/apiResponse';
-import { UserRole, CategoryType } from '@prisma/client';
+import { UserRole } from '@prisma/client';
+import { parseVendorCategory } from '@/lib/vendorCategory';
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,10 +60,7 @@ export async function POST(request: NextRequest) {
       const baseSlug = bizName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') || 'vendor-studio';
       const slug = `${baseSlug}-${Date.now().toString(36)}`;
 
-      const rawCat = (category || 'PHOTOGRAPHY').toUpperCase();
-      const validCategory = (Object.values(CategoryType) as string[]).includes(rawCat)
-        ? (rawCat as CategoryType)
-        : CategoryType.PHOTOGRAPHY;
+      const validCategory = parseVendorCategory(category);
 
       await prisma.vendorProfile.create({
         data: {

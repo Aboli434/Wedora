@@ -210,8 +210,9 @@ export const PaymentFilters: React.FC<PaymentFiltersProps> = ({
             className="w-full p-2 bg-white border border-[#161514]/20 text-xs text-[#161514] focus:outline-none focus:ring-1 focus:ring-[#C5A880] rounded-sm font-sans"
           >
             <option value="ALL">All Services</option>
-            <option value="Photography">Photography</option>
-            <option value="Film">Cinematography / Film</option>
+            <option value="Full">Full Experience Package</option>
+            <option value="Consultation">Consultation & Rehearsals</option>
+            <option value="Custom">Custom Service Package</option>
           </select>
         </div>
       </div>

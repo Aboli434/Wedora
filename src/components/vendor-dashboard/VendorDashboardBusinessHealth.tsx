@@ -4,6 +4,8 @@ import React from "react";
 import Link from "next/link";
 import { FullVendorDashboardData } from "@/data/vendorDashboard";
 import { MessageSquare, CalendarCheck, CreditCard, ChevronRight } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 interface VendorDashboardBusinessHealthProps {
   data: FullVendorDashboardData;
@@ -12,7 +14,19 @@ interface VendorDashboardBusinessHealthProps {
 export const VendorDashboardBusinessHealth: React.FC<
   VendorDashboardBusinessHealthProps
 > = ({ data }) => {
+  const { user } = useAuth();
   const { summary } = data;
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const category = vendorProfile?.category || data.profile.category;
+  const catDef = getCategoryDefinition(category);
+  const eventLabel =
+    catDef.unitTerm === "Shoot"
+      ? "Upcoming Shoots"
+      : catDef.unitTerm === "Performance"
+      ? "Upcoming Performances"
+      : catDef.unitTerm === "Gig"
+      ? "Upcoming Gigs"
+      : "Upcoming Events";
 
   return (
     <section aria-label="Business Health Snapshot" className="space-y-4">
@@ -62,7 +76,7 @@ export const VendorDashboardBusinessHealth: React.FC<
               </span>
             </div>
             <div className="font-serif text-3xl font-medium text-[#161514]">
-              {summary.upcomingBookings} <span className="text-sm font-sans text-[#5A5650] font-normal">Upcoming Shoots</span>
+              {summary.upcomingBookings} <span className="text-sm font-sans text-[#5A5650] font-normal">{eventLabel}</span>
             </div>
             <p className="text-xs text-[#5A5650] mt-1 font-sans">
               {summary.confirmedBookings} total booked season contracts

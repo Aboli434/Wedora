@@ -57,14 +57,19 @@ export const CLIENT_GUEST_RANGES = [
 
 export const VENDOR_CATEGORIES = [
   "Select category",
-  "Wedding Planning",
+  "Dance & Choreography",
+  "DJ & Music Entertainment",
   "Photography",
+  "Videography & Cinema",
+  "Wedding Planning",
   "Decor & Design",
   "Venue",
   "Catering",
-  "Music & Entertainment",
   "Makeup & Hair",
+  "Mehndi Artist",
   "Bridal & Couture",
+  "Invitations & Stationery",
+  "Favors & Gifts",
   "Other",
 ];
 

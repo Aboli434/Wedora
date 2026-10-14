@@ -14,6 +14,7 @@ export const updateMeSchema = z
 
     // Vendor Profile canonical fields
     businessName: z.string().trim().min(1, 'Business name cannot be empty').max(100).optional(),
+    category: z.string().trim().optional().nullable(),
     city: z.string().trim().max(100).optional().nullable(),
     description: z.string().trim().max(2000).optional().nullable(),
     coverImage: z.string().trim().url('Invalid cover image URL').or(z.literal('')).optional().nullable(),

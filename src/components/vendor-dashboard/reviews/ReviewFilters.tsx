@@ -204,8 +204,10 @@ export const ReviewFilters: React.FC<ReviewFiltersProps> = ({
             className="w-full p-2 bg-white border border-[#161514]/20 text-xs text-[#161514] focus:outline-none focus:ring-1 focus:ring-[#C5A880] rounded-sm font-sans"
           >
             <option value="ALL">All Services</option>
-            <option value="Photography">Photography</option>
-            <option value="Cinematography">Cinematography / Film</option>
+            <option value="Full">Full Experience Package</option>
+            <option value="Ceremony">Ceremony Coverage</option>
+            <option value="Consultation">Consultation & Rehearsals</option>
+            <option value="Custom">Custom Service</option>
           </select>
         </div>
       </div>

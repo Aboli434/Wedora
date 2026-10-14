@@ -1,8 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useMemo } from "react";
 import { VendorDashboardShell } from "@/components/vendor-dashboard/layout";
 import { MOCK_VENDOR_DASHBOARD_DATA } from "@/data/vendorDashboard";
+import { useAuth } from "@/hooks/useAuth";
+import { formatVendorCategory, getCategoryDefinition } from "@/lib/vendorCategory";
 import { VendorDashboardCommandCenter } from "@/components/vendor-dashboard/VendorDashboardCommandCenter";
 import { VendorDashboardReadiness } from "@/components/vendor-dashboard/VendorDashboardReadiness";
 import { VendorDashboardActionNeeded } from "@/components/vendor-dashboard/VendorDashboardActionNeeded";
@@ -15,7 +17,47 @@ import {
 } from "@/components/vendor-dashboard/overview";
 
 export default function VendorDashboardPage() {
-  const data = MOCK_VENDOR_DASHBOARD_DATA;
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as {
+    businessName?: string;
+    category?: string;
+    city?: string;
+    slug?: string;
+  } | null;
+
+  const data = useMemo(() => {
+    const raw = MOCK_VENDOR_DASHBOARD_DATA;
+    const cat = vendorProfile?.category || raw.profile.category;
+    const catDef = getCategoryDefinition(cat);
+
+    return {
+      ...raw,
+      profile: {
+        ...raw.profile,
+        businessName:
+          vendorProfile?.businessName ||
+          (user?.fullName ? `${user.fullName} Studio` : raw.profile.businessName),
+        ownerName: user?.fullName || raw.profile.ownerName,
+        category: formatVendorCategory(cat),
+        location: vendorProfile?.city || raw.profile.location,
+        publicSlug: vendorProfile?.slug || raw.profile.publicSlug,
+      },
+      enquiries: raw.enquiries.map((e, idx) => ({
+        ...e,
+        serviceRequested:
+          idx === 0
+            ? catDef.sampleEnquiryService
+            : `${catDef.label} Consultation`,
+      })),
+      bookings: raw.bookings.map((b, idx) => ({
+        ...b,
+        servicePackage:
+          idx === 0
+            ? catDef.sampleBookingPackage
+            : `${catDef.label} Package`,
+      })),
+    };
+  }, [user, vendorProfile]);
 
   return (
     <VendorDashboardShell>
