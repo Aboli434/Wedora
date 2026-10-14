@@ -131,8 +131,8 @@ export function ServiceAreas({ profile, serviceAreas, onChange }: ServiceAreasPr
       </div>
 
       <div className="pt-2 border-t border-[#E8E2D9]">
-        <p className="text-xs text-[#8C857B] italic">
-          Demo availability only — no real address or geolocation tracking.
+        <p className="text-xs text-[#8C857B]">
+          Selected cities and regions appear in directory search filters for couples looking in these destinations.
         </p>
       </div>
     </section>

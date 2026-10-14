@@ -98,7 +98,7 @@ export const ReviewRequestDetail: React.FC<ReviewRequestDetailProps> = ({
           </div>
 
           <div className="p-3 bg-[#FAF8F5] border border-[#161514]/10 rounded-sm text-[11px] text-[#5A5650]">
-            <strong>Demo Request Notice:</strong> Demo request entry — no real external email or messaging service was triggered.
+            <strong>Status Tracking:</strong> Track the lifecycle of this review invitation through response completion.
           </div>
         </div>
 

@@ -140,10 +140,7 @@ export function StudioDescription({ profile, onSave }: StudioDescriptionProps) {
             {errors.fullDesc && <p className="text-xs text-rose-700 mt-1">{errors.fullDesc}</p>}
           </div>
 
-          <div className="pt-2 border-t border-[#E8E2D9] flex flex-wrap items-center justify-between gap-4">
-            <p className="text-xs text-[#8C857B] italic">
-              Demo copy — changes reset after refresh.
-            </p>
+          <div className="pt-2 border-t border-[#E8E2D9] flex flex-wrap items-center justify-end gap-4">
             <div className="flex items-center gap-3">
               <button
                 type="button"

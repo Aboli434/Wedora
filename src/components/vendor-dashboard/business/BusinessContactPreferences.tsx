@@ -117,8 +117,8 @@ export function BusinessContactPreferences({ profile, onChange }: BusinessContac
       </div>
 
       <div className="pt-2 border-t border-[#E8E2D9]">
-        <p className="text-xs text-[#8C857B] italic">
-          Contact settings are not connected in this demo — frontend simulation.
+        <p className="text-xs text-[#8C857B]">
+          Direct contact channels are displayed on your verified Wedora public storefront.
         </p>
       </div>
     </section>

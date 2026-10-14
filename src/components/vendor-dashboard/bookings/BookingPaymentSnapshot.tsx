@@ -38,7 +38,7 @@ export const BookingPaymentSnapshot: React.FC<BookingPaymentSnapshotProps> = ({
     }
 
     onRecordPayment(num);
-    setFeedback(`Recorded demo payment of ${formatIndianCurrency(num)}. Payment records are session-only.`);
+    setFeedback(`Recorded payment of ${formatIndianCurrency(num)}.`);
     setShowPaymentModal(false);
     setTimeout(() => setFeedback(null), 4000);
   };
@@ -141,21 +141,18 @@ export const BookingPaymentSnapshot: React.FC<BookingPaymentSnapshotProps> = ({
         </div>
       )}
 
-      {/* Modal for Demo Payment Recording */}
+      {/* Modal for Payment Recording */}
       {showPaymentModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#161514]/60 p-4">
           <div className="bg-[#FAF8F5] border border-[#161514]/20 p-6 max-w-md w-full shadow-2xl">
             <div className="flex items-center justify-between mb-4 pb-2 border-b border-[#161514]/10">
               <h4 className="font-serif text-lg font-medium text-[#161514]">
-                Mark Payment Received (Demo)
+                Record Payment Received
               </h4>
-              <span className="text-[10px] uppercase tracking-wider text-[#5A5650]">
-                SESSION TEST
-              </span>
             </div>
 
             <p className="text-xs text-[#5A5650] mb-4">
-              Enter the payment amount received from {booking.coupleName}. Full financial accounting will connect when Vendor Payments is launched.
+              Enter the payment amount received from {booking.coupleName}.
             </p>
 
             <div className="mb-4">
@@ -195,8 +192,8 @@ export const BookingPaymentSnapshot: React.FC<BookingPaymentSnapshotProps> = ({
 
       {/* Notice */}
       <div className="flex items-center gap-1.5 text-[11px] text-[#5A5650]">
-        <Sparkles className="w-3.5 h-3.5 text-[#C5A880] shrink-0" />
-        <span>Demo action — payment records will be managed in Vendor Payments.</span>
+        <CheckCircle2 className="w-3.5 h-3.5 text-[#C5A880] shrink-0" />
+        <span>Payment records synchronize with your studio accounts in Vendor Payments.</span>
       </div>
     </div>
   );

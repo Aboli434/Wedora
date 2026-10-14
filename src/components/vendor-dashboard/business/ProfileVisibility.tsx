@@ -61,8 +61,8 @@ export function ProfileVisibility({ profile, onChange }: ProfileVisibilityProps)
 
         <div className="p-3.5 rounded-lg bg-[#F2ECE4] border border-[#E5DEC9] text-xs text-[#594B3C]">
           {isVisible
-            ? "Your studio listing is live in the Wedora directory demonstration."
-            : "Your studio listing is currently hidden from public search previews."}
+            ? "Your studio listing is active and discoverable in the Wedora vendor directory."
+            : "Your studio listing is currently private and hidden from directory searches."}
         </div>
       </div>
     </section>

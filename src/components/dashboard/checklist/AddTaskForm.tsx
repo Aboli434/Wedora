@@ -204,9 +204,9 @@ export function AddTaskForm({ onAddTask, isOpen: controlledIsOpen, onOpenChange 
                   />
                 </div>
 
-                {/* Demo Disclaimer */}
-                <p className="text-[11px] text-[#5A5650] italic">
-                  Note: Custom tasks are added to temporary frontend demonstration state for this session.
+                {/* Workspace Note */}
+                <p className="text-[11px] text-[#5A5650]">
+                  Note: Custom tasks are integrated directly into your active planning checklist.
                 </p>
 
                 {/* Submit Actions */}

@@ -30,9 +30,6 @@ export function VendorProfileSnapshot({ profile }: VendorProfileSnapshotProps) {
                   VERIFIED STUDIO
                 </span>
               )}
-              <span className="inline-flex items-center px-2 py-0.5 rounded bg-amber-50 border border-amber-200/60 text-[10px] font-mono tracking-wider uppercase text-amber-800">
-                DEMO PROFILE
-              </span>
             </div>
 
             <p className="text-xs text-[#6E6B65] font-medium">

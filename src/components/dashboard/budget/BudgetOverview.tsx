@@ -28,7 +28,7 @@ export function BudgetOverview({ summary }: BudgetOverviewProps) {
               TOTAL WEDDING BUDGET
             </span>
             <span className="text-[9px] font-semibold tracking-wider uppercase px-2 py-0.5 bg-[#F3EFEA] text-[#5A5650] border border-[#161514]/10">
-              ILLUSTRATIVE DEMO
+              CURRENT FINANCIALS
             </span>
           </div>
 

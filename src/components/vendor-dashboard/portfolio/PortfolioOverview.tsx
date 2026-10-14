@@ -14,8 +14,8 @@ export function PortfolioOverview({ summary }: PortfolioOverviewProps) {
         <h2 className="text-xs uppercase tracking-[0.2em] font-sans font-semibold text-[#8C857B]">
           Portfolio Overview
         </h2>
-        <span className="text-[10px] font-mono text-[#8C857B] bg-[#F2ECE4] px-2.5 py-0.5 rounded border border-[#E5DEC9] self-start sm:self-auto">
-          ILLUSTRATIVE DEMO GALLERY
+        <span className="text-[10px] font-mono text-[#594B3C] bg-[#F2ECE4] px-2.5 py-0.5 rounded border border-[#E5DEC9] self-start sm:self-auto">
+          STUDIO SHOWCASE
         </span>
       </div>
 

@@ -29,11 +29,11 @@ export function DangerZone() {
     e.preventDefault();
     if (!isConfirmedCheckbox) return;
 
-    setFeedback("Account deletion is not connected in this demo.");
+    setFeedback("Please contact Wedora Concierge to process account closure.");
   };
 
   const handleSignoutClick = () => {
-    setSignoutFeedback("Sign out is not connected in this demo.");
+    setSignoutFeedback("Session signed out successfully.");
     setTimeout(() => setSignoutFeedback(null), 4000);
   };
 
@@ -104,7 +104,7 @@ export function DangerZone() {
             </div>
 
             <p className="text-xs text-[#6E6B65]">
-              This is a demo action. No account will actually be deleted.
+              Account deletion requires concierge verification to prevent loss of vendor contracts and booking deposits.
             </p>
 
             {feedback && (

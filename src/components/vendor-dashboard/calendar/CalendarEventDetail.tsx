@@ -237,7 +237,7 @@ export const CalendarEventDetail: React.FC<CalendarEventDetailProps> = ({
               className="inline-flex items-center gap-1 text-xs text-rose-700 hover:text-rose-900 transition-colors"
             >
               <Trash2 className="w-3.5 h-3.5" />
-              <span>Delete Demo Event</span>
+              <span>Delete Event</span>
             </button>
 
             {showConfirmDelete && (

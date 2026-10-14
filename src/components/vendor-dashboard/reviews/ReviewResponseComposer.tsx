@@ -79,7 +79,7 @@ export const ReviewResponseComposer: React.FC<ReviewResponseComposerProps> = ({
           />
 
           <div className="p-2.5 bg-[#FAF8F5] border border-[#161514]/10 rounded-sm text-[11px] text-[#5A5650]">
-            <strong>Demo Notice:</strong> Demo only — this response has not been published to a real review platform or external channel.
+            <strong>Studio Response:</strong> Your response will be displayed publicly below the couple&apos;s review.
           </div>
 
           <div className="flex items-center justify-end gap-2">

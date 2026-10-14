@@ -27,7 +27,7 @@ export function VendorPaymentSnapshot({ summary }: VendorPaymentSnapshotProps) {
         <div>
           <h2 className="font-serif text-2xl text-[#2C2A29]">Payment snapshot</h2>
           <p className="text-xs text-[#6E6B65] mt-0.5">
-            Based on confirmed demo bookings.
+            Based on confirmed studio bookings.
           </p>
         </div>
         <Link

@@ -44,7 +44,7 @@ export const MOCK_VENDOR_SERVICES: VendorService[] = [
     category: "Wedding Photography",
     shortDescription: "Comprehensive multi-event documentary coverage for destination and luxury celebrations.",
     description:
-      "Our signature multi-day experience. The Frame House team documents your entire celebration from intimate pre-wedding rituals to the final farewell with an editorial, unobtrusive eye.",
+      "Our signature multi-day experience. Our studio team documents your entire celebration from intimate pre-wedding rituals to the final farewell with an editorial, unobtrusive eye.",
     pricingType: "STARTING_FROM",
     price: 240000,
     currency: "INR",
@@ -94,7 +94,7 @@ export const MOCK_VENDOR_SERVICES: VendorService[] = [
     duration: "1 Day / Up to 10 Hours",
     delivery: "Edited Digital Gallery (3-4 Weeks)",
     inclusions: [
-      "Lead Photographer (Riya Mehta) + Associate Photographer",
+      "Lead Photographer + Associate Photographer",
       "Ceremony, Family Portraits, & Evening Reception Coverage",
       "400+ hand-edited high-resolution digital photographs",
       "Online password-protected viewing & download portal",

@@ -27,7 +27,7 @@ const CATEGORIES: { value: PortfolioCategory; label: string }[] = [
   { value: "OTHER", label: "Other Work" },
 ];
 
-const DEMO_IMAGE_ASSETS = [
+const STUDIO_IMAGE_ASSETS = [
   { src: "/images/wedding/wedora-wedding-aditi-arjun.jpg", alt: "Aditi & Arjun Heritage Wedding" },
   { src: "/images/wedding/wedora-wedding-meera-rohan.jpg", alt: "Meera & Rohan Coastal Wedding" },
   { src: "/images/wedding/wedora-wedding-isha-kunal.jpg", alt: "Isha & Kunal Editorial Wedding" },
@@ -131,7 +131,7 @@ export function PortfolioItemEditor({ item, isOpen, onClose, onSave }: Portfolio
     onClose();
   };
 
-  const handleSelectDemoAsset = (asset: { src: string; alt: string }) => {
+  const handleSelectStudioAsset = (asset: { src: string; alt: string }) => {
     setFormData({
       ...formData,
       imageSrc: asset.src,
@@ -182,7 +182,7 @@ export function PortfolioItemEditor({ item, isOpen, onClose, onSave }: Portfolio
                 className="inline-flex items-center gap-1.5 text-xs font-medium text-[#C5A880] hover:text-[#2C2A29]"
               >
                 <Camera className="w-3.5 h-3.5" />
-                <span>Replace Image (Demo Selector)</span>
+                <span>Select from Studio Library</span>
               </button>
             </div>
 
@@ -390,14 +390,14 @@ export function PortfolioItemEditor({ item, isOpen, onClose, onSave }: Portfolio
         </div>
       </div>
 
-      {/* Demo Image Selector Modal */}
+      {/* Studio Image Selector Modal */}
       {showImageSelector && (
         <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-[#FAF8F5] border border-[#E8E2D9] rounded-xl max-w-lg w-full p-6 space-y-4 shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#E8E2D9] pb-3">
               <div className="flex items-center gap-2">
                 <Camera className="w-4 h-4 text-[#C5A880]" />
-                <h3 className="font-serif text-lg text-[#2C2A29]">Select Demo Image Asset</h3>
+                <h3 className="font-serif text-lg text-[#2C2A29]">Select Studio Asset</h3>
               </div>
               <button
                 type="button"
@@ -409,15 +409,15 @@ export function PortfolioItemEditor({ item, isOpen, onClose, onSave }: Portfolio
             </div>
 
             <p className="text-xs text-[#6E6B65]">
-              Image uploads will be connected when the vendor media service is added. Choose an existing studio asset for this demo session:
+              Choose a curated showcase image from your studio library:
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 max-h-64 overflow-y-auto p-1">
-              {DEMO_IMAGE_ASSETS.map((asset, idx) => (
+              {STUDIO_IMAGE_ASSETS.map((asset, idx) => (
                 <button
                   type="button"
                   key={idx}
-                  onClick={() => handleSelectDemoAsset(asset)}
+                  onClick={() => handleSelectStudioAsset(asset)}
                   className="relative aspect-[4/3] rounded-lg overflow-hidden border border-[#DCD5C9] hover:border-[#2C2A29] hover:scale-105 transition-all group text-left"
                 >
                   <Image src={asset.src} alt={asset.alt} fill className="object-cover" />

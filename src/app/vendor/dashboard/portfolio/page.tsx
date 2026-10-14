@@ -166,7 +166,7 @@ export default function VendorPortfolioPage() {
         {/* Overview Metrics */}
         <PortfolioOverview summary={summary} />
 
-        {/* Demo Media Notice */}
+        {/* Studio Media Notice */}
         <PortfolioMediaNotice />
 
         {/* Session Notice */}

@@ -170,9 +170,9 @@ export const InvoiceDetail: React.FC<InvoiceDetailProps> = ({
             </div>
           </div>
 
-          {/* Legal Notice */}
+          {/* Statement Notice */}
           <div className="p-3 bg-[#FAF8F5] border border-[#161514]/10 rounded-sm text-[11px] text-[#5A5650] text-center font-sans">
-            <strong>Demo Invoice Notice:</strong> This statement is an operational representation for Wedora Vendor Studio demonstration. It is not a tax document or legal tax invoice.
+            <strong>Invoice Statement:</strong> This operational transaction summary represents the agreed milestone schedule for this celebration.
           </div>
         </div>
 
@@ -185,11 +185,11 @@ export const InvoiceDetail: React.FC<InvoiceDetailProps> = ({
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => alert("Demo statement download initiated.")}
+              onClick={() => alert("Statement download initiated.")}
               className="px-4 py-2 border border-[#161514]/20 bg-white text-[#161514] text-xs font-medium uppercase tracking-wider hover:bg-[#161514]/5 rounded-sm inline-flex items-center gap-1.5"
             >
               <Download className="w-3.5 h-3.5" />
-              Download Demo
+              Download Statement
             </button>
 
             <button

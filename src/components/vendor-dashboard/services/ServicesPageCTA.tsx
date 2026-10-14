@@ -3,8 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export function ServicesPageCTA() {
+  const user = useAuthStore((s) => s.user);
+  const vendorSlug = (user?.profile as { slug?: string } | null)?.slug;
+  const publicProfileUrl = vendorSlug ? `/vendors/${vendorSlug}` : "/vendors";
+
   return (
     <section className="bg-[#161514] text-[#FAF8F5] rounded-xl p-8 md:p-10 space-y-6 relative overflow-hidden border border-[#2C2A28]">
       <div className="space-y-2 max-w-2xl relative z-10">
@@ -21,7 +26,9 @@ export function ServicesPageCTA() {
 
       <div className="flex flex-wrap items-center gap-4 relative z-10 pt-2">
         <Link
-          href="/vendors/the-frame-house"
+          href={publicProfileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-medium uppercase tracking-wider text-[#161514] bg-[#C5A880] hover:bg-[#d5b991] transition-colors rounded-md shadow-sm"
         >
           <span>View Public Profile</span>

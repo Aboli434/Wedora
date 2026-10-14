@@ -3,12 +3,16 @@
 import React from "react";
 import Link from "next/link";
 import { Plus, ArrowUpRight } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface ServicesPageHeaderProps {
   onAddService: () => void;
 }
 
 export function ServicesPageHeader({ onAddService }: ServicesPageHeaderProps) {
+  const user = useAuthStore((s) => s.user);
+  const vendorSlug = (user?.profile as { slug?: string } | null)?.slug;
+  const publicProfileUrl = vendorSlug ? `/vendors/${vendorSlug}` : "/vendors";
   return (
     <div className="space-y-4 border-b border-[#E8E2D9] pb-6">
       {/* Breadcrumb */}
@@ -48,7 +52,9 @@ export function ServicesPageHeader({ onAddService }: ServicesPageHeaderProps) {
           </button>
 
           <Link
-            href="/vendors/the-frame-house"
+            href={publicProfileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium uppercase tracking-wider text-[#594B3C] bg-[#F2ECE4] border border-[#E5DEC9] rounded-md hover:bg-[#EAE4DB] transition-colors"
           >
             <span>View Public Profile</span>

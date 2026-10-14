@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { UserPlus, Sparkles, Filter } from "lucide-react";
+import { UserPlus, Filter } from "lucide-react";
 
 interface ClientsPageHeaderProps {
   onAddClient: () => void;
@@ -64,14 +64,6 @@ export const ClientsPageHeader: React.FC<ClientsPageHeaderProps> = ({
             Add Client
           </button>
         </div>
-      </div>
-
-      {/* Subtle demo notice */}
-      <div className="mt-6 inline-flex items-center gap-2 px-3 py-1.5 bg-[#C5A880]/10 border border-[#C5A880]/20 text-[#161514] text-xs">
-        <Sparkles className="w-3.5 h-3.5 text-[#C5A880]" />
-        <span>
-          <strong>Demo workspace</strong> — client information is currently session-only.
-        </span>
       </div>
     </header>
   );

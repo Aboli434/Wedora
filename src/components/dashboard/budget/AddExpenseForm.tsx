@@ -269,9 +269,9 @@ export function AddExpenseForm({ onAddExpense, isOpen: controlledIsOpen, onOpenC
                   />
                 </div>
 
-                {/* Demo Disclaimer */}
-                <p className="text-[11px] text-[#5A5650] italic pt-1">
-                  Note: Expenses added in demo mode update budget statistics in temporary session state.
+                {/* Workspace Note */}
+                <p className="text-[11px] text-[#5A5650] pt-1">
+                  Note: Newly added expenses instantly update your budget breakdown and committed totals.
                 </p>
 
                 {/* Actions */}

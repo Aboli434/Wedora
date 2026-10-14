@@ -107,7 +107,7 @@ export function ProfileSettings({
             {profile.firstName} {profile.lastName}
           </h3>
           <span className="text-xs font-sans text-[#5A5650]">
-            Demo Client Account
+            Wedora Client Account
           </span>
         </div>
       </div>
@@ -204,10 +204,10 @@ export function ProfileSettings({
           </div>
         </div>
 
-        {/* Demo Disclaimer & Save Actions */}
+        {/* Save Actions & Workspace Sync Note */}
         <div className="pt-2 border-t border-[#161514]/10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <span className="text-[11px] font-sans text-[#5A5650] italic">
-            Demo only — profile changes reset after page refresh.
+          <span className="text-[11px] font-sans text-[#5A5650]">
+            Profile details are synchronized across your wedding planning workspace.
           </span>
 
           {isEditing && (

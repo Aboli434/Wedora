@@ -154,9 +154,9 @@ export function AddEventForm({
           </button>
         </div>
 
-        {/* Demo Notice */}
+        {/* Workspace Notice */}
         <div className="p-3 bg-[#161514]/5 border border-[#161514]/10 text-xs font-sans text-[#5A5650]">
-          <strong>Note:</strong> Function details update your local demo workspace in real-time.
+          <strong>Note:</strong> Function details update your celebration itinerary and timeline in real-time.
         </div>
 
         {/* Success Alert */}

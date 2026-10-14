@@ -163,7 +163,7 @@ export const ReviewRequestEditor: React.FC<ReviewRequestEditorProps> = ({
             </div>
 
             <div className="p-3 bg-[#FAF8F5] border border-[#161514]/10 rounded-sm text-[11px] text-[#5A5650]">
-              <strong>Demo Action Notice:</strong> Demo only — no message or email has been sent externally.
+              <strong>Review Invitation:</strong> A personalized review invitation will be dispatched to the couple upon confirmation.
             </div>
 
             <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#161514]/10">

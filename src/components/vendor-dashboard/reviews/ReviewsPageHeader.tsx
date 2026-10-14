@@ -6,7 +6,6 @@ import { MessageSquarePlus, Users } from "lucide-react";
 
 interface ReviewsPageHeaderProps {
   onRequestReview: () => void;
-  onResetData?: () => void;
 }
 
 export const ReviewsPageHeader: React.FC<ReviewsPageHeaderProps> = ({

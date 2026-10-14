@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { VendorPortfolioItem } from "@/data/vendorPortfolio";
 import { ArrowUpRight, Eye } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface PortfolioPublicPreviewProps {
   items: VendorPortfolioItem[];
@@ -12,6 +13,9 @@ interface PortfolioPublicPreviewProps {
 }
 
 export function PortfolioPublicPreview({ items, onPreviewImage }: PortfolioPublicPreviewProps) {
+  const user = useAuthStore((s) => s.user);
+  const vendorSlug = (user?.profile as { slug?: string } | null)?.slug;
+  const publicProfileUrl = vendorSlug ? `/vendors/${vendorSlug}` : "/vendors";
   const publicItems = items.filter((i) => i.visibility === "PUBLIC").slice(0, 4);
 
   return (
@@ -25,7 +29,9 @@ export function PortfolioPublicPreview({ items, onPreviewImage }: PortfolioPubli
         </div>
 
         <Link
-          href="/vendors/the-frame-house"
+          href={publicProfileUrl}
+          target="_blank"
+          rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-xs font-medium text-[#2C2A29] hover:text-[#C5A880] transition-colors group self-start sm:self-auto"
         >
           <span>View Full Profile</span>

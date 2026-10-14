@@ -37,11 +37,35 @@ import {
   CalendarEmptyState,
   CalendarPageCTA,
 } from "@/components/vendor-dashboard/calendar";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 export default function VendorCalendarPage() {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
+
+  const initialEvents = React.useMemo(() => {
+    if (!vendorProfile?.category || vendorProfile.category === "PHOTOGRAPHY") {
+      return INITIAL_CALENDAR_EVENTS;
+    }
+    return INITIAL_CALENDAR_EVENTS.map((e) => ({
+      ...e,
+      title: e.title
+        .replace("Wedding Photography", `${catDef.label}`)
+        .replace("Shoot", `${catDef.unitTerm}`)
+        .replace("shoot", `${catDef.unitTerm.toLowerCase()}`),
+    }));
+  }, [vendorProfile?.category, catDef]);
+
   const [events, setEvents] = useState<VendorCalendarEvent[]>(
-    INITIAL_CALENDAR_EVENTS
+    initialEvents
   );
+
+  React.useEffect(() => {
+    setEvents(initialEvents);
+  }, [initialEvents]);
+
   const [blocks, setBlocks] = useState<VendorAvailabilityBlock[]>(
     INITIAL_AVAILABILITY_BLOCKS
   );

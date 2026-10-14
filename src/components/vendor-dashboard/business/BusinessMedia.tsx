@@ -120,12 +120,8 @@ export function BusinessMedia({ profile }: BusinessMediaProps) {
             </div>
 
             <p className="text-xs text-[#5A5650] leading-relaxed">
-              Image uploads will be connected when the vendor media service is added.
+              Recommended: Upload a horizontal cover image with an aspect ratio of 16:9 for optimal presentation across desktop and mobile.
             </p>
-
-            <div className="p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs text-amber-900">
-              This is a frontend demo environment. Actual media management will be enabled in Phase 3.
-            </div>
 
             <div className="pt-2 border-t border-[#E8E2D9] flex justify-end">
               <button

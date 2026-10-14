@@ -115,7 +115,7 @@ export const PaymentReceiptPreview: React.FC<PaymentReceiptPreviewProps> = ({
 
           <div className="pt-4 border-t border-[#161514]/10 text-center">
             <p className="text-[11px] text-[#5A5650]">
-              Demo receipt — no real payment was processed.
+              This official payment receipt is generated and recorded for your studio accounts.
             </p>
           </div>
         </div>

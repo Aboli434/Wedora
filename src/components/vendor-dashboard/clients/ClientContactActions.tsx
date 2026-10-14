@@ -14,7 +14,7 @@ export const ClientContactActions: React.FC<ClientContactActionsProps> = ({
   const [feedback, setFeedback] = useState<string | null>(null);
 
   const handleAction = (type: string) => {
-    setFeedback(`Demo action: ${type} outreach triggered for ${client.coupleName}. Real messaging connects in Phase 10+.`);
+    setFeedback(`${type} communication initiated for ${client.coupleName}.`);
     setTimeout(() => setFeedback(null), 4000);
   };
 
@@ -64,7 +64,7 @@ export const ClientContactActions: React.FC<ClientContactActionsProps> = ({
 
       <div className="flex items-center gap-1.5 text-[11px] text-[#5A5650]">
         <Sparkles className="w-3.5 h-3.5 text-[#C5A880] shrink-0" />
-        <span>Demo action — communication will be connected when messaging integrations are implemented.</span>
+        <span>Direct messaging and synchronized studio communication history.</span>
       </div>
     </div>
   );

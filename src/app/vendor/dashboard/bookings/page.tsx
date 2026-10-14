@@ -33,9 +33,31 @@ import {
   getVendorBookingsApi,
   updateVendorBookingStatusApi,
 } from "@/lib/api/endpoints";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 export default function VendorBookingsPage() {
-  const [bookings, setBookings] = useState<VendorBooking[]>(INITIAL_VENDOR_BOOKINGS);
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
+
+  const initialBookings = React.useMemo(() => {
+    if (!vendorProfile?.category || vendorProfile.category === "PHOTOGRAPHY") {
+      return INITIAL_VENDOR_BOOKINGS;
+    }
+    return INITIAL_VENDOR_BOOKINGS.map((b, idx) => ({
+      ...b,
+      serviceName: catDef.defaultServiceName,
+      packageName: idx === 0 ? catDef.sampleBookingPackage : `${catDef.label} Package`,
+    }));
+  }, [vendorProfile?.category, catDef]);
+
+  const [bookings, setBookings] = useState<VendorBooking[]>(initialBookings);
+
+  useEffect(() => {
+    setBookings(initialBookings);
+  }, [initialBookings]);
+
   const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingBooking, setEditingBooking] = useState<VendorBooking | null>(null);

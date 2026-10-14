@@ -130,8 +130,8 @@ export function PrivacySettings({ privacy, onChange }: PrivacySettingsProps) {
       </div>
 
       <div className="pt-2 border-t border-[#E8E2D9]">
-        <p className="text-xs text-[#8C857B] italic">
-          Demo only — frontend simulation. No actual analytics scripts or tracking services are loaded.
+        <p className="text-xs text-[#8C857B]">
+          Your privacy preferences control profile visibility and communication permissions across Wedora.
         </p>
       </div>
     </section>

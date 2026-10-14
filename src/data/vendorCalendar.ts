@@ -57,12 +57,12 @@ export interface VendorCalendarSummary {
   blockedDates: number;
 }
 
-// Initial demo dataset for The Frame House (Fixed reference date: 2026-09-18)
+// Initial studio calendar dataset (Fixed reference date: 2026-09-18)
 export const INITIAL_CALENDAR_EVENTS: VendorCalendarEvent[] = [
   {
     id: "evt-cal-101",
-    title: "Aditi & Arjun — Wedding Photography Contract Hold",
-    description: "Multi-day Rajasthan destination wedding coverage hold.",
+    title: "Aditi & Arjun — Wedding Celebration Contract Hold",
+    description: "Multi-day Rajasthan destination celebration hold.",
     type: "BOOKING",
     status: "SCHEDULED",
     priority: "HIGH",
@@ -100,7 +100,7 @@ export const INITIAL_CALENDAR_EVENTS: VendorCalendarEvent[] = [
   {
     id: "evt-cal-103",
     title: "Aditi & Arjun — Sunset Pheras & Wedding Ceremony",
-    description: "Palace Mandap Deck sunset ceremony shoot.",
+    description: "Palace Mandap Deck sunset ceremony celebration.",
     type: "WEDDING_EVENT",
     status: "SCHEDULED",
     priority: "HIGH",
@@ -120,7 +120,7 @@ export const INITIAL_CALENDAR_EVENTS: VendorCalendarEvent[] = [
   {
     id: "evt-cal-104",
     title: "Ananya & Kabir — Overdue Milestone Payment",
-    description: "Second milestone payment of ₹15,00,000 for Rambagh Palace Jaipur shoot.",
+    description: "Second milestone payment of ₹15,00,000 for Rambagh Palace Jaipur celebration.",
     type: "PAYMENT_DUE",
     status: "SCHEDULED",
     priority: "HIGH",
@@ -155,8 +155,8 @@ export const INITIAL_CALENDAR_EVENTS: VendorCalendarEvent[] = [
   },
   {
     id: "evt-cal-106",
-    title: "Priya & Dev — Send Final Shot List Template",
-    description: "Prepare and email shot list customization guide to Priya.",
+    title: "Priya & Dev — Send Schedule & Briefing Template",
+    description: "Prepare and email celebration coordination guide to Priya.",
     type: "PREPARATION",
     status: "SCHEDULED",
     priority: "NORMAL",
@@ -212,8 +212,8 @@ export const INITIAL_CALENDAR_EVENTS: VendorCalendarEvent[] = [
   },
   {
     id: "evt-cal-109",
-    title: "Isha & Kunal — Pre-Wedding Permit Check",
-    description: "Confirm drone shoot permissions for Asiatic Library and Marine Drive.",
+    title: "Isha & Kunal — Pre-Wedding Schedule Check",
+    description: "Confirm permissions and rehearsal schedule for Asiatic Library and Marine Drive.",
     type: "PREPARATION",
     status: "SCHEDULED",
     priority: "HIGH",
@@ -231,7 +231,7 @@ export const INITIAL_CALENDAR_EVENTS: VendorCalendarEvent[] = [
   {
     id: "evt-cal-110",
     title: "Isha & Kunal — Milestone Deposit Due",
-    description: "Milestone payment of ₹15,00,000 due prior to pre-wedding shoot.",
+    description: "Milestone payment of ₹15,00,000 due prior to pre-wedding schedule.",
     type: "PAYMENT_DUE",
     status: "SCHEDULED",
     priority: "HIGH",
@@ -246,8 +246,8 @@ export const INITIAL_CALENDAR_EVENTS: VendorCalendarEvent[] = [
   },
   {
     id: "evt-cal-111",
-    title: "Simran & Harpreet — Album Delivery Handover",
-    description: "Completed printed fine-art photo album handed over.",
+    title: "Simran & Harpreet — Deliverables Handover",
+    description: "Completed celebration deliverables handed over.",
     type: "WEDDING_EVENT",
     status: "COMPLETED",
     priority: "LOW",
@@ -262,8 +262,8 @@ export const INITIAL_CALENDAR_EVENTS: VendorCalendarEvent[] = [
   },
   {
     id: "evt-cal-112",
-    title: "Studio Internal Planning & Equipment Maintenance",
-    description: "Quarterly camera sensor cleaning and lens calibration.",
+    title: "Studio Internal Planning & Maintenance",
+    description: "Quarterly studio inventory and equipment audit.",
     type: "REMINDER",
     status: "SCHEDULED",
     priority: "NORMAL",
@@ -284,16 +284,16 @@ export const INITIAL_AVAILABILITY_BLOCKS: VendorAvailabilityBlock[] = [
     startDate: "2026-10-20",
     endDate: "2026-10-28",
     reason: "Personal / Unavailable",
-    notes: "No new shoot commitments during holiday week.",
+    notes: "No new event commitments during holiday week.",
     createdAt: "2026-09-01T09:00:00Z",
   },
   {
     id: "blk-02",
-    title: "International Travel & Equipment Transit",
+    title: "International Travel & Transit",
     startDate: "2026-12-10",
     endDate: "2026-12-15",
     reason: "Travel",
-    notes: "In transit for overseas photography exhibition.",
+    notes: "In transit for industry showcase and conference.",
     createdAt: "2026-09-10T10:00:00Z",
   },
 ];

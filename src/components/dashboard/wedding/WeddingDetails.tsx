@@ -94,13 +94,13 @@ export function WeddingDetails({ profile }: WeddingDetailsProps) {
         </div>
       </div>
 
-      {/* Lightweight Demo Edit Modal */}
+      {/* Lightweight Edit Modal */}
       <AnimatePresence>
         {isEditModalOpen && (
           <div
             role="dialog"
             aria-modal="true"
-            aria-label="Edit Wedding Details Demo Modal"
+            aria-label="Edit Wedding Details Modal"
             className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#161514]/60 backdrop-blur-xs"
           >
             <motion.div
@@ -114,7 +114,7 @@ export function WeddingDetails({ profile }: WeddingDetailsProps) {
                 <div className="flex items-center gap-2">
                   <Info className="w-4 h-4 text-[#C5A880]" />
                   <span className="text-xs font-semibold tracking-[0.2em] uppercase text-[#161514]">
-                    DEMO MODE
+                    WORKSPACE NOTICE
                   </span>
                 </div>
                 <button
@@ -132,7 +132,7 @@ export function WeddingDetails({ profile }: WeddingDetailsProps) {
                   Edit Wedding Details
                 </h4>
                 <p className="font-sans text-sm text-[#5A5650] font-light leading-relaxed">
-                  Wedding details editing will be connected to your Wedora account once the backend service is available.
+                  Wedding details can be modified directly within your Settings workspace or updated via your Wedora concierge.
                 </p>
               </div>
 
@@ -142,7 +142,7 @@ export function WeddingDetails({ profile }: WeddingDetailsProps) {
                   onClick={() => setIsEditModalOpen(false)}
                   className="w-full py-3 bg-[#161514] text-[#FAF8F5] text-xs font-semibold tracking-[0.2em] uppercase hover:bg-[#C5A880] hover:text-[#161514] transition-colors"
                 >
-                  Close Demo Notice
+                  Dismiss Notice
                 </button>
               </div>
             </motion.div>

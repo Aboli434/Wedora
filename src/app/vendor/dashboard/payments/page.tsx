@@ -123,16 +123,6 @@ export default function VendorPaymentsPage() {
     });
   };
 
-  const handleResetDemoData = () => {
-    setPayments(INITIAL_VENDOR_PAYMENTS);
-    setTransactions(INITIAL_PAYMENT_TRANSACTIONS);
-    setInvoices(INITIAL_VENDOR_INVOICES);
-    handleResetFilters();
-    setSelectedPaymentId(null);
-    setSelectedInvoiceId(null);
-    setSelectedReceiptTxn(null);
-  };
-
   const handleMetricSelect = (metricKey: string) => {
     setActiveTab("ledger");
     handleResetFilters();
@@ -286,7 +276,7 @@ export default function VendorPaymentsPage() {
     );
   };
 
-  // Create Invoice Demo Handler
+  // Create Invoice Handler
   const handleCreateInvoice = () => {
     const now = new Date().toISOString().split("T")[0];
     const newInvId = `inv_${Date.now()}`;
@@ -320,7 +310,6 @@ export default function VendorPaymentsPage() {
         <PaymentsPageHeader
           onRecordPayment={() => setIsRecordPaymentOpen(true)}
           onCreateInvoice={handleCreateInvoice}
-          onResetData={handleResetDemoData}
         />
 
         {/* Financial Overview Metrics */}

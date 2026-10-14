@@ -30,11 +30,32 @@ import {
   getVendorEnquiriesApi,
   updateVendorEnquiryStatusApi,
 } from "@/lib/api/endpoints";
+import { useAuth } from "@/hooks/useAuth";
+import { getCategoryDefinition } from "@/lib/vendorCategory";
 
 export default function VendorEnquiriesPage() {
+  const { user } = useAuth();
+  const vendorProfile = user?.profile as { category?: string } | null;
+  const catDef = getCategoryDefinition(vendorProfile?.category);
+
+  const initialEnquiries = React.useMemo(() => {
+    if (!vendorProfile?.category || vendorProfile.category === "PHOTOGRAPHY") {
+      return INITIAL_VENDOR_ENQUIRIES;
+    }
+    return INITIAL_VENDOR_ENQUIRIES.map((eq, idx) => ({
+      ...eq,
+      serviceRequested: idx === 0 ? catDef.sampleEnquiryService : `${catDef.label} Consultation`,
+    }));
+  }, [vendorProfile?.category, catDef]);
+
   const [enquiries, setEnquiries] = useState<VendorEnquiry[]>(
-    INITIAL_VENDOR_ENQUIRIES
+    initialEnquiries
   );
+
+  useEffect(() => {
+    setEnquiries(initialEnquiries);
+  }, [initialEnquiries]);
+
   const [selectedEnquiryId, setSelectedEnquiryId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 

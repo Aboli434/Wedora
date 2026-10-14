@@ -56,9 +56,6 @@ export function StudioExperience({ profile, onSave }: StudioExperienceProps) {
         <div>
           <div className="flex items-center gap-2">
             <h2 className="font-serif text-2xl text-[#2C2A29]">Experience &amp; team</h2>
-            <span className="text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded bg-amber-50 text-amber-900 border border-amber-200">
-              ILLUSTRATIVE DEMO
-            </span>
           </div>
           <p className="text-xs text-[#6E6B65] mt-1">
             Studio operational history and core team capacity.
@@ -133,10 +130,7 @@ export function StudioExperience({ profile, onSave }: StudioExperienceProps) {
             </div>
           </div>
 
-          <div className="pt-2 border-t border-[#E8E2D9] flex flex-wrap items-center justify-between gap-4">
-            <p className="text-xs text-[#8C857B] italic">
-              Illustrative demo data — changes reset after refresh.
-            </p>
+          <div className="pt-2 border-t border-[#E8E2D9] flex flex-wrap items-center justify-end gap-4">
             <div className="flex items-center gap-3">
               <button
                 type="button"

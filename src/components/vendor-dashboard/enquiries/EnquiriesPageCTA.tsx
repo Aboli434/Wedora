@@ -3,8 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import { ExternalLink } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 export const EnquiriesPageCTA: React.FC = () => {
+  const user = useAuthStore((s) => s.user);
+  const vendorSlug = (user?.profile as { slug?: string } | null)?.slug;
+  const publicProfileUrl = vendorSlug ? `/vendors/${vendorSlug}` : "/vendors";
+
   return (
     <section className="mt-16 py-12 px-8 bg-[#161514] text-[#FAF8F5] text-center border border-[#161514]">
       <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#C5A880] block mb-2">
@@ -17,7 +22,7 @@ export const EnquiriesPageCTA: React.FC = () => {
         Keep the details close, respond thoughtfully, and turn the right conversations into lasting work.
       </p>
       <Link
-        href="/vendors/the-frame-house"
+        href={publicProfileUrl}
         target="_blank"
         rel="noopener noreferrer"
         className="inline-flex items-center gap-2 px-6 py-3 bg-[#C5A880] text-[#161514] text-xs uppercase tracking-wider font-medium hover:bg-[#C5A880]/90 transition-colors"

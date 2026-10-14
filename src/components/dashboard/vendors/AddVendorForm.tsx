@@ -177,9 +177,9 @@ export function AddVendorForm({
           </button>
         </div>
 
-        {/* Demo Notice */}
+        {/* Workspace Notice */}
         <div className="p-3 bg-[#161514]/5 border border-[#161514]/10 text-xs font-sans text-[#5A5650]">
-          <strong>Note:</strong> Record external vendor contracts or shortlist partners. Data updates your local demo session in real-time.
+          <strong>Note:</strong> Record external vendor contracts or shortlist partners to keep all creative team details organized in your workspace.
         </div>
 
         {/* Success Alert */}

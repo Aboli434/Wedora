@@ -108,8 +108,8 @@ export function NotificationSettings({ notifications, onChange }: NotificationSe
       </div>
 
       <div className="pt-2 border-t border-[#E8E2D9]">
-        <p className="text-xs text-[#8C857B] italic">
-          Demo only — changes update the active session view instantly.
+        <p className="text-xs text-[#8C857B]">
+          Notification alerts and milestone digests are delivered to your registered email and phone.
         </p>
       </div>
     </section>

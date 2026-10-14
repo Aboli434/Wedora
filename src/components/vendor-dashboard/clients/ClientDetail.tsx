@@ -104,7 +104,7 @@ export const ClientDetail: React.FC<ClientDetailProps> = ({
           {/* Operational Completeness Bar */}
           <ClientCompletion client={client} />
 
-          {/* Direct Communication Actions (Demo) */}
+          {/* Direct Communication Actions */}
           <ClientContactActions client={client} />
 
           {/* Connected Contract Bookings */}

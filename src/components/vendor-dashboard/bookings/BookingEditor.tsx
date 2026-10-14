@@ -208,7 +208,7 @@ export const BookingEditor: React.FC<BookingEditorProps> = ({
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="couple@weddingdemo.in"
+                placeholder="couple@example.com"
                 className="w-full p-2.5 bg-white border border-[#161514]/20 focus:outline-none focus:ring-1 focus:ring-[#C5A880]"
               />
             </div>

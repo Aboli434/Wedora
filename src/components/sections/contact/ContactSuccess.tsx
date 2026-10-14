@@ -33,7 +33,7 @@ export function ContactSuccess({ onReset }: ContactSuccessProps) {
           We have your starting point.
         </h3>
         <p className="font-sans text-base sm:text-lg text-[#5A5650] font-light leading-relaxed max-w-xl">
-          Your enquiry has been captured for this demonstration. In the connected Wedora experience, this is where your conversation would begin.
+          Your enquiry has been received. Our wedding concierge team will review your celebration vision and reach out to you shortly.
         </p>
       </div>
 
@@ -64,8 +64,8 @@ export function ContactSuccess({ onReset }: ContactSuccessProps) {
           <span>Start another enquiry</span>
         </button>
 
-        <span className="text-[11px] text-[#5A5650] italic">
-          Frontend Demonstration Mode
+        <span className="text-[11px] text-[#5A5650]">
+          Wedora Concierge Direct
         </span>
       </div>
     </motion.div>

@@ -23,7 +23,7 @@ export function EventOverview({ summary }: EventOverviewProps) {
         </div>
         <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#161514]/5 border border-[#161514]/15 text-[10px] font-mono tracking-widest uppercase text-[#5A5650]">
           <span className="w-1.5 h-1.5 rounded-full bg-[#C5A880]" />
-          ILLUSTRATIVE DEMO
+          ACTIVE ITINERARY
         </span>
       </div>
 

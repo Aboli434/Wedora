@@ -112,14 +112,6 @@ export default function VendorReviewsPage() {
     });
   };
 
-  const handleResetDemoData = () => {
-    setReviews(INITIAL_VENDOR_REVIEWS);
-    setRequests(INITIAL_REVIEW_REQUESTS);
-    handleResetFilters();
-    setSelectedReviewId(null);
-    setSelectedRequestId(null);
-  };
-
   const handleMetricSelect = (metricKey: string) => {
     setActiveTab("reviews");
     handleResetFilters();
@@ -241,7 +233,6 @@ export default function VendorReviewsPage() {
         {/* Page Header */}
         <ReviewsPageHeader
           onRequestReview={() => setIsRequestEditorOpen(true)}
-          onResetData={handleResetDemoData}
         />
 
         {/* Reviews Overview Metrics */}

@@ -2,7 +2,8 @@
 
 import React from "react";
 import Link from "next/link";
-import { ExternalLink, Sparkles, Filter } from "lucide-react";
+import { ExternalLink, Filter } from "lucide-react";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface EnquiriesPageHeaderProps {
   onFilterNew: () => void;
@@ -11,6 +12,9 @@ interface EnquiriesPageHeaderProps {
 export const EnquiriesPageHeader: React.FC<EnquiriesPageHeaderProps> = ({
   onFilterNew,
 }) => {
+  const user = useAuthStore((s) => s.user);
+  const vendorSlug = (user?.profile as { slug?: string } | null)?.slug;
+  const publicProfileUrl = vendorSlug ? `/vendors/${vendorSlug}` : "/vendors";
   return (
     <header className="mb-10 pb-8 border-b border-[#161514]/10">
       {/* Breadcrumb */}
@@ -55,7 +59,7 @@ export const EnquiriesPageHeader: React.FC<EnquiriesPageHeaderProps> = ({
             View New Enquiries
           </button>
           <Link
-            href="/vendors/the-frame-house"
+            href={publicProfileUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 px-4 py-2.5 border border-[#161514]/20 text-[#161514] text-xs uppercase tracking-wider font-medium hover:bg-[#161514]/5 transition-colors focus:outline-none focus:ring-2 focus:ring-[#C5A880] focus:ring-offset-2"
@@ -64,14 +68,6 @@ export const EnquiriesPageHeader: React.FC<EnquiriesPageHeaderProps> = ({
             <ExternalLink className="w-3.5 h-3.5 text-[#5A5650]" />
           </Link>
         </div>
-      </div>
-
-      {/* Subtle demo notice */}
-      <div className="mt-6 inline-flex items-center gap-2 px-3 py-1.5 bg-[#C5A880]/10 border border-[#C5A880]/20 text-[#161514] text-xs">
-        <Sparkles className="w-3.5 h-3.5 text-[#C5A880]" />
-        <span>
-          <strong>Demo workspace</strong> — enquiry messaging will connect to the backend later.
-        </span>
       </div>
     </header>
   );

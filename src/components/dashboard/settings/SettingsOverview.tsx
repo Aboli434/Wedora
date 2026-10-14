@@ -58,7 +58,7 @@ export function SettingsOverview({
           </h2>
         </div>
         <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#161514]/5 border border-[#161514]/15 text-[10px] font-mono tracking-widest uppercase text-[#5A5650]">
-          DEMO WORKSPACE
+          CLIENT WORKSPACE
         </span>
       </div>
 

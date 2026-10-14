@@ -7,7 +7,6 @@ import { FileText, CreditCard } from "lucide-react";
 interface PaymentsPageHeaderProps {
   onRecordPayment: () => void;
   onCreateInvoice: () => void;
-  onResetData?: () => void;
 }
 
 export const PaymentsPageHeader: React.FC<PaymentsPageHeaderProps> = ({

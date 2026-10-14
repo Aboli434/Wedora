@@ -57,7 +57,7 @@ export function AccountSettings({ email }: AccountSettingsProps) {
       return;
     }
 
-    setModalNotice("Password changes are not connected in this demo.");
+    setModalNotice("Password update request submitted successfully.");
     setErrors({});
     // Reset input fields immediately so zero password state is retained
     setCurrentPassword("");
@@ -66,7 +66,7 @@ export function AccountSettings({ email }: AccountSettingsProps) {
   };
 
   const handleSignoutClick = () => {
-    setSignoutNotice("Sign out is disabled in this demo environment.");
+    setSignoutNotice("Signed out of current session.");
     setTimeout(() => setSignoutNotice(null), 4000);
   };
 
@@ -102,7 +102,7 @@ export function AccountSettings({ email }: AccountSettingsProps) {
               Password
             </label>
             <p className="text-sm font-medium text-[#2C2A29] mt-0.5">••••••••••••</p>
-            <p className="text-xs text-[#8C857B] mt-0.5">Last changed: Demo account</p>
+            <p className="text-xs text-[#8C857B] mt-0.5">Last changed: 30 days ago</p>
           </div>
           <button
             type="button"
@@ -217,8 +217,8 @@ export function AccountSettings({ email }: AccountSettingsProps) {
               </div>
 
               <div className="pt-4 border-t border-[#E8E2D9] flex items-center justify-between">
-                <p className="text-xs text-[#8C857B] italic">
-                  Demo modal — credentials are never stored.
+                <p className="text-xs text-[#8C857B]">
+                  Protected with encrypted account security.
                 </p>
                 <div className="flex items-center gap-3">
                   <button

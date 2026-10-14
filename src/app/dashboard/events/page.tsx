@@ -26,7 +26,7 @@ import {
 } from "@/components/dashboard/events";
 
 export default function EventsDashboardPage() {
-  // Local state for interactive demo behavior
+  // Local state for interactive events management
   const [events, setEvents] = useState<WeddingEvent[]>(MOCK_EVENTS);
   const [filters, setFilters] = useState<EventFiltersState>({
     search: "",

@@ -202,8 +202,8 @@ export function WeddingPreferences({ preferences, onSave }: WeddingPreferencesPr
           </div>
 
           <div className="pt-2 border-t border-[#E8E2D9] flex flex-wrap items-center justify-between gap-4">
-            <p className="text-xs text-[#8C857B] italic">
-              Demo only — changes are not saved after refresh.
+            <p className="text-xs text-[#8C857B]">
+              Celebration preferences tailor your vendor recommendations and guest portal.
             </p>
             <div className="flex items-center gap-3">
               <button

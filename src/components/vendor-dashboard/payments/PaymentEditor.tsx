@@ -285,7 +285,7 @@ export const PaymentEditor: React.FC<PaymentEditorProps> = ({
             </div>
 
             <div className="p-3 bg-[#FAF8F5] border border-[#161514]/10 rounded-sm text-[11px] text-[#5A5650]">
-              <strong>Demo Action Notice:</strong> Demo only — no real money movement or payment gateway processing will occur.
+              <strong>Accounting Entry:</strong> Recording this transaction updates your studio balance sheet and receipt ledger.
             </div>
 
             {/* Buttons */}

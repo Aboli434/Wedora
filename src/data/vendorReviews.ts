@@ -106,11 +106,11 @@ export const INITIAL_VENDOR_REVIEWS: VendorReview[] = [
     rating: 5,
     title: "Unmatched artistry and calm elegance at Jagmandir Palace",
     review:
-      "Riya and The Frame House team captured our 3-day Udaipur celebration with sheer poetry. They managed to be everywhere without ever intruding. The teaser film brought our families to tears. Truly the best investment we made for our wedding.",
+      "The studio team handled our 3-day Udaipur celebration with sheer poetry. They managed to be everywhere without ever intruding. The experience brought our families to tears. Truly the best investment we made for our wedding.",
     status: "PUBLISHED",
     responseStatus: "RESPONDED",
     response:
-      "Aditi & Arjun, hearing this fills our entire team with immense joy. Capturing your sunset pheras at Jagmandir Island Palace was an absolute honor. Thank you for placing your trust in our vision.",
+      "Aditi & Arjun, hearing this fills our entire team with immense joy. Collaborating with you for your celebration at Jagmandir Island Palace was an absolute honor. Thank you for placing your trust in our vision.",
     respondedAt: "2026-08-20T14:30:00Z",
     source: "WEDORA",
     createdAt: "2026-08-18T10:15:00Z",
@@ -183,7 +183,7 @@ export const INITIAL_VENDOR_REVIEWS: VendorReview[] = [
     rating: 5,
     title: "Captured the emotion and tradition beautifully",
     review:
-      "From the candid tears during Vidaai to the high-energy Sangeet dances, The Frame House captured every detail. The physical coffee table album quality is superior to anything we have seen.",
+      "From the emotional moments during Vidaai to the high-energy Sangeet dances, the studio team executed every detail flawlessly. The quality and presentation was superior to anything we had envisioned.",
     status: "PUBLISHED",
     responseStatus: "RESPONDED",
     response:
@@ -257,9 +257,9 @@ export const INITIAL_VENDOR_REVIEWS: VendorReview[] = [
     destination: "Jaipur",
     weddingDate: "2026-09-05",
     rating: 2,
-    title: "Demo review entry - Schedule misunderstanding note",
+    title: "Minor schedule coordination delay during evening ceremony",
     review:
-      "This is a demo sample entry illustrating a flagged or lower-rated feedback scenario regarding ceremony schedule timing.",
+      "The artistry was high quality, but there was miscommunication regarding arrival timing for the evening ceremony. The studio team addressed it constructively afterwards.",
     status: "FLAGGED",
     responseStatus: "NOT_RESPONDED",
     source: "DIRECT",

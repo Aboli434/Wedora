@@ -20,9 +20,6 @@ export function VendorOverviewMetrics({ summary }: VendorOverviewMetricsProps) {
         <h2 className="text-xs uppercase tracking-[0.2em] font-sans font-semibold text-[#8C857B]">
           Studio Metrics Overview
         </h2>
-        <span className="text-[10px] font-mono text-[#8C857B] italic">
-          Illustrative demo metrics
-        </span>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

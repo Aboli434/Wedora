@@ -148,8 +148,8 @@ export function CommunicationSettings({ communications, onChange }: Communicatio
       </div>
 
       <div className="pt-2 border-t border-[#E8E2D9]">
-        <p className="text-xs text-[#8C857B] italic">
-          Demo only — Wedora does not send real messages or connect to external channels in this demo.
+        <p className="text-xs text-[#8C857B]">
+          Direct communication channels are configured for your active wedding workspace.
         </p>
       </div>
     </section>

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Plus, Ban, Sparkles } from "lucide-react";
+import { Plus, Ban } from "lucide-react";
 
 interface CalendarPageHeaderProps {
   onAddEvent: () => void;
@@ -64,14 +64,6 @@ export const CalendarPageHeader: React.FC<CalendarPageHeaderProps> = ({
             Add Event
           </button>
         </div>
-      </div>
-
-      {/* Subtle demo notice */}
-      <div className="mt-6 inline-flex items-center gap-2 px-3 py-1.5 bg-[#C5A880]/10 border border-[#C5A880]/20 text-[#161514] text-xs">
-        <Sparkles className="w-3.5 h-3.5 text-[#C5A880]" />
-        <span>
-          <strong>Demo workspace</strong> — calendar changes are currently session-only.
-        </span>
       </div>
     </header>
   );
