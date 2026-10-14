@@ -3,7 +3,7 @@ import { requireRole } from '@/lib/auth';
 import { UserRole, Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { apiResponse } from '@/lib/apiResponse';
-import { ValidationError } from '@/lib/errors';
+import { ValidationError, NotFoundError } from '@/lib/errors';
 
 export async function GET(request: NextRequest) {
   try {
@@ -98,6 +98,56 @@ export async function PATCH(request: NextRequest) {
       },
       200,
       'Vendor status updated successfully'
+    );
+  } catch (error) {
+    return apiResponse.handleError(error);
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  try {
+    await requireRole(UserRole.ADMIN);
+
+    const searchParams = request.nextUrl.searchParams;
+    const vendorId = searchParams.get('vendorId');
+
+    if (!vendorId) {
+      throw new ValidationError('Vendor ID is required');
+    }
+
+    const vendor = await prisma.vendorProfile.findUnique({
+      where: { id: vendorId },
+      include: { user: true },
+    });
+
+    if (!vendor) {
+      throw new NotFoundError('Vendor not found');
+    }
+
+    const wasVerified = vendor.verified;
+    const userId = vendor.userId;
+
+    // Delete the vendor profile record
+    await prisma.vendorProfile.delete({
+      where: { id: vendorId },
+    });
+
+    // If the associated user is purely a vendor, mark account inactive
+    if (vendor.user && vendor.user.role === UserRole.VENDOR) {
+      await prisma.user.update({
+        where: { id: userId },
+        data: { isActive: false },
+      });
+    }
+
+    return apiResponse.success(
+      {
+        vendorId,
+        wasVerified,
+        businessName: vendor.businessName,
+      },
+      200,
+      'Vendor profile rejected and removed successfully'
     );
   } catch (error) {
     return apiResponse.handleError(error);

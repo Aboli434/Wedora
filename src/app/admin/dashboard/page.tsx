@@ -203,6 +203,67 @@ export default function AdminDashboardPage() {
     }
   };
 
+  const handleRejectVendor = async (vendorId: string, businessName: string) => {
+    const confirmed = window.confirm(
+      `Are you sure you want to reject and remove "${businessName}"? This vendor profile will be permanently deleted from the platform.`
+    );
+    if (!confirmed) return;
+
+    setActionLoadingId(vendorId);
+    setFeedbackMessage(null);
+
+    try {
+      const supabase = createClient();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      const authHeaders: Record<string, string> = {};
+      if (session?.access_token) {
+        authHeaders["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
+      const res = await fetch(`/api/v1/admin/vendors?vendorId=${vendorId}`, {
+        method: "DELETE",
+        headers: authHeaders,
+      });
+
+      const json = await res.json();
+      if (res.ok && json.success) {
+        const removed = vendors.find((v) => v.id === vendorId);
+        setVendors((prev) => prev.filter((v) => v.id !== vendorId));
+        if (stats && removed) {
+          setStats({
+            ...stats,
+            totalVendors: Math.max(0, stats.totalVendors - 1),
+            verifiedVendors: removed.verified
+              ? Math.max(0, stats.verifiedVendors - 1)
+              : stats.verifiedVendors,
+            pendingVendors: !removed.verified
+              ? Math.max(0, stats.pendingVendors - 1)
+              : stats.pendingVendors,
+          });
+        }
+        setFeedbackMessage({
+          type: "success",
+          text: `Vendor "${businessName}" has been rejected and removed from the platform.`,
+        });
+      } else {
+        setFeedbackMessage({
+          type: "error",
+          text: json.message || "Failed to reject vendor.",
+        });
+      }
+    } catch {
+      setFeedbackMessage({
+        type: "error",
+        text: "Network error while rejecting vendor.",
+      });
+    } finally {
+      setActionLoadingId(null);
+    }
+  };
+
   const handleLogout = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
@@ -249,29 +310,23 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-3">
             <Link
-              href="/dashboard"
+              href="/"
+              target="_blank"
               className="px-3.5 py-2 bg-[#F3EFEA] hover:bg-[#EBE5DE] text-[#161514] text-xs font-semibold tracking-wider uppercase border border-[#161514]/15 rounded-xs transition-colors inline-flex items-center gap-1.5"
             >
-              <span>Client Dashboard</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-
-            <Link
-              href="/vendor/dashboard"
-              className="px-3.5 py-2 bg-[#F3EFEA] hover:bg-[#EBE5DE] text-[#161514] text-xs font-semibold tracking-wider uppercase border border-[#161514]/15 rounded-xs transition-colors inline-flex items-center gap-1.5"
-            >
-              <span>Vendor Studio</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ExternalLink className="w-3.5 h-3.5 text-[#5A5650]" />
+              <span>Live Website</span>
             </Link>
 
             <button
               onClick={handleLogout}
-              className="p-2 text-[#5A5650] hover:text-[#161514] hover:bg-[#F3EFEA] rounded-xs transition-colors"
+              className="px-3.5 py-2 bg-[#161514] hover:bg-red-700 text-[#FAF8F5] text-xs font-semibold tracking-wider uppercase rounded-xs transition-colors inline-flex items-center gap-1.5 shadow-xs"
               title="Sign Out"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-3.5 h-3.5" />
+              <span>Sign Out</span>
             </button>
           </div>
         </div>
@@ -530,13 +585,13 @@ export default function AdminDashboardPage() {
                         {/* Actions */}
                         <td className="py-4 px-6 text-right">
                           <div className="inline-flex items-center gap-2 justify-end">
-                            {/* Toggle Verification (Answers user request: "kuthun off karu") */}
+                            {/* Toggle Verification */}
                             <button
                               onClick={() => handleToggleVerification(vendor.id, vendor.verified)}
                               disabled={isOperating}
                               className={`px-3 py-1.5 rounded-xs text-xs font-semibold uppercase tracking-wider transition-colors disabled:opacity-50 ${
                                 vendor.verified
-                                  ? "bg-red-50 text-red-700 border border-red-200 hover:bg-red-100"
+                                  ? "bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100"
                                   : "bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs"
                               }`}
                               title={
@@ -550,6 +605,17 @@ export default function AdminDashboardPage() {
                                 : vendor.verified
                                 ? "Turn OFF Verification"
                                 : "✓ Verify Vendor"}
+                            </button>
+
+                            {/* Reject / Delete Vendor */}
+                            <button
+                              onClick={() => handleRejectVendor(vendor.id, vendor.businessName)}
+                              disabled={isOperating}
+                              className="px-2.5 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-semibold uppercase tracking-wider rounded-xs transition-colors disabled:opacity-50 inline-flex items-center gap-1"
+                              title="Reject and remove fake or unapproved vendor"
+                            >
+                              <XCircle className="w-3.5 h-3.5" />
+                              <span>Reject</span>
                             </button>
 
                             {/* Toggle Featured */}
