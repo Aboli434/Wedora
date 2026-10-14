@@ -40,11 +40,9 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set, get) => {
-  const cached = getCachedUser();
-
   return {
-    user: cached,
-    loading: !cached,
+    user: null,
+    loading: true,
     isInitialized: false,
 
     setUser: (user) => {
@@ -55,6 +53,12 @@ export const useAuthStore = create<AuthState>((set, get) => {
     initialize: async () => {
       if (typeof window === "undefined") return;
       if (get().isInitialized) return;
+
+      // Restore from localStorage immediately on client mount
+      const cached = getCachedUser();
+      if (cached && !get().user) {
+        set({ user: cached, loading: false });
+      }
 
       const supabase = createClient();
 

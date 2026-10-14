@@ -71,6 +71,11 @@ export function Navbar() {
   }, [isMobileMenuOpen]);
 
   const { user, isAuthenticated, loading, logout } = useAuth();
+  const [mounted, setMounted] = useState<boolean>(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   if (
     pathname?.startsWith("/dashboard") ||
@@ -239,7 +244,7 @@ export function Navbar() {
               variants={navItemVariants}
               className="hidden lg:flex items-center space-x-3"
             >
-              {isAuthenticated ? (
+              {mounted && isAuthenticated ? (
                 <Link href={dashboardHref}>
                   <Button
                     variant="primary"
@@ -361,7 +366,7 @@ export function Navbar() {
                 <span className="caption text-[10px] tracking-[0.25em] text-[var(--accent-gold)] uppercase font-semibold block">
                   ACCOUNT
                 </span>
-                {isAuthenticated ? (
+                {mounted && isAuthenticated ? (
                   <div className="flex flex-col space-y-3">
                     <div className="text-xs text-[var(--text-secondary)] font-sans">
                       Signed in as <span className="font-medium text-[var(--text-primary)]">{user?.fullName || user?.email}</span>

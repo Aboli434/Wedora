@@ -27,6 +27,11 @@ export function LoginForm() {
   const router = useRouter();
 
   const { user, isAuthenticated, dashboardHref, logout } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [userRole, setUserRole] = useState<"CLIENT" | "VENDOR" | "ADMIN" | null>(null);
 
@@ -139,7 +144,7 @@ export function LoginForm() {
     return <AuthSuccess type="login" role={userRole} onReset={handleReset} />;
   }
 
-  if (isAuthenticated && user) {
+  if (mounted && isAuthenticated && user) {
     return (
       <div className="space-y-8 bg-[#FAF8F5] p-8 sm:p-10 border border-[#161514]/15">
         <div className="flex items-center gap-3">
