@@ -14,12 +14,14 @@ interface BookingListItemProps {
   booking: VendorBooking;
   onSelect: (booking: VendorBooking) => void;
   isSelected?: boolean;
+  variant?: "row" | "card";
 }
 
 export const BookingListItem: React.FC<BookingListItemProps> = ({
   booking,
   onSelect,
   isSelected = false,
+  variant = "row",
 }) => {
   const outstanding = calculateAmountOutstanding(booking);
 
@@ -54,17 +56,54 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
     }
   };
 
-  return (
-    <>
-      {/* Desktop Table Row */}
-      <tr
+  if (variant === "card") {
+    return (
+      <div
         onClick={() => onSelect(booking)}
-        className={`hidden md:table-row border-b border-[#161514]/10 cursor-pointer transition-colors group ${
-          isSelected
-            ? "bg-[#161514]/5"
-            : "hover:bg-[#161514]/[0.02]"
-        }`}
+        className="p-4 border border-[#161514]/10 mb-3 bg-[#FAF8F5] cursor-pointer hover:border-[#161514]/30 transition-all"
       >
+        <div className="flex items-center justify-between mb-2">
+          <span
+            className={`text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 ${getStatusBadge(
+              booking.bookingStatus
+            )}`}
+          >
+            {formatBookingStatus(booking.bookingStatus)}
+          </span>
+          <span className="text-[10px] font-mono text-[#5A5650]">
+            {booking.bookingReference}
+          </span>
+        </div>
+
+        <h3 className="font-serif text-lg font-medium text-[#161514] mb-1">
+          {booking.coupleName}
+          {booking.partnerName ? ` & ${booking.partnerName}` : ""}
+        </h3>
+
+        <p className="text-xs text-[#5A5650] mb-2">{booking.serviceName}</p>
+
+        <div className="flex items-center justify-between text-xs text-[#5A5650] pt-2 border-t border-[#161514]/10">
+          <div className="flex items-center gap-1">
+            <MapPin className="w-3 h-3 text-[#5A5650]/70" />
+            <span>{booking.destination}</span>
+          </div>
+          <div className="font-semibold text-[#161514]">
+            {formatIndianCurrency(booking.totalAmount)}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <tr
+      onClick={() => onSelect(booking)}
+      className={`border-b border-[#161514]/10 cursor-pointer transition-colors group ${
+        isSelected
+          ? "bg-[#161514]/5"
+          : "hover:bg-[#161514]/[0.02]"
+      }`}
+    >
         {/* Couple & Ref */}
         <td className="py-4 px-4 text-xs">
           <div>
@@ -145,42 +184,5 @@ export const BookingListItem: React.FC<BookingListItemProps> = ({
           </button>
         </td>
       </tr>
-
-      {/* Mobile Stacked Card View */}
-      <div
-        onClick={() => onSelect(booking)}
-        className="md:hidden p-4 border border-[#161514]/10 mb-3 bg-[#FAF8F5] cursor-pointer hover:border-[#161514]/30 transition-all"
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span
-            className={`text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 ${getStatusBadge(
-              booking.bookingStatus
-            )}`}
-          >
-            {formatBookingStatus(booking.bookingStatus)}
-          </span>
-          <span className="text-[10px] font-mono text-[#5A5650]">
-            {booking.bookingReference}
-          </span>
-        </div>
-
-        <h3 className="font-serif text-lg font-medium text-[#161514] mb-1">
-          {booking.coupleName}
-          {booking.partnerName ? ` & ${booking.partnerName}` : ""}
-        </h3>
-
-        <p className="text-xs text-[#5A5650] mb-2">{booking.serviceName}</p>
-
-        <div className="flex items-center justify-between text-xs text-[#5A5650] pt-2 border-t border-[#161514]/10">
-          <div className="flex items-center gap-1">
-            <MapPin className="w-3 h-3 text-[#5A5650]/70" />
-            <span>{booking.destination}</span>
-          </div>
-          <div className="font-semibold text-[#161514]">
-            {formatIndianCurrency(booking.totalAmount)}
-          </div>
-        </div>
-      </div>
-    </>
-  );
+    );
 };

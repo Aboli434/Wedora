@@ -12,28 +12,81 @@ interface ReviewListItemProps {
   review: VendorReview;
   isSelected: boolean;
   onSelect: () => void;
+  variant?: "row" | "card";
 }
 
 export const ReviewListItem: React.FC<ReviewListItemProps> = ({
   review,
   isSelected,
   onSelect,
+  variant = "row",
 }) => {
   const isResponded = review.responseStatus === "RESPONDED";
   const isFlagged = review.status === "FLAGGED";
   const isHidden = review.status === "HIDDEN";
 
-  return (
-    <>
-      {/* DESKTOP TABLE ROW */}
-      <tr
+  if (variant === "card") {
+    return (
+      <div
         onClick={onSelect}
-        className={`hidden md:table-row cursor-pointer transition-colors border-b border-[#161514]/10 ${
+        className={`p-4 border rounded-sm transition-all cursor-pointer bg-[#FAF8F5] mb-3 ${
           isSelected
-            ? "bg-[#C5A880]/15"
-            : "bg-[#FAF8F5] hover:bg-white"
+            ? "border-[#C5A880] ring-1 ring-[#C5A880]"
+            : "border-[#161514]/10 hover:border-[#C5A880]"
         }`}
       >
+        <div className="flex items-center justify-between gap-2 mb-2">
+          <div className="flex items-center gap-1 text-[#C5A880]">
+            <span className="font-serif text-sm font-bold text-[#161514] mr-1">
+              {review.rating}.0
+            </span>
+            {[1, 2, 3, 4, 5].map((s) => (
+              <Star
+                key={s}
+                className={`w-3 h-3 ${
+                  s <= review.rating
+                    ? "fill-[#C5A880] text-[#C5A880]"
+                    : "text-[#161514]/20"
+                }`}
+              />
+            ))}
+          </div>
+
+          <span
+            className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-xs font-sans ${
+              isResponded
+                ? "bg-emerald-100 text-emerald-900"
+                : "bg-amber-100 text-amber-900"
+            }`}
+          >
+            {formatResponseStatus(review.responseStatus)}
+          </span>
+        </div>
+
+        <h4 className="font-serif text-base font-medium text-[#161514] mb-1">
+          &quot;{review.title}&quot;
+        </h4>
+        <p className="text-xs text-[#5A5650] font-sans leading-relaxed mb-3 line-clamp-2">
+          {review.review}
+        </p>
+
+        <div className="pt-2 border-t border-[#161514]/10 flex items-center justify-between text-xs font-sans text-[#5A5650]">
+          <span>{review.reviewerName} ({review.coupleName})</span>
+          <span>{review.createdAt.split("T")[0]}</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <tr
+      onClick={onSelect}
+      className={`border-b border-[#161514]/10 cursor-pointer transition-colors ${
+        isSelected
+          ? "bg-[#C5A880]/15"
+          : "bg-[#FAF8F5] hover:bg-white"
+      }`}
+    >
         {/* Reviewer & Couple */}
         <td className="py-4 px-4 align-middle">
           <div className="flex items-center gap-3">
@@ -131,56 +184,5 @@ export const ReviewListItem: React.FC<ReviewListItemProps> = ({
           </button>
         </td>
       </tr>
-
-      {/* MOBILE CARD VIEW */}
-      <div
-        onClick={onSelect}
-        className={`md:hidden p-4 border rounded-sm transition-all cursor-pointer bg-[#FAF8F5] mb-3 ${
-          isSelected
-            ? "border-[#C5A880] ring-1 ring-[#C5A880]"
-            : "border-[#161514]/10 hover:border-[#C5A880]"
-        }`}
-      >
-        <div className="flex items-center justify-between gap-2 mb-2">
-          <div className="flex items-center gap-1 text-[#C5A880]">
-            <span className="font-serif text-sm font-bold text-[#161514] mr-1">
-              {review.rating}.0
-            </span>
-            {[1, 2, 3, 4, 5].map((s) => (
-              <Star
-                key={s}
-                className={`w-3 h-3 ${
-                  s <= review.rating
-                    ? "fill-[#C5A880] text-[#C5A880]"
-                    : "text-[#161514]/20"
-                }`}
-              />
-            ))}
-          </div>
-
-          <span
-            className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-xs font-sans ${
-              isResponded
-                ? "bg-emerald-100 text-emerald-900"
-                : "bg-amber-100 text-amber-900"
-            }`}
-          >
-            {formatResponseStatus(review.responseStatus)}
-          </span>
-        </div>
-
-        <h4 className="font-serif text-base font-medium text-[#161514] mb-1">
-          &quot;{review.title}&quot;
-        </h4>
-        <p className="text-xs text-[#5A5650] font-sans leading-relaxed mb-3 line-clamp-2">
-          {review.review}
-        </p>
-
-        <div className="pt-2 border-t border-[#161514]/10 flex items-center justify-between text-xs font-sans text-[#5A5650]">
-          <span>{review.reviewerName} ({review.coupleName})</span>
-          <span>{review.createdAt.split("T")[0]}</span>
-        </div>
-      </div>
-    </>
-  );
+    );
 };

@@ -13,12 +13,14 @@ interface EnquiryListItemProps {
   enquiry: VendorEnquiry;
   onSelect: (enquiry: VendorEnquiry) => void;
   isSelected?: boolean;
+  variant?: "row" | "card";
 }
 
 export const EnquiryListItem: React.FC<EnquiryListItemProps> = ({
   enquiry,
   onSelect,
   isSelected = false,
+  variant = "row",
 }) => {
   const dueInfo = calculateResponseDueStatus(enquiry);
 
@@ -55,19 +57,69 @@ export const EnquiryListItem: React.FC<EnquiryListItemProps> = ({
     }
   };
 
-  return (
-    <>
-      {/* Desktop Table Row */}
-      <tr
+  if (variant === "card") {
+    return (
+      <div
         onClick={() => onSelect(enquiry)}
-        className={`hidden md:table-row border-b border-[#161514]/10 cursor-pointer transition-colors group ${
-          isSelected
-            ? "bg-[#161514]/5"
-            : enquiry.unread
-            ? "bg-[#FAF8F5] font-medium hover:bg-[#161514]/[0.03]"
-            : "hover:bg-[#161514]/[0.02]"
+        className={`p-4 border border-[#161514]/10 mb-3 bg-[#FAF8F5] cursor-pointer hover:border-[#161514]/30 transition-all ${
+          enquiry.unread ? "border-l-4 border-l-[#C5A880]" : ""
         }`}
       >
+        <div className="flex items-center justify-between mb-2">
+          <span
+            className={`text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 ${getStatusStyle(
+              enquiry.status
+            )}`}
+          >
+            {formatEnquiryStatus(enquiry.status)}
+          </span>
+          <span className="text-[10px] text-[#5A5650]">
+            {new Date(enquiry.receivedAt).toLocaleDateString("en-IN", {
+              day: "numeric",
+              month: "short",
+            })}
+          </span>
+        </div>
+
+        <h3 className="font-serif text-lg font-medium text-[#161514] mb-1">
+          {enquiry.coupleName}
+          {enquiry.partnerName ? ` & ${enquiry.partnerName}` : ""}
+        </h3>
+
+        <p className="text-xs text-[#5A5650] mb-2">{enquiry.serviceRequested}</p>
+
+        <div className="flex items-center justify-between text-xs text-[#5A5650] pt-2 border-t border-[#161514]/10">
+          <div className="flex items-center gap-1">
+            <MapPin className="w-3 h-3 text-[#5A5650]/70" />
+            <span>{enquiry.destination}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Calendar className="w-3 h-3 text-[#5A5650]/70" />
+            <span>
+              {enquiry.weddingDate
+                ? new Date(enquiry.weddingDate).toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                  })
+                : "TBD"}
+            </span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <tr
+      onClick={() => onSelect(enquiry)}
+      className={`border-b border-[#161514]/10 cursor-pointer transition-colors group ${
+        isSelected
+          ? "bg-[#161514]/5"
+          : enquiry.unread
+          ? "bg-[#FAF8F5] font-medium hover:bg-[#161514]/[0.03]"
+          : "hover:bg-[#161514]/[0.02]"
+      }`}
+    >
         {/* Couple Column */}
         <td className="py-4 px-4 text-xs">
           <div className="flex items-center gap-2.5">
@@ -171,55 +223,5 @@ export const EnquiryListItem: React.FC<EnquiryListItemProps> = ({
           </button>
         </td>
       </tr>
-
-      {/* Mobile Stacked Card View */}
-      <div
-        onClick={() => onSelect(enquiry)}
-        className={`md:hidden p-4 border border-[#161514]/10 mb-3 bg-[#FAF8F5] cursor-pointer hover:border-[#161514]/30 transition-all ${
-          enquiry.unread ? "border-l-4 border-l-[#C5A880]" : ""
-        }`}
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span
-            className={`text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 ${getStatusStyle(
-              enquiry.status
-            )}`}
-          >
-            {formatEnquiryStatus(enquiry.status)}
-          </span>
-          <span className="text-[10px] text-[#5A5650]">
-            {new Date(enquiry.receivedAt).toLocaleDateString("en-IN", {
-              day: "numeric",
-              month: "short",
-            })}
-          </span>
-        </div>
-
-        <h3 className="font-serif text-lg font-medium text-[#161514] mb-1">
-          {enquiry.coupleName}
-          {enquiry.partnerName ? ` & ${enquiry.partnerName}` : ""}
-        </h3>
-
-        <p className="text-xs text-[#5A5650] mb-2">{enquiry.serviceRequested}</p>
-
-        <div className="flex items-center justify-between text-xs text-[#5A5650] pt-2 border-t border-[#161514]/10">
-          <div className="flex items-center gap-1">
-            <MapPin className="w-3 h-3 text-[#5A5650]/70" />
-            <span>{enquiry.destination}</span>
-          </div>
-          <div className="flex items-center gap-1">
-            <Calendar className="w-3 h-3 text-[#5A5650]/70" />
-            <span>
-              {enquiry.weddingDate
-                ? new Date(enquiry.weddingDate).toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "short",
-                  })
-                : "TBD"}
-            </span>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+    );
 };

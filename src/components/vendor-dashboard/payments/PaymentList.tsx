@@ -53,6 +53,7 @@ export const PaymentList: React.FC<PaymentListProps> = ({
               <PaymentListItem
                 key={payment.id}
                 payment={payment}
+                variant="row"
                 isSelected={selectedPaymentId === payment.id}
                 onSelect={() => onSelectPayment(payment.id)}
               />
@@ -67,6 +68,7 @@ export const PaymentList: React.FC<PaymentListProps> = ({
           <PaymentListItem
             key={payment.id}
             payment={payment}
+            variant="card"
             isSelected={selectedPaymentId === payment.id}
             onSelect={() => onSelectPayment(payment.id)}
           />

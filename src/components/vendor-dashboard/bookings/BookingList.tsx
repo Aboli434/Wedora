@@ -68,6 +68,7 @@ export const BookingList: React.FC<BookingListProps> = ({
               <BookingListItem
                 key={booking.id}
                 booking={booking}
+                variant="row"
                 onSelect={onSelectBooking}
                 isSelected={booking.id === selectedBookingId}
               />
@@ -82,6 +83,7 @@ export const BookingList: React.FC<BookingListProps> = ({
           <BookingListItem
             key={booking.id}
             booking={booking}
+            variant="card"
             onSelect={onSelectBooking}
             isSelected={booking.id === selectedBookingId}
           />

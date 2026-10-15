@@ -52,6 +52,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
               <ReviewListItem
                 key={review.id}
                 review={review}
+                variant="row"
                 isSelected={selectedReviewId === review.id}
                 onSelect={() => onSelectReview(review.id)}
               />
@@ -66,6 +67,7 @@ export const ReviewList: React.FC<ReviewListProps> = ({
           <ReviewListItem
             key={review.id}
             review={review}
+            variant="card"
             isSelected={selectedReviewId === review.id}
             onSelect={() => onSelectReview(review.id)}
           />

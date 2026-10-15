@@ -13,12 +13,14 @@ interface ClientListItemProps {
   client: VendorClient;
   onSelect: (client: VendorClient) => void;
   isSelected?: boolean;
+  variant?: "row" | "card";
 }
 
 export const ClientListItem: React.FC<ClientListItemProps> = ({
   client,
   onSelect,
   isSelected = false,
+  variant = "row",
 }) => {
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -37,17 +39,62 @@ export const ClientListItem: React.FC<ClientListItemProps> = ({
     }
   };
 
-  return (
-    <>
-      {/* Desktop Table Row */}
-      <tr
+  if (variant === "card") {
+    return (
+      <div
         onClick={() => onSelect(client)}
-        className={`hidden md:table-row border-b border-[#161514]/10 cursor-pointer transition-colors group ${
-          isSelected
-            ? "bg-[#161514]/5"
-            : "hover:bg-[#161514]/[0.02]"
-        }`}
+        className="p-4 border border-[#161514]/10 mb-3 bg-[#FAF8F5] cursor-pointer hover:border-[#161514]/30 transition-all"
       >
+        <div className="flex items-center justify-between mb-2">
+          <span
+            className={`text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 ${getStatusBadge(
+              client.relationshipStatus
+            )}`}
+          >
+            {formatClientStatus(client.relationshipStatus)}
+          </span>
+          <span className="text-[10px] font-mono text-[#5A5650]">
+            {client.clientReference}
+          </span>
+        </div>
+
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-8 h-8 rounded-full bg-[#161514] text-[#FAF8F5] flex items-center justify-center font-serif text-xs font-medium shrink-0">
+            {client.avatarInitials}
+          </div>
+          <div>
+            <h3 className="font-serif text-lg font-medium text-[#161514]">
+              {client.coupleName}
+              {client.partnerName ? ` & ${client.partnerName}` : ""}
+            </h3>
+            <p className="text-xs text-[#5A5650]">{client.destination}</p>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between text-xs text-[#5A5650] pt-2 border-t border-[#161514]/10">
+          <div>{client.services[0] || "Client Package"}</div>
+          <div className="font-medium text-[#161514]">
+            {client.weddingDate
+              ? new Date(client.weddingDate).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                })
+              : "Flexible"}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <tr
+      onClick={() => onSelect(client)}
+      className={`border-b border-[#161514]/10 cursor-pointer transition-colors group ${
+        isSelected
+          ? "bg-[#161514]/5"
+          : "hover:bg-[#161514]/[0.02]"
+      }`}
+    >
         {/* Client & Initials */}
         <td className="py-4 px-4 text-xs">
           <div className="flex items-center gap-3">
@@ -142,50 +189,5 @@ export const ClientListItem: React.FC<ClientListItemProps> = ({
           </div>
         </td>
       </tr>
-
-      {/* Mobile Stacked Card View */}
-      <div
-        onClick={() => onSelect(client)}
-        className="md:hidden p-4 border border-[#161514]/10 mb-3 bg-[#FAF8F5] cursor-pointer hover:border-[#161514]/30 transition-all"
-      >
-        <div className="flex items-center justify-between mb-2">
-          <span
-            className={`text-[10px] uppercase font-semibold tracking-wider px-2 py-0.5 ${getStatusBadge(
-              client.relationshipStatus
-            )}`}
-          >
-            {formatClientStatus(client.relationshipStatus)}
-          </span>
-          <span className="text-[10px] font-mono text-[#5A5650]">
-            {client.clientReference}
-          </span>
-        </div>
-
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-8 h-8 rounded-full bg-[#161514] text-[#FAF8F5] flex items-center justify-center font-serif text-xs font-medium shrink-0">
-            {client.avatarInitials}
-          </div>
-          <div>
-            <h3 className="font-serif text-lg font-medium text-[#161514]">
-              {client.coupleName}
-              {client.partnerName ? ` & ${client.partnerName}` : ""}
-            </h3>
-            <p className="text-xs text-[#5A5650]">{client.destination}</p>
-          </div>
-        </div>
-
-        <div className="flex items-center justify-between text-xs text-[#5A5650] pt-2 border-t border-[#161514]/10">
-          <div>{client.services[0] || "Client Package"}</div>
-          <div className="font-medium text-[#161514]">
-            {client.weddingDate
-              ? new Date(client.weddingDate).toLocaleDateString("en-IN", {
-                  day: "numeric",
-                  month: "short",
-                })
-              : "Flexible"}
-          </div>
-        </div>
-      </div>
-    </>
-  );
+    );
 };

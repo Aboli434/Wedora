@@ -49,6 +49,7 @@ export function ServiceList({
               <ServiceListItem
                 key={service.id}
                 service={service}
+                variant="row"
                 onEdit={onEdit}
                 onDuplicate={onDuplicate}
                 onToggleVisibility={onToggleVisibility}
@@ -65,6 +66,7 @@ export function ServiceList({
           <ServiceListItem
             key={service.id}
             service={service}
+            variant="card"
             onEdit={onEdit}
             onDuplicate={onDuplicate}
             onToggleVisibility={onToggleVisibility}

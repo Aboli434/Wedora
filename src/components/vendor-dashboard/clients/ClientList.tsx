@@ -71,6 +71,7 @@ export const ClientList: React.FC<ClientListProps> = ({
               <ClientListItem
                 key={client.id}
                 client={client}
+                variant="row"
                 onSelect={onSelectClient}
                 isSelected={client.id === selectedClientId}
               />
@@ -85,6 +86,7 @@ export const ClientList: React.FC<ClientListProps> = ({
           <ClientListItem
             key={client.id}
             client={client}
+            variant="card"
             onSelect={onSelectClient}
             isSelected={client.id === selectedClientId}
           />

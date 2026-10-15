@@ -71,6 +71,7 @@ export const EnquiryList: React.FC<EnquiryListProps> = ({
               <EnquiryListItem
                 key={enquiry.id}
                 enquiry={enquiry}
+                variant="row"
                 onSelect={onSelectEnquiry}
                 isSelected={enquiry.id === selectedEnquiryId}
               />
@@ -85,6 +86,7 @@ export const EnquiryList: React.FC<EnquiryListProps> = ({
           <EnquiryListItem
             key={enquiry.id}
             enquiry={enquiry}
+            variant="card"
             onSelect={onSelectEnquiry}
             isSelected={enquiry.id === selectedEnquiryId}
           />

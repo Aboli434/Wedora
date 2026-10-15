@@ -45,6 +45,13 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
 
   const totalDaysInMonth = lastDayOfMonth.getDate();
 
+  const formatYMD = (d: Date): string => {
+    const yyyy = d.getFullYear();
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    return `${yyyy}-${mm}-${dd}`;
+  };
+
   // Grid cells generation
   const days: { dateStr: string; isCurrentMonth: boolean; dayNumber: number }[] = [];
 
@@ -53,18 +60,14 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
   for (let i = startingDayOfWeek - 1; i >= 0; i--) {
     const prevDay = prevMonthLastDay - i;
     const prevDate = new Date(year, month - 1, prevDay);
-    const dateStr = prevDate.toISOString().split("T")[0];
+    const dateStr = formatYMD(prevDate);
     days.push({ dateStr, isCurrentMonth: false, dayNumber: prevDay });
   }
 
   // Days of current month
   for (let day = 1; day <= totalDaysInMonth; day++) {
     const d = new Date(year, month, day);
-    // Format YYYY-MM-DD manually to avoid timezone shift
-    const yyyy = d.getFullYear();
-    const mm = String(d.getMonth() + 1).padStart(2, "0");
-    const dd = String(day).padStart(2, "0");
-    const dateStr = `${yyyy}-${mm}-${dd}`;
+    const dateStr = formatYMD(d);
     days.push({ dateStr, isCurrentMonth: true, dayNumber: day });
   }
 
@@ -72,7 +75,7 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
   const remainingCells = (7 - (days.length % 7)) % 7;
   for (let day = 1; day <= remainingCells; day++) {
     const nextDate = new Date(year, month + 1, day);
-    const dateStr = nextDate.toISOString().split("T")[0];
+    const dateStr = formatYMD(nextDate);
     days.push({ dateStr, isCurrentMonth: false, dayNumber: day });
   }
 
@@ -120,7 +123,7 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
 
         {/* Month Days Grid */}
         <div className="grid grid-cols-7 divide-x divide-y divide-[#161514]/10">
-          {days.map(({ dateStr, isCurrentMonth, dayNumber }) => {
+          {days.map(({ dateStr, isCurrentMonth, dayNumber }, idx) => {
             const isToday = dateStr === FIXED_TODAY_DATE;
             const isSelected = dateStr === selectedDateStr;
             const dayEvents = getEventsForDate(events, dateStr);
@@ -129,7 +132,7 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
 
             return (
               <div
-                key={dateStr}
+                key={`day-${dateStr}-${isCurrentMonth ? "curr" : "pad"}-${idx}`}
                 onClick={() => onSelectDate(dateStr)}
                 className={`min-h-[100px] sm:min-h-[120px] p-1.5 sm:p-2 cursor-pointer transition-all flex flex-col justify-between group ${
                   !isCurrentMonth ? "bg-gray-50/60 opacity-40" : "bg-white"
